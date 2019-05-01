@@ -1683,6 +1683,12 @@ class test1View extends WatchUi.WatchFace
 				loadProfile(profileNumber);			// will set profileActive
 				//setProfileDelay = true;
 			}
+			else if (profileManagement == 7)		// copy profile to watch settings
+			{
+				loadProfile(profileNumber);			// will set profileActive
+				saveProfile(PROFILE_PRIVATE_INDEX);	// will set profileActive = PROFILE_PRIVATE_INDEX
+				//setProfileDelay = true;
+			}
 			else if (profileManagement == 4)
 			{
 				exportProfile(profileNumber);

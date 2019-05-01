@@ -2730,6 +2730,7 @@
             <listEntry value="1">@Strings.ProfileRetrieveSettings</listEntry>
             <listEntry value="2">@Strings.ProfileSave</listEntry>
             <listEntry value="3">@Strings.ProfileLoad</listEntry>
+            <listEntry value="7">@Strings.ProfileCopy</listEntry>
             <listEntry value="4">@Strings.ProfileExport</listEntry>
             <listEntry value="5">@Strings.ProfileImport</listEntry>
             <listEntry value="6">@Strings.ProfileWasActive</listEntry>

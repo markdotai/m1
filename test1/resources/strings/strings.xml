@@ -4,7 +4,6 @@
     <string id="Unused1">X</string>
     <string id="Unused2">X</string>
     <string id="Unused3">X</string>
-    <string id="Unused4">X</string>
  -->
                 
     <string id="Unused1">X</string>
@@ -108,6 +107,7 @@
     <string id="ProfileRetrieveSettings">Retrieve Watch Settings</string>
     <string id="ProfileSave">Save Profile</string>
     <string id="ProfileLoad">Load Profile</string>
+    <string id="ProfileCopy">Copy Profile To Watch Settings</string>
     <string id="ProfileExport">Export Profile (to text fields below)</string>
     <string id="ProfileImport">Import Profile (from text fields below)</string>
     <string id="ProfileWasActive">Profile Was Active (settings will not be updated)</string>

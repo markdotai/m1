@@ -14,7 +14,7 @@
     <string id="BackgroundColorTitle">Background Color</string>
     
     <string id="TimeOnTitle">Time Display</string>
-    <string id="TimeMilitaryFormatTitle">Time Military Style (when watch set to 24 hour format)</string>
+    <string id="TimeMilitaryFormatTitle">Time Add Leading Zero</string>
     <string id="TimeHourFontTitle">Time Hours Font</string>
     <string id="TimeMinuteFontTitle">Time Minutes Font</string>
     <string id="TimeItalicTitle">Time Custom Fonts Italic</string>

@@ -2209,16 +2209,15 @@ class test1View extends WatchUi.WatchFace
                 
         // Get the current time and format it correctly       
         var hour = clockTime.hour;
-        if (deviceSettings.is24Hour)		// 24 hours - test if military is needed
-        {
-            if (propertiesGetBoolean("3"))		// time military on
-            {
-                hour = hour.format("%02d");
-            }
-        }
-        else        	// 12 hours
+        if (!deviceSettings.is24Hour)	// 12 hours
         {
             hour += ((hour > 12) ? -12 : 0);
+        }
+
+		// check for adding a leading zero
+        if (propertiesGetBoolean("3"))	// time military on
+        {
+            hour = hour.format("%02d");
         }
         
         var minuteString = clockTime.min.format("%02d");

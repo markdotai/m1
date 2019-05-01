@@ -2,6 +2,9 @@
 
 <!-- 
     <string id="Unused1">X</string>
+    <string id="Unused2">X</string>
+    <string id="Unused3">X</string>
+    <string id="Unused4">X</string>
  -->
                 
     <string id="Unused1">X</string>
@@ -206,15 +209,11 @@
     <string id="SecondRefreshEveryMinute">Every Minute</string>
     <string id="SecondRefreshAlternateMinutes">Alternate Minutes</string>
 
-    <string id="CustomFontTiny">Tiny</string>
-    <string id="CustomFontSmall">Small</string>
-    <string id="CustomFontMedium">Medium</string>
-
-    <string id="SystemFontXTiny">System Extra Tiny</string>
-    <string id="SystemFontTiny">System Tiny</string>
-    <string id="SystemFontSmall">System Small</string>
-    <string id="SystemFontMedium">System Medium</string>
-    <string id="SystemFontLarge">System Large</string>
+    <string id="FontXTiny">Extra Tiny</string>
+    <string id="FontTiny">Tiny</string>
+    <string id="FontSmall">Small</string>
+    <string id="FontMedium">Medium</string>
+    <string id="FontLarge">Large</string>
 
     <string id="CustomFontUltraLight">Ultra Light</string>
     <string id="CustomFontExtraLight">Extra Light</string>

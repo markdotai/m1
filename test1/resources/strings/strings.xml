@@ -50,12 +50,12 @@
     <string id="FieldYOffsetTitle">Field Vertical Offset (+-120 pixels from centre)</string>
     <string id="FieldXOffsetTitle">Field Horizontal Offset (+-120 pixels from centre)</string>
     <string id="FieldJustificationTitle">Field Horizontal Justification</string>
-    <string id="FieldElement1Title">Field Element 1</string>
-    <string id="FieldElement2Title">Field Element 2</string>
-    <string id="FieldElement3Title">Field Element 3</string>
-    <string id="FieldElement4Title">Field Element 4</string>
-    <string id="FieldElement5Title">Field Element 5</string>
-    <string id="FieldElement6Title">Field Element 6</string>
+    <string id="FieldElement1Title">Element 1 (of field)</string>
+    <string id="FieldElement2Title">Element 2 (of field)</string>
+    <string id="FieldElement3Title">Element 3 (of field)</string>
+    <string id="FieldElement4Title">Element 4 (of field)</string>
+    <string id="FieldElement5Title">Element 5 (of field)</string>
+    <string id="FieldElement6Title">Element 6 (of field)</string>
 
     <string id="ItemVisibilityTitle">Visible if ... (for item above)</string>
     <string id="ItemAlwaysOn">Always On</string>

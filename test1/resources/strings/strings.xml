@@ -48,7 +48,7 @@
     <string id="FieldBatteryLowPercentageTitle">Status Battery Low Percentage</string>
 
     <string id="FieldManagementTitle">Field Management (turn off/on or retrieve the field settings below)</string>
-    <string id="FieldNumberTitle">Field Number (1-8, each field has 6 elements below)</string>
+    <string id="FieldNumberTitle">Field Number To Manage (1-8, each field has 6 elements below)</string>
     <string id="FieldYOffsetTitle">Field Vertical Offset (+-120 pixels from centre)</string>
     <string id="FieldXOffsetTitle">Field Horizontal Offset (+-120 pixels from centre)</string>
     <string id="FieldJustificationTitle">Field Horizontal Justification</string>

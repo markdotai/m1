@@ -56,6 +56,7 @@ class test1View extends WatchUi.WatchFace
     var propTimeMinuteFont;
 	var propTimeHourColor;
 	var propTimeMinuteColor;
+	var propTimeColon = true;
 	var propTimeItalic;
 	var propTimeYOffset;
     
@@ -489,10 +490,10 @@ class test1View extends WatchUi.WatchFace
 
 	//var worldBitmap;
 
-    var backgroundTimeCharArray = new[4];        
+    var backgroundTimeCharArray = new[5];        
     var backgroundTimeCharArrayLength;
 	var backgroundTimeCharArrayMinuteStart;
-    var backgroundTimeWidthArray = new[4];	        	        
+    var backgroundTimeWidthArray = new[5];	        	        
 	var backgroundTimeTotalWidth;
 	var backgroundTimeXOffset;
 
@@ -566,12 +567,12 @@ class test1View extends WatchUi.WatchFace
 	//	//!APPCHAR_7 = 55,		// digit 7
 	//	//!APPCHAR_8 = 56,		// digit 8
 	//	APPCHAR_9 = 57,		// digit 9
+	//	//!APPCHAR_COLON = 58,	// call this digit 10!
 	//
 	//	APPCHAR_SPACE = 32,
 	//	APPCHAR_COMMA = 44,
 	//	APPCHAR_MINUS = 45,
 	//	//!APPCHAR_DOT = 46,
-	//	//!APPCHAR_COLON = 58,
 	//	//!APPCHAR_f = 102,
 	//	APPCHAR_t = 116,
 	//	//!APPCHAR_F = 70,
@@ -580,28 +581,40 @@ class test1View extends WatchUi.WatchFace
 	//	APPCHAR_CLOSE_SQUARE_BRACKET = 93,
 	//}
 	
-	function getKern(cur, next, appFontCur, appFontNext)
+	function getKern(cur, next, appFontCur, appFontNext, narrow)
 	{
 		var val = 0;
 		
 		var kernTable = [
-					/*76543210    3210  98      987654 */
-		/* 0 & 1 */	0x10F01010, 0x01010000, 0x00218104,
-		/* 2 & 3 */	0x10F20000, 0x10100000, 0x000010F0,
-		/* 4 & 5 */	0x30001020, 0x10100010, 0x001010F0,
-		/* 6 & 7 */	0x10F01010, 0x12400010, 0x000010F6,
-		/* 8 & 9 */	0x10F01010, 0x10100000, 0x000010F0,
+			[
+						/*76543210    3210 :98     :987654 */
+			/* 0 & 1 */	0x10F01010, 0x01010000, 0x04218104,
+			/* 2 & 3 */	0x10F20000, 0x10100100, 0x000010F0,
+			/* 4 & 5 */	0x30001020, 0x10100110, 0x011010F0,
+			/* 6 & 7 */	0x10F01010, 0x12400110, 0x020010F6,
+			/* 8 & 9 */	0x10F01010, 0x10100000, 0x000010F0,
+			/* :     */	0x00012140, 0x00000000,
+			],
+			[			/* NARROW */
+						/*76543210    3210 :98     :987654 */
+			/* 0 & 1 */	0x10000010, 0x00010000, 0x03218104,
+			/* 2 & 3 */	0x10030000, 0x00100000, 0x00001000,
+			/* 4 & 5 */	0x30102020, 0x00100030, 0x00201000,
+			/* 6 & 7 */	0x10000010, 0x12400010, 0x02001006,
+			/* 8 & 9 */	0x10000010, 0x00100000, 0x00001000,
+			/* :     */	0x00002030, 0x00000000,
+			]
 		];
 	
 		var bits = cur*48 + next*4;
 		var byte4 = bits/32;
 	
 		// make sure index inside array
-		if (byte4>=0 && byte4<15)
+		if (byte4>=0 && byte4<17)
 		{
 			bits = bits%32;
 			
-			val = (kernTable[byte4] >> bits) & 0xF;
+			val = (kernTable[narrow?1:0][byte4] >> bits) & 0xF;
 			if (val > 0x8)
 			{
 				val -= 0x10;
@@ -634,158 +647,8 @@ class test1View extends WatchUi.WatchFace
 			}
 		}
 		
-		return val;
-	}	
-	
-//	function getKern2(cur, next, appFontCur, appFontNext)
-//	{
-//		var kernTable = [
-//				/* 3 2 1 0     7 6 5 4         9 8 */
-//		/* 0 */	0x00000000, 0x0000FF00, 0x00000000,
-//		/* 1 */	0x00000000, 0x05000004, 0x00000100,
-//		/* 2 */	0x00000000, 0x0000FF02, 0x00000000,
-//		/* 3 */	0x00000000, 0x0000FF00, 0x00000000,
-//		/* 4 */	0x01000100, 0x02000000, 0x00000100,
-//		/* 5 */	0x00000000, 0x0000FF00, 0x00000100,
-//		/* 6 */	0x00000000, 0x0000FF00, 0x00000000,
-//		/* 7 */	0x000103FF, 0x0000FF05, 0x00000000,
-//		/* 8 */	0x00000000, 0x0000FF00, 0x00000000,
-//		/* 9 */	0x00000000, 0x0000FF00, 0x00000000,
-//		];
-//	
-//		var val = 0;
-//		
-//		cur -= 48/*APPCHAR_0*/;
-//		next -= 48/*APPCHAR_0*/;
-//	
-//		var index = cur*3 + next/4;
-//		
-//		// make sure index inside array, and both fonts are our custom ones
-//		if (index>=0 && index<30 && appFontCur<=5/*APPFONT_HEAVY*/ && appFontNext<=5/*APPFONT_HEAVY*/)
-//		{
-//			val = kernTable[index];
-//			
-//			var byte = (next%4);
-//			val = (val >> (byte*8)) & 0xFF;
-//			
-//			if (val > 0x80)
-//			{
-//				val -= 0x100;
-//			}
-//		}
-//				
-////if ((cur==0 || cur==2 || cur==3 || cur==5 || cur==6  || cur==7 || cur==8 || cur==9) && next==5)
-////{
-////	val -= 1;
-////}
-////else if (cur==1 && next==4)
-////{
-////	val += 1;
-////}
-////else if (cur==1 && next==7)
-////{
-////	val += 2;
-////}
-////else if (cur==7 && next==4)
-////{
-////	val += 2;
-////}
-////else if (cur==7 && next==0)
-////{
-////	val -= 1;
-////}
-//
-//		return val;
-//	}
-	
-//	function getKern(cur, next, appFontCur, appFontNext)
-//	{
-//		// ultra light & extra light = 0x00, 0x01, 0x02, 0x03 (= 0, 1, 2, 3)
-//		// light & regular = 0x00, 0x04, 0x08, 0x0C (= 0, 1, 2, 3)
-//		// bold & heavy = 0x00, 0x10, 0x20, 0x30 (= 0, 1, 2, 3)
-//		// unused = 0x40, 0x80
-//		var kernTable = [
-//				/* 3 2 1 0     7 6 5 4         9 8 */
-//		/* 0 */	0x16001B00, 0x1A000000, 0x00000000,
-//		/* 1 */	0x0000001B, 0x001B0000, 0x00002A1B,
-//		/* 2 */	0x00000000, 0x1A000000, 0x00000000,
-//		/* 3 */	0x16001B00, 0x1A000000, 0x00000000,
-//		/* 4 */	0x00000000, 0x00000000, 0x00000000,
-//		/* 5 */	0x1A001B00, 0x2A00152A, 0x00002F00,
-//		/* 6 */	0x1A001B00, 0x2A00152A, 0x00002F00,
-//		/* 7 */	0x1B1B1B15, 0x1B150000, 0x00001515,
-//		/* 8 */	0x16001B00, 0x1A000000, 0x00000000,
-//		/* 9 */	0x16001B00, 0x1A000000, 0x00000000,
-//		];
-//	
-//		var val = 0;
-//		
-//		cur -= 48/*APPCHAR_0*/;
-//		next -= 48/*APPCHAR_0*/;
-//		
-//		var index = cur*3 + next/4;
-//		
-//		// make sure index inside array, and both fonts are our custom ones
-//		if (index>=0 && index<30 && appFontCur<=5/*APPFONT_HEAVY*/ && appFontNext<=5/*APPFONT_HEAVY*/)
-//		{
-//			val = kernTable[index];
-//			
-//			var byte = (next%4);
-//			val = (val >> (byte*8));
-//	
-//			// for digit "1" the test is for it's own font, not font of next character
-//			// (it shouldn't be for "1" then "9" - but it's ok since that is set to same change on every font weight)
-//			var kernFont = ((cur==1) ? appFontCur : appFontNext);
-//	
-//			val >>= 2*(kernFont/2);	// same as below but less code
-//			//if (kernFont>=APPFONT_BOLD)			// bold (4) & heavy (5)
-//			//{
-//			//	val = (val>>4);
-//			//}
-//			//else if (kernFont>=APPFONT_LIGHT)		// light (2) & regular (3)
-//			//{
-//			//	val = (val>>2);
-//			//}
-//			//else									// ultra light (0) & extra light (1)
-//			//{
-//			//}
-//	
-//			val = (val&0x03);
-//
-//			// we also do some programmed custom kerning for "1" followed by "4" or "7"
-//			// x advance for normal 1, then ultra light, extra light, light, regular, bold, heavy
-//    		if (cur==1)
-//    		{
-//    			if (next==4 || next==7)			// digit 1 followed by 4 or 7
-//	    		{
-//        			val += (39-25) - appFontCur;		// 39 -> 25 26 27 28 29 30
-//
-//	    			//val += (39-24) - appFontCur - (APPFONT_HEAVY-appFontNext)/3;		// 39 -> 25 26 27 27 28 29
-//        			//val += (39-24) - appFontCur;		// 39 -> 24 25 26 27 28 29
-//        			//val += (39-25) - appFontCur;		// 39 -> 25 26 27 28 29 30
-//        			//val += (39-27) - (appFontCur/2);	// 39 -> 27 27 28 28 29 29
-//	    		}
-//    			//else if (next==7)		// digit 1 followed by 7
-//	    		//{
-//	    		//	val += (39-25) - appFontCur;		// 39 -> 25 26 27 28 29 30
-//	    		//	//val += (39-24) - appFontCur;		// 39 -> 24 25 26 27 28 29
-//	    		//}
-//	    	}
-//			else if (cur==7)	// and special kerning for new slanted 7 too
-//			{
-//				if (next==1)
-//				{
-//					val += 5;
-//				}
-//				else if (next==2)
-//				{
-//					val += 1;
-//				}
-//			}
-//		}
-//				
-//		return val;
-//	}
+		return val + (narrow?3:0);
+	}
 	
 	function useUnsupportedFieldFont(s)
 	{
@@ -2232,8 +2095,17 @@ class test1View extends WatchUi.WatchFace
 		// calculate main time display
 		if ((propTimeOn & onOrGlanceActive)!=0 && !propDemoDisplayOn)
         {
-			backgroundTimeCharArrayMinuteStart = addStringToCharArray(hourString, backgroundTimeCharArray, 0, 4);
-			backgroundTimeCharArrayLength = addStringToCharArray(minuteString, backgroundTimeCharArray, backgroundTimeCharArrayMinuteStart, 4);
+			var curLength = addStringToCharArray(hourString, backgroundTimeCharArray, 0, 5);
+			if (propTimeColon)
+			{
+				curLength = addStringToCharArray(":", backgroundTimeCharArray, curLength, 5);
+				backgroundTimeCharArrayMinuteStart = ((propTimeHourFont <= propTimeMinuteFont) ? curLength : (curLength-1));
+			}
+			else
+			{
+				backgroundTimeCharArrayMinuteStart = curLength;
+			}
+			backgroundTimeCharArrayLength = addStringToCharArray(minuteString, backgroundTimeCharArray, curLength, 5);
 			
 			backgroundTimeTotalWidth = 0;
 			backgroundTimeXOffset = (propTimeItalic ? 1 : 0);
@@ -2253,7 +2125,7 @@ class test1View extends WatchUi.WatchFace
 						var appFontCur = ((i<backgroundTimeCharArrayMinuteStart) ? propTimeHourFont : propTimeMinuteFont);
 						var appFontNext = ((i<(backgroundTimeCharArrayMinuteStart-1)) ? propTimeHourFont : propTimeMinuteFont);
 						
-						w -= getKern(curNum, nextNum, appFontCur, appFontNext);
+						w -= getKern(curNum, nextNum, appFontCur, appFontNext, propTimeColon);
 				    }
 				    else
 				    {

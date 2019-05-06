@@ -56,7 +56,7 @@ class test1View extends WatchUi.WatchFace
     var propTimeMinuteFont;
 	var propTimeHourColor;
 	var propTimeMinuteColor;
-	var propTimeColon = true;
+	var propTimeColon;
 	var propTimeItalic;
 	var propTimeYOffset;
     
@@ -129,7 +129,7 @@ class test1View extends WatchUi.WatchFace
 	var fieldActiveNotificationsCount = null;
 	var fieldActiveLTEStatus = null;
 
-    const PROFILE_NUM_PROPERTIES = 36;
+    const PROFILE_NUM_PROPERTIES = 37;
 	
 	const PROFILE_PRIVATE_INDEX = -1;			// only used for temporary storage while app is running
 
@@ -492,6 +492,7 @@ class test1View extends WatchUi.WatchFace
 
     var backgroundTimeCharArray = new[5];        
     var backgroundTimeCharArrayLength;
+    var backgroundTimeColorArray = new[5];        
 	var backgroundTimeCharArrayMinuteStart;
     var backgroundTimeWidthArray = new[5];	        	        
 	var backgroundTimeTotalWidth;
@@ -597,7 +598,7 @@ class test1View extends WatchUi.WatchFace
 			],
 			[			/* NARROW / COLON */
 						/*76543210    3210 :98     :987654 */
-			/* 0 & 1 */	0x10000010, 0x00010000, 0x02218104,
+			/* 0 & 1 */	0x10000010, 0x00010000, 0x02217104,
 			/* 2 & 3 */	0x10020000, 0x00100000, 0x00001000,
 			/* 4 & 5 */	0x30102020, 0x00100030, 0x00201000,
 			/* 6 & 7 */	0x10000010, 0x12400010, 0x01001006,
@@ -1775,6 +1776,7 @@ class test1View extends WatchUi.WatchFace
 	 		propTimeMinuteFont = 3/*APPFONT_REGULAR*/;
 		}
 		propTimeMinuteColor = propertiesGetColor("7");
+		propTimeColon = propertiesGetColor("36");
     	propTimeItalic = (propertiesGetBoolean("8") && (propTimeHourFont<=5/*APPFONT_HEAVY*/) && (propTimeMinuteFont<=5/*APPFONT_HEAVY*/));
 		propTimeYOffset = propertiesGetNumber("9");
     	
@@ -2095,9 +2097,13 @@ class test1View extends WatchUi.WatchFace
 		// calculate main time display
 		if ((propTimeOn & onOrGlanceActive)!=0 && !propDemoDisplayOn)
         {
+        	var hasColon = (propTimeColon!=COLOR_NOTSET);
+			backgroundTimeColorArray[0] = propTimeHourColor;
+			backgroundTimeColorArray[1] = propTimeHourColor;	// set element 1 even if hour is only 1 digit - saves having an if statement
 			var curLength = addStringToCharArray(hourString, backgroundTimeCharArray, 0, 5);
-			if (propTimeColon)
+			if (hasColon)
 			{
+				backgroundTimeColorArray[curLength] = propTimeColon;
 				curLength = addStringToCharArray(":", backgroundTimeCharArray, curLength, 5);
 				backgroundTimeCharArrayMinuteStart = ((propTimeHourFont <= propTimeMinuteFont) ? curLength : (curLength-1));
 			}
@@ -2105,6 +2111,8 @@ class test1View extends WatchUi.WatchFace
 			{
 				backgroundTimeCharArrayMinuteStart = curLength;
 			}
+			backgroundTimeColorArray[curLength] = propTimeMinuteColor;
+			backgroundTimeColorArray[curLength+1] = propTimeMinuteColor;
 			backgroundTimeCharArrayLength = addStringToCharArray(minuteString, backgroundTimeCharArray, curLength, 5);
 			
 			backgroundTimeTotalWidth = 0;
@@ -2125,7 +2133,7 @@ class test1View extends WatchUi.WatchFace
 						var appFontCur = ((i<backgroundTimeCharArrayMinuteStart) ? propTimeHourFont : propTimeMinuteFont);
 						var appFontNext = ((i<(backgroundTimeCharArrayMinuteStart-1)) ? propTimeHourFont : propTimeMinuteFont);
 						
-						w -= getKern(curNum, nextNum, appFontCur, appFontNext, propTimeColon);
+						w -= getKern(curNum, nextNum, appFontCur, appFontNext, hasColon);
 				    }
 				    else
 				    {
@@ -2780,7 +2788,7 @@ class test1View extends WatchUi.WatchFace
 								timeY += 30 - graphics.getFontAscent(fontTimeResource);	
 							}
 			
-				       		useDc.setColor(beforeMinuteStart ? propTimeHourColor : propTimeMinuteColor, graphics.COLOR_TRANSPARENT);
+				       		useDc.setColor(backgroundTimeColorArray[i], graphics.COLOR_TRANSPARENT);
 			        		useDc.drawText(timeX, timeY, fontTimeResource, backgroundTimeCharArray[i].toString(), graphics.TEXT_JUSTIFY_LEFT);
 			        	}
 					}

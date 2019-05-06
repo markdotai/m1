@@ -4,6 +4,7 @@
     
     <property id="2" type="number">1</property>				<!-- time on -->
     <property id="3" type="boolean">false</property>		<!-- time military -->
+    <property id="36" type="number">-1</property>			<!-- time colon separator -->
     <property id="4" type="number">4</property>				<!-- time hour font -->
     <property id="5" type="number">3</property>				<!-- time hour color -->
     <property id="6" type="number">2</property>				<!-- time minute font -->

@@ -113,8 +113,119 @@
         </settingConfig>
     </setting>
 
-    <setting propertyKey="@Properties.3" title="@Strings.TimeMilitaryFormatTitle">
+    <setting propertyKey="@Properties.3" title="@Strings.TimeLeadingZeroTitle">
         <settingConfig type="boolean" />
+    </setting>
+
+    <setting propertyKey="@Properties.36" title="@Strings.TimeColonSeparatorTitle">
+        <settingConfig type="list">
+            <listEntry value="-1">@Strings.ItemOff</listEntry>
+
+            <listEntry value="69">@Strings.MenuBlank</listEntry>
+            <listEntry value="70">@Strings.MenuLine</listEntry>
+            <listEntry value="71">@Strings.MenuBlank</listEntry>
+            
+            <listEntry value="0">@Strings.Color0</listEntry>
+            <listEntry value="1">@Strings.Color1</listEntry>
+            <listEntry value="2">@Strings.Color2</listEntry>
+            <listEntry value="3">@Strings.Color3</listEntry>
+
+            <listEntry value="72">@Strings.MenuBlank</listEntry>
+            <listEntry value="73">@Strings.MenuLine</listEntry>
+            <listEntry value="74">@Strings.MenuBright</listEntry>
+            <listEntry value="75">@Strings.MenuLine</listEntry>
+            
+		    <listEntry value="4">@Strings.Color4</listEntry>
+		    <listEntry value="5">@Strings.Color5</listEntry>
+		    <listEntry value="6">@Strings.Color6</listEntry>
+		    <listEntry value="7">@Strings.Color7</listEntry>
+		    <listEntry value="8">@Strings.Color8</listEntry>
+		    <listEntry value="9">@Strings.Color9</listEntry>
+		    <listEntry value="10">@Strings.Color10</listEntry>
+		    <listEntry value="11">@Strings.Color11</listEntry>
+		    <listEntry value="12">@Strings.Color12</listEntry>
+		    <listEntry value="13">@Strings.Color13</listEntry>
+		    <listEntry value="14">@Strings.Color14</listEntry>
+		    <listEntry value="15">@Strings.Color15</listEntry>
+		    <listEntry value="16">@Strings.Color16</listEntry>
+		    <listEntry value="17">@Strings.Color17</listEntry>
+		    <listEntry value="18">@Strings.Color18</listEntry>
+		    <listEntry value="19">@Strings.Color19</listEntry>
+		    <listEntry value="20">@Strings.Color20</listEntry>
+		    <listEntry value="21">@Strings.Color21</listEntry>
+
+            <listEntry value="76">@Strings.MenuBlank</listEntry>
+            <listEntry value="77">@Strings.MenuLine</listEntry>
+            <listEntry value="78">@Strings.MenuDim</listEntry>
+            <listEntry value="79">@Strings.MenuLine</listEntry>
+            
+		    <listEntry value="22">@Strings.Color22</listEntry>
+		    <listEntry value="23">@Strings.Color23</listEntry>
+		    <listEntry value="24">@Strings.Color24</listEntry>
+		    <listEntry value="25">@Strings.Color25</listEntry>
+		    <listEntry value="26">@Strings.Color26</listEntry>    
+		    <listEntry value="27">@Strings.Color27</listEntry>
+
+            <listEntry value="80">@Strings.MenuBlank</listEntry>
+            <listEntry value="81">@Strings.MenuLine</listEntry>
+            <listEntry value="82">@Strings.MenuPale</listEntry>
+            <listEntry value="83">@Strings.MenuLine</listEntry>
+            
+		    <listEntry value="28">@Strings.Color28</listEntry>
+		    <listEntry value="29">@Strings.Color29</listEntry>
+		    <listEntry value="30">@Strings.Color30</listEntry>
+		    <listEntry value="31">@Strings.Color31</listEntry>
+		    <listEntry value="32">@Strings.Color32</listEntry>
+		    <listEntry value="33">@Strings.Color33</listEntry>
+		    <listEntry value="34">@Strings.Color34</listEntry>
+		    <listEntry value="35">@Strings.Color35</listEntry>
+		    <listEntry value="36">@Strings.Color36</listEntry>
+		    <listEntry value="37">@Strings.Color37</listEntry>
+		    <listEntry value="38">@Strings.Color38</listEntry>
+		    <listEntry value="39">@Strings.Color39</listEntry>
+
+            <listEntry value="84">@Strings.MenuBlank</listEntry>
+            <listEntry value="85">@Strings.MenuLine</listEntry>
+            <listEntry value="86">@Strings.MenuPalest</listEntry>
+            <listEntry value="87">@Strings.MenuLine</listEntry>
+            
+		    <listEntry value="40">@Strings.Color40</listEntry>
+		    <listEntry value="41">@Strings.Color41</listEntry>
+		    <listEntry value="42">@Strings.Color42</listEntry>
+		    <listEntry value="43">@Strings.Color43</listEntry>
+		    <listEntry value="44">@Strings.Color44</listEntry>
+		    <listEntry value="45">@Strings.Color45</listEntry>
+
+            <listEntry value="88">@Strings.MenuBlank</listEntry>
+            <listEntry value="89">@Strings.MenuLine</listEntry>
+            <listEntry value="90">@Strings.MenuDark</listEntry>
+            <listEntry value="91">@Strings.MenuLine</listEntry>
+            
+		    <listEntry value="46">@Strings.Color46</listEntry>
+		    <listEntry value="47">@Strings.Color47</listEntry>
+		    <listEntry value="48">@Strings.Color48</listEntry>
+		    <listEntry value="49">@Strings.Color49</listEntry>
+		    <listEntry value="50">@Strings.Color50</listEntry>
+		    <listEntry value="51">@Strings.Color51</listEntry>
+		    <listEntry value="52">@Strings.Color52</listEntry>
+		    <listEntry value="53">@Strings.Color53</listEntry>
+		    <listEntry value="54">@Strings.Color54</listEntry>
+		    <listEntry value="55">@Strings.Color55</listEntry>
+		    <listEntry value="56">@Strings.Color56</listEntry>    
+		    <listEntry value="57">@Strings.Color57</listEntry>
+
+            <listEntry value="92">@Strings.MenuBlank</listEntry>
+            <listEntry value="93">@Strings.MenuLine</listEntry>
+            <listEntry value="94">@Strings.MenuDarkest</listEntry>
+            <listEntry value="95">@Strings.MenuLine</listEntry>
+            
+		    <listEntry value="58">@Strings.Color58</listEntry>
+		    <listEntry value="59">@Strings.Color59</listEntry>
+		    <listEntry value="60">@Strings.Color60</listEntry>
+		    <listEntry value="61">@Strings.Color61</listEntry>
+		    <listEntry value="62">@Strings.Color62</listEntry>
+		    <listEntry value="63">@Strings.Color63</listEntry>
+        </settingConfig>
     </setting>
 
     <setting propertyKey="@Properties.4" title="@Strings.TimeHourFontTitle">

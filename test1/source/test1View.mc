@@ -130,6 +130,7 @@ class test1View extends WatchUi.WatchFace
 	var fieldActiveLTEStatus = null;
 
     const PROFILE_NUM_PROPERTIES = 37;
+    //const PROFILE_PROPERTY_COLON = 36;
 	
 	const PROFILE_PRIVATE_INDEX = -1;			// only used for temporary storage while app is running
 
@@ -3592,6 +3593,12 @@ class test1View extends WatchUi.WatchFace
 					// ok not to check byte value range as loading from byte array (user profile)
 					propFieldData[i] = pArray[i];
 				}
+			}
+
+			// special code to turn off colon separator for older (shorter) profiles
+			if (propertiesOrFields && size==36/*PROFILE_PROPERTY_COLON*/)
+			{
+				applicationProperties.setValue("36", -1);
 			}
 		}
 	}

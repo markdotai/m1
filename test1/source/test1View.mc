@@ -11,12 +11,9 @@ using Application.Storage as applicationStorage;
 class test1View extends WatchUi.WatchFace
 {
 	//const forceTestFont = false;
-	//const forceClearStorage = false;
+	//const forceClearStorage = true;
 	//const forceDemoProfiles = false;
 	//const forceDemoFontStyles = false;
-
-	const PROFILE_VERSION = 13;			// a version number
-	const PROFILE_NUM_PRESET = 14;		// number of preset profiles (in the jsondata resource)
 
 	var firstUpdateSinceInitialize = true;
 
@@ -81,7 +78,7 @@ class test1View extends WatchUi.WatchFace
 	
 	var propDemoDisplayOn;
 	
-	const FIELD_NUM = 8;		// number of fields
+	const FIELD_NUM = 3;		// number of fields
 	const FIELD_NUM_ELEMENTS = 6;
 	const FIELD_NUM_ELEMENTS_DRAW = 10;		// 4 extra for 5 move bar icons + 5 other icons
 	// We pack justifcation and field management (off/on/glance) into 1 char:
@@ -128,40 +125,6 @@ class test1View extends WatchUi.WatchFace
 	var fieldActiveNotificationsStatus = null;
 	var fieldActiveNotificationsCount = null;
 	var fieldActiveLTEStatus = null;
-
-    const PROFILE_NUM_PROPERTIES = 37;
-    //const PROFILE_PROPERTY_COLON = 36;
-	
-	const PROFILE_PRIVATE_INDEX = -1;			// only used for temporary storage while app is running
-
-	// Time is stored as hour*60 + minutes
-	// This has a maximum of 24*60 = 1,440 = 0x5A0 (11 bits 0x7FF)
-	const PROFILE_NUM_USER = 24;				// number of user profiles
-	var profileTimes = new[PROFILE_NUM_USER*2];
-	// 1st number:
-	const PROFILE_DAYS_MASK = 0x7F;				// 7 bits for days mon-sun
-	const PROFILE_BLOCK_MASK = 0x80;			// block random
-	//!const PROFILE_UNUSED1_MASK = 0x100;
-	//!const PROFILE_UNUSED2_MASK = 0x200;
-	const PROFILE_START_MASK = 0x7FF;
-	const PROFILE_START_SHIFT = 10;
-	const PROFILE_END_MASK = 0x7FF;
-	const PROFILE_END_SHIFT = 21;
-	// 2nd number:
-	const PROFILE_EVENTS_MASK = 0xFF;			// number of random events per day 0-255
-	
-	var profileActive = PROFILE_PRIVATE_INDEX;	// currently active profile
-	var profileDelayEnd = 0;		// after manually changing settings then any automatic profile loads get delayed until this moment
-	var profileGlance = -1;		// -1 means no glance profile active
-	var profileGlanceReturn = PROFILE_PRIVATE_INDEX;
-	var profileRandom = -1;		// -1 means no random profile active
-	var profileRandomEnd = 0;
-	var profileRandomLastMin = -1;		// last minute number that we did the random checks
-
-	var demoProfilesOn = false;
-	var demoProfilesOnPrev = false;	
-	var demoProfilesCurrentProfile = -1;
-	var demoProfilesCurrentEnd = 0;
 
 	var iconsFontResource;
 	//!const iconsString = "ABCDEFGHIJKLMNOPQRSTUVWX";
@@ -743,75 +706,6 @@ class test1View extends WatchUi.WatchFace
 		return v;
 	}
 	
-	function propertiesGetCharArray(p)
-	{	
-		var v = applicationProperties.getValue(p);
-		if (v == null)
-		{
-			v = "";
-		}
-		else if (!(v instanceof String))
-		{
-			v = v.toString();
-		}
-		return v.toCharArray();
-	}
-	
-	// Parse 2 numbers (number seperator number) from a string
-	function propertiesGetTwoNumbers(p)
-	{
-		var n = new[2];
-		
-		var charArray = propertiesGetCharArray(p);
-		var charArraySize = charArray.size();
-		parseIndex = 0;
-		
-		n[0] = parseNumber(charArray, charArraySize);
-
-       	// find next non-numeric character
-    	for (; parseIndex<charArraySize; parseIndex++)
-    	{
-    		var c = charArray[parseIndex].toNumber();
-       		if (c<48/*APPCHAR_0*/ || c>57/*APPCHAR_9*/)
-    		{
-    			break;
-    		}
-    	}
-		
-		parseIndex++;		// step over the separator
-		
-    	// then find next numeric character
-    	for (; parseIndex<charArraySize; parseIndex++)
-    	{
-    		var c = charArray[parseIndex].toNumber();
-       		if (c>=48/*APPCHAR_0*/ && c<=57/*APPCHAR_9*/)
-    		{
-    			break;
-    		}
-    	}
-
-		n[1] = parseNumber(charArray, charArraySize);
-		
-		//System.println("parseTwoNumbers=" + n[0] + " and " + n[1]);
-
-		return n;
-	}
-	
-	// Parse a time (hours & minutes) from a string
-	function propertiesGetTime(p)
-	{
-		var n = propertiesGetTwoNumbers(p);
-
-		var t = n[0]*60 + n[1];  	// convert hours to minutes
-	
-		if (t<0 || t>=(24*60))		// check in correct range
-		{
-			t = 0;
-		}
-		
-		return t;
-	}
-	
 	function propertiesGetColor(p)
 	{
 		var v = propertiesGetNumber(p);
@@ -835,41 +729,6 @@ class test1View extends WatchUi.WatchFace
 		return toLen;
 	}
 	
-	function addArrayToCharArray(sArray, toArray, toLen, toMax)
-	{
-		var lastComma = toLen;
-		var charArray = sArray.toString().toCharArray();
-		var charArraySize = charArray.size();
-		var cPrev = 0;
-		for (var i=0; i<charArraySize; i++)
-		{
-			var c = charArray[i];
-			var cNumber = c.toNumber();
-			// remove square brackets
-			// remove spaces immediately after commas (leave spaces in middle of profile names!)
-			if (cNumber!=91/*APPCHAR_OPEN_SQUARE_BRACKET*/ && cNumber!=93/*APPCHAR_CLOSE_SQUARE_BRACKET*/ && !(cNumber==32/*APPCHAR_SPACE*/ && cPrev==44/*APPCHAR_COMMA*/))
-			{
-				if (toLen >= toMax)
-				{
-					toLen = lastComma;
-					break;
-				}
-
-				if (cNumber==44/*APPCHAR_COMMA*/)
-				{
-					lastComma = toLen;
-				}
-
-				toArray[toLen] = c;
-				toLen += 1;
-			}
-			
-			cPrev = cNumber;
-		}
-
-		return toLen;
-	}
-
     // Order of calling on start up
 	// initialize() → onLayout() → onShow() → onUpdate()
 	//
@@ -886,30 +745,6 @@ class test1View extends WatchUi.WatchFace
         WatchFace.initialize();
     }
 
-	function importJsonData(id, profileIndex, watchUi, storage)
-	{
-		var tempResource = watchUi.loadResource(id);
-		for (var i=0; i<tempResource.size(); i++)
-		{
-			storage.setValue("P" + profileIndex, tempResource[i][0]);
-			
-			// use propFieldData byte array temporarily (it gets initialized later anyway)
-			// we convert all the resource field data to a byte array so that it is in the same format (and memory size) as any user saved profiles
-			// - then we don't need to worry about presets and user profiles acting differently when loaded/exported
-			var fArray = tempResource[i][1];
-			var fArraySize = fArray.size();					
-			for (var j=0; j<FIELD_NUM*FIELD_NUM_PROPERTIES; j++)
-			{
-				propFieldData[j] = ((j<fArraySize) ? fArray[j] : 0);
-			}
-			storage.setValue("PF" + profileIndex, propFieldData);
-
-			profileIndex++;
-		}
-		
-		return profileIndex;
-	}
-
     // Load your resources here
     function onLayout(dc)
     {
@@ -922,7 +757,7 @@ class test1View extends WatchUi.WatchFace
 		//if (forceClearStorage)
 		//{
 		//	storage.clearValues();		// clear all values from storage for debugging
-		//}		
+		//}
 	
         var deviceSettings = System.getDeviceSettings();	// 960 bytes, but uses less code memory 
 		hasDoNotDisturb = (deviceSettings has :doNotDisturb);
@@ -951,29 +786,6 @@ class test1View extends WatchUi.WatchFace
 		// load in character string (for seconds & outer ring)
 		//characterString = WatchUi.loadResource(Rez.JsonData.id_characterString);
 
-		// make sure preset profiles are saved to storage (from jsondata)
-		{
-			var sVersion = storage.getValue("V");
-			if (sVersion==null || sVersion!=PROFILE_VERSION)
-			{
-				var jsonData = Rez.JsonData;
-				var profileIndex = PROFILE_NUM_USER;
-
-				// less code to just call 3 times instead of loop				
-				//var loadPreset = [jsonData.id_preset, jsonData.id_preset2, jsonData.id_preset3];
-				//for (var i=0; i<loadPreset.size(); i++)
-				//{
-				//	profileIndex = importJsonData(loadPreset[i], profileIndex, watchUi, storage);
-				//}
-				
-				profileIndex = importJsonData(jsonData.id_preset, profileIndex, watchUi, storage);
-				profileIndex = importJsonData(jsonData.id_preset2, profileIndex, watchUi, storage);
-				profileIndex = importJsonData(jsonData.id_preset3, profileIndex, watchUi, storage);
-									
-				storage.setValue("V", PROFILE_VERSION);
-			}
-		}
-		
 		// load in second indicator & outer ring positions
 		{
 			var tempResource = watchUi.loadResource(Rez.JsonData.id_coordsXY);
@@ -987,124 +799,14 @@ class test1View extends WatchUi.WatchFace
 			tempResource = null;
 		}
 
-		// initialize propFieldData
-		{
-			var sArray = storage.getValue("F");		// load saved prop field data from storage
-		 	var sArraySize = ((sArray!=null) ? sArray.size() : 0);
-			for (var i=0; i<FIELD_NUM*FIELD_NUM_PROPERTIES; i++)
-			{
-				if (i<sArraySize)
-				{
-					propFieldData[i] = sArray[i];
-				}
-				else
-				{
-					var n = (i%FIELD_NUM_PROPERTIES);
-	    			if (n==0/*FIELD_INDEX_YOFFSET*/ || n==1/*FIELD_INDEX_XOFFSET*/)
-	    			{
-	    				propFieldData[i] = 120;
-	    			}
-	    			else
-	    			{
-						propFieldData[i] = 0;
-					}
-				}
-			}
-			
-			// if there was no saved field data (first time running watch face)
-			// then make sure the propFieldData matches the properties (as set to their default values)
-			if (sArray==null)
-			{
-				getOrSetPropFieldDataProperties();		// get field data from properties
-			}
-			//else
-			//{
-			//	// delete the saved prop field data (in case the app decides to reset itself and all properties ...)
-			//	// this doesn't even work - must call onStop() when crashing too
-			//	storage.deleteValue("F");
-			//}
-			
-			sArray = null;
-		}
-						
-		// remember which profile was active and also any profileDelayEnd value
-		// - then checkProfiles will know whether to restore the private profile or not
-		{
-			var saveData = storage.getValue("C");
-			if (saveData!=null)
-			{
-				// delete the saved data (in case the app decides to reset itself and all properties ...)
-				//storage.deleteValue("C");
-
-				var timeNowValue = Time.now().value();
-				
-				if (saveData[0]>=PROFILE_PRIVATE_INDEX && saveData[0]<PROFILE_NUM_USER+PROFILE_NUM_PRESET)
-				{
-					profileActive = saveData[0];
-					profileDelayEnd = saveData[1];
-					
-					// verify that profileDelayEnd is not too far in the future ... just in case (should be 2+1 minutes or less)
-					if (profileDelayEnd > (timeNowValue + (2+1)*60))
-					{
-						profileDelayEnd = 0;
-					}
-				}
-				
-				if (saveData[2]>=0 && saveData[2]<PROFILE_NUM_USER)
-				{
-					profileRandom = saveData[2]; 
-					profileRandomEnd = saveData[3];
-					
-					// verify that profileRandomEnd is not too far in the future ... just in case (should be 20+1 minutes or less)
-					if (profileRandomEnd > (timeNowValue + (20+1)*60))
-					{
-						profileRandomEnd = 0;
-					}
-				}
-				
-				if (saveData[4]>=0 && saveData[4]<PROFILE_NUM_USER+PROFILE_NUM_PRESET)
-				{
-					demoProfilesCurrentProfile = saveData[4]; 
-					demoProfilesCurrentEnd = saveData[5];
-					
-					// verify that demoProfilesCurrentEnd is not too far in the future ... just in case (should be 5+1 minutes or less)
-					if (demoProfilesCurrentEnd > (timeNowValue + (5+1)*60))
-					{
-						demoProfilesCurrentEnd = 0;
-					}
-				}
-				
-				demoProfilesOn = saveData[6];
-				demoProfilesOnPrev = demoProfilesOn; 
-			}
-			saveData = null;
-		}
-
-		initProfiles();			// load profile times and save out a first version of the private profile to storage if it doesn't exist
-    }
-
-	function saveDataForStop()
-	{
-		// remember the active profile and profileDelayEnd
-		// and other variables we want to save between runs
-		var saveData = [profileActive, profileDelayEnd, profileRandom, profileRandomEnd, demoProfilesCurrentProfile, demoProfilesCurrentEnd, demoProfilesOn];
-		applicationStorage.setValue("C", saveData);
-		
-		// store the current field data to storage - used only when watchface next loaded
-		applicationStorage.setValue("F", propFieldData);	// seems to work storing a byte array ...
+		// make sure the propFieldData matches the properties
+		getPropFieldDataProperties();		// get field data from properties
 	}
 
 	// called from the app when it is being ended
 	function onStop()
 	{
         //System.println("onStop");
-
-		saveDataForStop();
-
-		if (profileActive>=0)	// not the private profile (watch settings)
-		{
-			applicationProperties.setValue("PM", 6);	// set the "profile was active" management status
-		}
 	}
 
     // Called when this View is brought to the foreground.
@@ -1503,123 +1205,9 @@ class test1View extends WatchUi.WatchFace
         WatchUi.requestUpdate();
 	}
 	
-	function clearExportImportStrings()
-	{
-		applicationProperties.setValue("EP", "");
-		applicationProperties.setValue("EF", "");
-		applicationProperties.setValue("EG", "");
-	}
-	
 	function handleSettingsChanged(clockTime, timeNow)
 	{
-		demoProfilesOnPrev = demoProfilesOn; 
-		demoProfilesOn = propertiesGetBoolean("DP");
-
-		var profileManagement = propertiesGetNumber("PM");
-		var profileNumber = propertiesGetNumber("PN") - 1;
-		var setProfileDelay = false;
-
-		if (profileManagement!=5)		// clear the export/import strings if doing anything other than an import
-		{
-			clearExportImportStrings();
-		}
-
-		if (profileManagement>0)	// not making changes to watch settings
-		{
-			// set property to do a normal update (so not caught out the next time you open settings)
-			applicationProperties.setValue("PM", 0);
-
-			setProfileDelay = true;
-
-			if (profileManagement == 1)				// retrieve watch settings
-			{
-				// always load this even if it was currently active
-				// - otherwise whatever settings are in the users window get applied, which is confusing! 
-				loadProfile(PROFILE_PRIVATE_INDEX);	// clears profileActive, and sets field management property to retrieve
-				//setProfileDelay = true;
-			}
-			else if (profileManagement == 2)		// save to profile
-			{
-				saveProfile(profileNumber);			// will set profileActive
-				//setProfileDelay = true;
-			}
-			else if (profileManagement == 3)		// load from profile
-			{
-				loadProfile(profileNumber);			// will set profileActive
-				//setProfileDelay = true;
-			}
-			else if (profileManagement == 7)		// copy profile to watch settings
-			{
-				loadProfile(profileNumber);			// will set profileActive
-				saveProfile(PROFILE_PRIVATE_INDEX);	// will set profileActive = PROFILE_PRIVATE_INDEX
-				//setProfileDelay = true;
-			}
-			else if (profileManagement == 4)
-			{
-				exportProfile(profileNumber);
-				loadProfile(profileNumber);			// also load it to show the user what they exported
-				//setProfileDelay = true;
-			}
-			else if (profileManagement == 5)
-			{
-				importProfile(profileNumber);
-				clearExportImportStrings();			// clear the export/import strings before load 
-				loadProfile(profileNumber);			// also load it to show the user what they imported
-				//setProfileDelay = true;
-			}
-			else //if (profileManagement == 6)		// profile was active (so settings won't get changed)
-			{
-				setProfileDelay = false;
-
-				// always load this even though it was currently active
-				// - otherwise whatever settings are in the users window get applied, which is confusing! 
-				loadProfile(profileActive);			// sets field management property to retrieve
-				
-				// if we didn't have this setting, then whenever the user leaves the watchface (e.g. to a widget)
-				// and returns while a profile was active, then those profile settings would get saved to the 
-				// private profile below! 
-			}
-
-			getOrSetPropFieldDataProperties();
-		}
-		else	// making changes to watch settings
-		{
-			var fManagement = propertiesGetNumber("FM");
-		
-			getOrSetPropFieldDataProperties();
-	
-			// if user is retrieving field settings, or turning on/off demo profiles, then don't accept any settings changes
-			// - instead load the currently active profile to override any changes
-			if (fManagement==ITEM_RETRIEVE || demoProfilesOn!=demoProfilesOnPrev)
-			{
-				loadProfile(profileActive);			// sets field management property to retrieve
-			}
-			else
-			{
-				// do this after getOrSetPropFieldDataProperties
-				saveProfile(PROFILE_PRIVATE_INDEX);		// will set profileActive = PROFILE_PRIVATE_INDEX
-			}
-		}
-		
-		// special case for handling when demoProfiles is toggled from off to on - don't do any profile delay
-		if (!setProfileDelay)
-		{
-			if (demoProfilesOn!=demoProfilesOnPrev)
-			{
-				profileDelayEnd = 0;
-			}
-			else if (settingsHaveChanged)
-			{
-				setProfileDelay = true;
-			}
-		}
-		
-		if (setProfileDelay)
-		{
-			profileDelayEnd = timeNow.value() + ((60-clockTime.sec)%60) + 2*60;		// delay of 2 minutes before any auto profile switching
-			profileRandomEnd = 0;							// clear this
-			demoProfilesCurrentEnd = 0;
-		}
+		getPropFieldDataProperties();
 	}
 		
 	// forceChange is set to true when either the settings have been changed by the user or a new profile has loaded
@@ -1678,85 +1266,45 @@ class test1View extends WatchUi.WatchFace
 	    return changed;
 	}
 
-	function getOrSetPropFieldDataProperties()
+	function getPropFieldDataProperties()
 	{
-		var fManagement = propertiesGetNumber("FM");
-		var fNumber = propertiesGetNumber("FN");
-		
-		var fNumberValid = (fNumber>=1 && fNumber<=FIELD_NUM);	// check the field number is in range (1-8)
-		if (!fNumberValid)
+		for (var fNumber=0; fNumber<3; fNumber++)
 		{
-			fNumber = 1;
-			applicationProperties.setValue("FN", fNumber);
-		}
+			var sPrefix = ["F", "G", "H"][fNumber];
 		
-		var fIndex = (fNumber-1)*FIELD_NUM_PROPERTIES;		// index into field data array
-    	if (fManagement==ITEM_RETRIEVE)						// field status off/on/retrieve == retrieve
-    	{
-    		// set field properties from values in memory
-    		for (var i=0; i<FIELD_NUM_PROPERTIES; i++)
-    		{
-    			var v = propFieldData[fIndex + i].toNumber();
-    			if (i==0/*FIELD_INDEX_YOFFSET*/)
-    			{
-    				v = 120 - v;
-    			}
-    			else if (i==1/*FIELD_INDEX_XOFFSET*/)
-    			{
-    				v -= 120;
-    			}
-    			else if (i==2/*FIELD_INDEX_JUSTIFICATION*/)
-    			{
-    				var m = (v%FIELD_MANAGEMENT_MODULO);
-					applicationProperties.setValue("FM", m);
-
-    				v = (v/FIELD_MANAGEMENT_MODULO);
-    			}
-				applicationProperties.setValue("F" + i, v);
-    		}
-    	}
-    	else
-    	{
-   			// only store the values if the user entered a valid number
-   			// (best not to overwrite the wrong field which they didn't intend)
-    		if (fNumberValid)
-    		{
-	    		// store all current field properties to memory
-	    		for (var i=0; i<FIELD_NUM_PROPERTIES; i++)
-	    		{
-					var v = propertiesGetNumber("F" + i);	// All of the field properties are numbers
-
-	    			if (i==0/*FIELD_INDEX_YOFFSET*/)
-	    			{
-	    				v = 120 - v;
-	    			}
-	    			else if (i==1/*FIELD_INDEX_XOFFSET*/)
-	    			{
-	    				v += 120;
-	    			}
-	    			else if (i==2/*FIELD_INDEX_JUSTIFICATION*/)
-	    			{
-	    				v = (fManagement%FIELD_MANAGEMENT_MODULO) + (v*FIELD_MANAGEMENT_MODULO);
-	    			}
-
-    				if (v<0)
-    				{
-    					v = 0;
-    				}
-    				else if (v>255)
-    				{
-    					v = 255;
-    				}
-
-					propFieldData[fIndex + i] = v;
-	    		}
-
-				// store the current field data to storage - used only when watchface next loaded
-				// - ideally we'd only do this in onStop() but there seems to be a bug where saving there doesn't always happen
-				// e.g. if switching watchfaces fast in the system menu
-				saveDataForStop();
-	    	}	    	
-    	}
+			var fManagement = propertiesGetNumber(sPrefix + "M");
+			var fIndex = fNumber*FIELD_NUM_PROPERTIES;		// index into field data array
+	
+			// store all current field properties to memory
+			for (var i=0; i<FIELD_NUM_PROPERTIES; i++)
+			{
+				var v = propertiesGetNumber(sPrefix + i);	// All of the field properties are numbers
+	
+				if (i==0/*FIELD_INDEX_YOFFSET*/)
+				{
+					v = 120 - v;
+				}
+				else if (i==1/*FIELD_INDEX_XOFFSET*/)
+				{
+					v += 120;
+				}
+				else if (i==2/*FIELD_INDEX_JUSTIFICATION*/)
+				{
+					v = (fManagement%FIELD_MANAGEMENT_MODULO) + (v*FIELD_MANAGEMENT_MODULO);
+				}
+	
+				if (v<0)
+				{
+					v = 0;
+				}
+				else if (v>255)
+				{
+					v = 255;
+				}
+	
+				propFieldData[fIndex + i] = v;
+			}
+		}
 	}
 		
     // Get values for all our settings
@@ -1987,7 +1535,6 @@ class test1View extends WatchUi.WatchFace
     
         var clockTime = System.getClockTime();	// get as first thing so we know it is correct and won't change later on
 		var timeNow = Time.now();
-		var profileToActivate;
 		var demoSettingsChanged;
 		var doGetPropertiesAndDynamicResources = false;
 		var forceDemoSettingsChange = false;
@@ -2010,8 +1557,6 @@ class test1View extends WatchUi.WatchFace
 
 		if (settingsHaveChanged || firstUpdateSinceInitialize)
 		{
-			profileRandomLastMin = clockTime.min;	// don't do a random profile change on first minute (after initialize or settings change)
-
 			releaseDynamicResources();						// also done in onSettingsChanged()
 			doGetPropertiesAndDynamicResources = true;
 			forceDemoSettingsChange = true;
@@ -2022,19 +1567,6 @@ class test1View extends WatchUi.WatchFace
 			firstUpdateSinceInitialize = false;		// and make sure this is cleared now also
 		}
 					
-		profileToActivate = checkProfileToActivate(clockTime, timeNow);
-		if (profileToActivate != profileActive)
-		{
-			releaseDynamicResources();
-			doGetPropertiesAndDynamicResources = true;
-			forceDemoSettingsChange = true;
-			
-			clearExportImportStrings();				// clear the export/import strings before load (won't match properties or watch display after load anyway) 
-			loadProfile(profileToActivate);			// will set profileActive
-			getOrSetPropFieldDataProperties();
-			profileGlance = doActivateGlanceCheck;		// set this after loadProfile, so it gets remembered
-		}
-
     	demoSettingsChanged = checkDemoSettings(clockTime.hour*60 + clockTime.min, forceDemoSettingsChange);
     	if (demoSettingsChanged)
     	{
@@ -3204,595 +2736,7 @@ class test1View extends WatchUi.WatchFace
 			}
 		}
     }
-
-	function initProfiles()
-	{
-       	var storage = applicationStorage;
-
-		// load times from storage
-		var sArray = storage.getValue("PT");			// profile times
-		var sArraySize = ((sArray!=null) ? sArray.size() : 0);
-		for (var i=0; i<PROFILE_NUM_USER*2; i++)
-		{
-			profileTimes[i] = ((i<sArraySize) ? sArray[i] : 0);
-		}
-
-		// and also save out a first version of the private profile to storage (so it is always available later on)
-		// Note this would probably get done in onUpdate first time after initialize anyway - but wouldn't if someone changed the profile
-		// management property before ever running the watchface.
-		if (storage.getValue("P" + PROFILE_PRIVATE_INDEX) == null)
-		{
-			saveProfile(PROFILE_PRIVATE_INDEX);		// remember current watch settings
-		}
-   	}
 	
-	var doActivateGlanceCheck = -1;
-	
-	function checkProfileToActivate(clockTime, timeNow)
-	{
-		var doActivate = profileActive;		// stick with current profile until told otherwise
-		doActivateGlanceCheck = -1;			// -1 used to clear profileGlance once glance is finished
-		
-		if ((onOrGlanceActive&ITEM_ONGLANCE)!=0)		// during glance
-		{
-			if (profileGlance<0)
-			{
-				var check = propertiesGetNumber("35") - 1;		// 0 (goes to -1) which means none
-				if (check>=0 && check<(PROFILE_NUM_USER+PROFILE_NUM_PRESET))
-				{
-					doActivate = check;
-					doActivateGlanceCheck = check;
-					profileGlanceReturn = profileActive;	// return to this profile after glance 
-				}
-			}
-			else
-			{
-				doActivate = profileGlance;		// keep glance profile active until glance ends
-				doActivateGlanceCheck = profileGlance;
-			}
-		}
-		else
-		{
-			if (profileGlance>=0)
-			{
-				doActivate = profileGlanceReturn; 
-			}
-		}
-		
-		var timeNowValue = timeNow.value();
-		
-		if (doActivateGlanceCheck<0 && timeNowValue>=profileDelayEnd)
-		{
-			doActivate = PROFILE_PRIVATE_INDEX;		// assume want to be in normal watch settings
-
-			var dateInfoShort = Time.Gregorian.info(timeNow, Time.FORMAT_SHORT);
-			var nowDayNumber = (dateInfoShort.day_of_week+5)%7;		// 1=Sun, 2=Mon 3=Tue, etc so convert to 0=Mon, 1=Tue ... 6=Sun
-			var prevDayNumber = (nowDayNumber+6)%7;
-	        var nowTime = clockTime.hour*60 + clockTime.min;
-			var randomNum = 0;
-			var randomProfiles = new[PROFILE_NUM_USER];
-			var randomEvents = new[PROFILE_NUM_USER];
-			var randomEventsTotal = 0;
-			
-			for (var i=0; i<PROFILE_NUM_USER; i++)
-			{
-				if (doActivate==PROFILE_PRIVATE_INDEX)	// not found a profile to activate yet
-				{
-					var t0 = profileTimes[i];
-					var startTime = (t0>>PROFILE_START_SHIFT)&PROFILE_START_MASK;
-					var endTime = (t0>>PROFILE_END_SHIFT)&PROFILE_END_MASK;
-					if (startTime<endTime)		// Note: if 2 times are equal then go for 24 hours (e.g. by default both times are 0)
-					{
-						if (nowTime>=startTime && nowTime<endTime && (t0&(0x01<<nowDayNumber))!=0)	// current day set?
-						{
-							doActivate = i;
-						}
-					}
-					else
-					{
-						// goes over midnight
-						if ((nowTime>=startTime && (t0&(0x01<<nowDayNumber))!=0) ||			// current day 
-							(nowTime<endTime && (t0&(0x01<<prevDayNumber))!=0))				// previous day
-						{
-							doActivate = i;
-						}
-					}
-				}
-
-				var t1 = profileTimes[i+PROFILE_NUM_USER];
-				var numEvents = (t1&PROFILE_EVENTS_MASK);
-				if (numEvents>0)
-				{
-					randomProfiles[randomNum] = i;
-					randomEvents[randomNum] = numEvents;
-					randomEventsTotal += numEvents;
-					randomNum++;
-				}
-			}
-			
-			// doActivate must be PROFILE_PRIVATE_INDEX or in range (0 to PROFILE_NUM_USER-1) when we get here
-			if (doActivate==PROFILE_PRIVATE_INDEX || (profileTimes[doActivate]&PROFILE_BLOCK_MASK)==0)
-			{
-				if (profileRandom>=0)					// random already active
-				{
-					if (timeNowValue<profileRandomEnd)
-					{
-						doActivate = profileRandom;		// stick with same random
-					}
-					else
-					{
-						profileRandom = -1;				// end current random
-					}
-				}
-				
-				if (profileRandom<0 && randomNum>0 && profileRandomLastMin!=clockTime.min)
-				{
-					profileRandomLastMin = clockTime.min;
-				
-					var r = Math.rand()%(24*60);		// number of minutes in a day
-					if (r < randomEventsTotal)
-					{
-						r = Math.rand()%randomEventsTotal;
-						for (var i=0; i<randomNum; i++)
-						{
-							var numEvents = randomEvents[i];
-							
-							r -= numEvents;
-							
-							if (r < 0)
-							{
-								var lenMinutes = 3 + Math.rand()%12;		// 3 to 14 minutes
-								// scale length depending on how many events per day for this particular random profile
-								// minimum of 1 minute long
-								// if 9 events a day then roughly 2/3 as long
-								// if 18 events a day then roughly 1/2 as long
-								// if 36 events a day then roughly 1/3 as long
-								// if 72 events a day then roughly 1/5 as long
-								// if 144 events a day then roughly 1/9 as long
-								// if 216 events a day then roughly 1/13 as long
-								lenMinutes = 1 + ((lenMinutes*18 + numEvents/2) / (17 + numEvents));
-								
-								profileRandom = randomProfiles[i];
-								profileRandomEnd = timeNowValue + ((60-clockTime.sec)%60) + lenMinutes*60;
-								doActivate = profileRandom;
-								
-								break;
-							}
-						}
-					}
-				}
-			}
-			else
-			{
-				profileRandom = -1;
-			}
-
-			if (demoProfilesOn /*|| forceDemoProfiles*/)
-			{
-				if (doActivate!=PROFILE_PRIVATE_INDEX)
-				{
-					// end current demo profile
-					demoProfilesCurrentEnd = 0;
-				}
-				else
-				{
-					var n = propertiesGetTwoNumbers("DR");
-					n[0] = n[0] - 1;	// convert from user to code index
-					n[1] = n[1] - 1;	// convert from user to code index
-					if (n[0] < 0)
-					{
-						n[0] = 0;
-					}
-					if (n[1] > PROFILE_NUM_USER+PROFILE_NUM_PRESET - 1)
-					{
-						n[1] = PROFILE_NUM_USER+PROFILE_NUM_PRESET - 1;
-					}
-					
-	       			//System.println("DR=" + n[0] + " " + n[1]);
-
-					if (n[1] >= n[0])
-					{
-						if (timeNowValue >= demoProfilesCurrentEnd)
-						{
-							var nextProfile = demoProfilesCurrentProfile + 1;
-							if (nextProfile < n[0] || nextProfile > n[1])
-							{
-								nextProfile = n[0];
-							}
-
-							demoProfilesCurrentProfile = nextProfile;
-							// if within 1 minute of end time of previous demo profile - then just add 5 minutes to end of previous
-							demoProfilesCurrentEnd = ((timeNowValue-demoProfilesCurrentEnd < 60) ? demoProfilesCurrentEnd : (timeNowValue + (60-clockTime.sec)%60)) + 5*60;	// 5 minutes
-						}
-					
-						if (demoProfilesCurrentProfile >= 0)
-						{
-							doActivate = demoProfilesCurrentProfile; 
-						}
-					}
-				}
-			}
-		}
-
-		return doActivate;
-	}
-	
-	var parseIndex;
-	
-   	// find next comma or end of array
-	function parseToComma(charArray, charArraySize)
-	{	
-    	for (; parseIndex<charArraySize; parseIndex++)
-    	{
-    		if (charArray[parseIndex].toNumber()==44/*APPCHAR_COMMA*/)
-    		{
-    			break;
-    		}
-    	}
-    }
-    	
-	function parseNumber(charArray, charArraySize)
-	{
-		var v = 0;
-		var vMult = 1;
-	
-    	for (; parseIndex<charArraySize; parseIndex++)
-    	{
-    		var c = charArray[parseIndex].toNumber();
-    		if (c>=48/*APPCHAR_0*/ && c<=57/*APPCHAR_9*/)
-    		{
-    			v = v*10 + (c-48/*APPCHAR_0*/); 
-    		}
-    		else if (c==45/*APPCHAR_MINUS*/)
-    		{
-    			vMult = -1;
-    		}
-    		else
-    		{
-    			break;
-    		}
-    	}
-
-		return v*vMult;
-	}
-
-	function parseNumberComma(charArray, charArraySize)
-	{
-		var v = parseNumber(charArray, charArraySize);
-
-		parseToComma(charArray, charArraySize);   	// find next comma or end of array
-		parseIndex++;		// step over the comma
-
-		return v;
-	}
-
-	function parseBooleanComma(charArray, charArraySize)
-	{
-		var v = false;
-	
-		if (parseIndex<charArraySize)
-		{	
-    		var c = charArray[parseIndex].toNumber();
-			v = (c==116/*APPCHAR_t*/ || c==49/*APPCHAR_1*/ || c==84/*APPCHAR_T*/);
-				
-			parseToComma(charArray, charArraySize);   	// find next comma or end of array
-			parseIndex++;		// step over the comma
-		}
-
-		return v;
-	}
-
-	function parseStringComma(charArray, charArraySize)
-	{
-		var v = "";
-		
-		var charStart = parseIndex;
-		parseToComma(charArray, charArraySize);   	// find next comma or end of array
-		var charEnd = parseIndex;
-		parseIndex++;		// step over the comma
-		
-		if (charEnd > charStart)
-		{
-			var charMax = charStart+20;		// limit length of strings just in case
-			if (charEnd > charMax)
-			{
-				charEnd = charMax;
-			}
-			v = StringUtil.charArrayToString(charArray.slice(charStart, charEnd));	
-		}
-
-		return v;
-	}
-
-	function saveProfile(profileIndex)
-	{
-		profileActive = profileIndex;		// profile now active
-		profileGlance = -1;					// clear glance profile if it was active
-
-		if (profileIndex>=PROFILE_PRIVATE_INDEX && profileIndex<PROFILE_NUM_USER)
-		{
-        	var storage = applicationStorage;
-
-			// save normal properties
-			var pArray = new[PROFILE_NUM_PROPERTIES];
-			for (var i=0; i<PROFILE_NUM_PROPERTIES; i++)
-			{
-				pArray[i] = applicationProperties.getValue("" + i);	// these values are only copied from & to properties, never used directly
-			}
-			storage.setValue("P" + profileIndex, pArray);
-			pArray = null;
-
-			// save field data
-			storage.setValue("PF" + profileIndex, propFieldData);	// seems to work ok for byte array
-
-			if (profileIndex!=PROFILE_PRIVATE_INDEX)
-			{
-				// calculate activate times from properties
-				var t0 = 0;
-				
-				var daysNumber = propertiesGetNumber("PD");
-				while (daysNumber>0)
-				{
-					var d = daysNumber%10;
-					daysNumber /= 10;
-					
-					if (d>=1 && d<=7)
-					{
-						t0 |= (0x1<<(d-1));					
-					}
-				}
-				
-				var startTime = propertiesGetTime("PS");
-				var endTime = propertiesGetTime("PE");
-				t0 |= (startTime<<PROFILE_START_SHIFT) | (endTime<<PROFILE_END_SHIFT);
-				
-				if (propertiesGetBoolean("PB"))
-				{
-					t0 |= PROFILE_BLOCK_MASK;
-				}
-
-				var t1 = propertiesGetNumber("PR");
-				if (t1<0)
-				{
-					t1 = 0;
-				}
-				else if (t1>PROFILE_EVENTS_MASK)
-				{
-					t1 = PROFILE_EVENTS_MASK;
-				}
-
-				// remember the profile time
-				profileTimes[profileIndex] = t0;
-				profileTimes[profileIndex+PROFILE_NUM_USER] = t1;
-
-				// and save all profile times to storage
-				storage.setValue("PT", profileTimes);
-			}
-		}
-	}
-
-	function loadProperties(profileIndex, propertiesOrFields)
-	{
-		var pArray = applicationStorage.getValue((propertiesOrFields ? "P" : "PF") + profileIndex);
-		if (pArray != null)
-		{
-			var size = (propertiesOrFields ? PROFILE_NUM_PROPERTIES : (FIELD_NUM*FIELD_NUM_PROPERTIES));
-			if (pArray.size() < size)
-			{
-				size = pArray.size();
-			}
-
-			for (var i=0; i<size; i++)
-			{
-				if (propertiesOrFields)
-				{
-					applicationProperties.setValue("" + i, pArray[i]);
-				}
-				else
-				{
-					// ok not to check byte value range as loading from byte array (user profile)
-					propFieldData[i] = pArray[i];
-				}
-			}
-
-			// special code to turn off colon separator for older (shorter) profiles
-			if (propertiesOrFields && size==36/*PROFILE_PROPERTY_COLON*/)
-			{
-				applicationProperties.setValue("36", -1);
-			}
-		}
-	}
-
-	function loadProfile(profileIndex)
-	{
-		profileActive = profileIndex;		// profile now active
-		profileGlance = -1;					// clear glance profile if it was active
-
-		if (profileIndex>=PROFILE_PRIVATE_INDEX && profileIndex<(PROFILE_NUM_USER+PROFILE_NUM_PRESET))
-		{
-			loadProperties(profileIndex, true);
-			loadProperties(profileIndex, false);
-			
-        	var properties = applicationProperties;		// using local variable reduces code size
-
-			properties.setValue("FM", ITEM_RETRIEVE);	// set field management to retrieve - so that properties are updated to match field settings
-			
-			if (profileIndex>=0 && profileIndex<PROFILE_NUM_USER)	// not for private or preset profiles
-			{
-				// set the profile properties from our profile times array
-				var t0 = profileTimes[profileIndex];
-				var t1 = profileTimes[profileIndex+PROFILE_NUM_USER];
-				var days = t0&PROFILE_DAYS_MASK;
-				var startTime = (t0>>PROFILE_START_SHIFT)&PROFILE_START_MASK;
-				var endTime = (t0>>PROFILE_END_SHIFT)&PROFILE_END_MASK;
-		
-				var daysNumber = 0;
-				for (var i=0; i<7; i++)
-				{
-					if ((days&(0x1<<i))!=0)
-					{
-						daysNumber *= 10;
-						daysNumber += i+1;
-					}
-				}
-				properties.setValue("PD", daysNumber);
-		
-				properties.setValue("PS", "" + (startTime/60).format("%02d") + ":" + (startTime%60).format("%02d"));
-				properties.setValue("PE", "" + (endTime/60).format("%02d") + ":" + (endTime%60).format("%02d"));
-
-				properties.setValue("PB", ((t0&PROFILE_BLOCK_MASK)!=0));
-				properties.setValue("PR", (t1&PROFILE_EVENTS_MASK));		
-			}
-		}
-	}
-
-	function exportPropertiesFillCharArray(profileIndex, toArray, toMax)
-	{
-		var toLen = 0;
-		
-		var pArray = applicationStorage.getValue("P" + profileIndex);
-		if (pArray != null)
-		{
-			// profile activation times
-			var sTimes;
-			if (profileIndex<PROFILE_NUM_USER)
-			{			
-        		sTimes = Lang.format("$1$,$2$,", [profileTimes[profileIndex], profileTimes[profileIndex+PROFILE_NUM_USER]]);
-			}
-			else
-			{
-				sTimes = "0,0,";
-			}
-			toLen = addStringToCharArray(sTimes, toArray, toLen, toMax);
-				
-			toLen = addArrayToCharArray(pArray, toArray, toLen, toMax);
-		}
-
-		return toLen;
-	}
-
-	function exportPropertiesGetString(profileIndex)
-	{
-		var charArray = new[255];
-		var charArrayLen = exportPropertiesFillCharArray(profileIndex, charArray, 255);
-		charArray = charArray.slice(0, charArrayLen);
-
-		return StringUtil.charArrayToString(charArray);
-	}
-
-	function exportFieldDataGetString(fArray, start, end)
-	{
-		var tempArray = fArray.slice(start, end);
-		var charArray = new[255];
-		var charArrayLen = addArrayToCharArray(tempArray, charArray, 0, 255);
-		tempArray = null;
-		
-		charArray = charArray.slice(0, charArrayLen);
-
-		return StringUtil.charArrayToString(charArray);
-	}
-	
-	function exportProfile(profileIndex)
-	{
-		if (profileIndex>=0 && profileIndex<(PROFILE_NUM_USER+PROFILE_NUM_PRESET))
-		{
-			var s = exportPropertiesGetString(profileIndex);
-			applicationProperties.setValue("EP", s);
-			s = null;
-	
-			var fArray = applicationStorage.getValue("PF" + profileIndex);
-			
-			s = exportFieldDataGetString(fArray, 0, (FIELD_NUM*FIELD_NUM_PROPERTIES)/2);
-			applicationProperties.setValue("EF", s);
-			s = null;
-			
-			s = exportFieldDataGetString(fArray, (FIELD_NUM*FIELD_NUM_PROPERTIES)/2, FIELD_NUM*FIELD_NUM_PROPERTIES);
-			applicationProperties.setValue("EG", s);
-		}
-	}
-
-	function importPropertiesFillArray(profileIndex, pArray)
-	{
-		// main bulk of profile properties
-		var charArray = propertiesGetCharArray("EP");
-		var charArraySize = charArray.size();
-		parseIndex = 0;
-
-		profileTimes[profileIndex] = parseNumberComma(charArray, charArraySize);
-		profileTimes[profileIndex+PROFILE_NUM_USER] = parseNumberComma(charArray, charArraySize);
-		applicationStorage.setValue("PT", profileTimes);  	// and save all profile times to storage
-
-		var pNum = 0;
-		for (; pNum<PROFILE_NUM_PROPERTIES && parseIndex<charArraySize; pNum++)
-		{
-			if (pNum==0)		// "0" profile name
-			{
-				pArray[pNum] = parseStringComma(charArray, charArraySize);
-			}
-			else if (pNum==3 ||	// "3" time military
-					pNum==8 || 	// "8" time italic font
-					pNum==18 || 	// "18" seconds color demo
-					pNum==19 || 	// "19" seconds move in a bit
-					pNum==32 || 	// "32" demo font styles
-					pNum==33 || 	// "33" demo second styles
-					pNum==34)		// "34" demo display
-			{
-				pArray[pNum] = parseBooleanComma(charArray, charArraySize);
-			}
-			else
-			{
-				pArray[pNum] = parseNumberComma(charArray, charArraySize);
-			}
-		}
-		
-		return pNum;
-	}
-			
-	function importFieldDataAddToByteArray(fArray, fNum, propertyStr)
-	{
-		// field data properties
-		var charArray = propertiesGetCharArray(propertyStr);
-		var charArraySize = charArray.size();
-		parseIndex = 0;
-
-		for (; fNum<FIELD_NUM*FIELD_NUM_PROPERTIES && parseIndex<charArraySize; fNum++)
-		{
-			var v = parseNumberComma(charArray, charArraySize);
-
-			if (v<0)
-			{
-				v = 0;
-			}
-			else if (v>255)
-			{
-				v = 255;
-			}
-
-			fArray[fNum] = v; 
-		}
-				
-		return fNum;
-	}
-	
-	function importProfile(profileIndex)
-	{
-		if (profileIndex>=0 && profileIndex<PROFILE_NUM_USER)
-		{
-			var pArray = new[PROFILE_NUM_PROPERTIES];
-			var pNum = importPropertiesFillArray(profileIndex, pArray);
-			pArray = pArray.slice(0, pNum);
-			applicationStorage.setValue("P" + profileIndex, pArray);
-			pArray = null;
-
-			var fArray = new[FIELD_NUM*FIELD_NUM_PROPERTIES]b;
-			var fNum = 0;
-			fNum = importFieldDataAddToByteArray(fArray, fNum, "EF");
-			fNum = importFieldDataAddToByteArray(fArray, fNum, "EG");
-			fArray = fArray.slice(0, fNum);
-			applicationStorage.setValue("PF" + profileIndex, fArray);
-		}
-	}
-
 	var dayWeekYearCalculatedDay = [-1, -1, -1];	// dayOfYear, ISO, Calendar
 	var dayOfYear;		// the day number of the year (0-364)
 	var ISOWeek;		// in ISO format the first week of the year always includes the first Thursday

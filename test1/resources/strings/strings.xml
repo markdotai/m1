@@ -6,9 +6,11 @@
                 
     <string id="Unused1">X</string>
     <string id="Unused2">X</string>
+    <string id="Unused3">X</string>
 
-    <string id="AppName">M1</string>
+    <string id="AppName">M1Lite</string>
 <!-- 
+    <string id="AppName">M1</string>
     <string id="AppName">M1beta</string>
  -->
 
@@ -18,7 +20,9 @@
     <string id="TimeLeadingZeroTitle">Time Add Leading Zero</string>
     <string id="TimeColonSeparatorTitle">Time Colon Separator</string>
     <string id="TimeHourFontTitle">Time Hours Font</string>
+    <string id="TimeHourColorTitle">Time Hours Color</string>
     <string id="TimeMinuteFontTitle">Time Minutes Font</string>
+    <string id="TimeMinuteColorTitle">Time Minutes Color</string>
     <string id="TimeItalicTitle">Time Custom Fonts Italic</string>
     <string id="TimeYOffsetTitle">Time Vertical Offset (+-120 pixels from centre)</string>
     
@@ -47,21 +51,42 @@
     <string id="FieldBatteryHighPercentageTitle">Status Battery High Percentage</string>
     <string id="FieldBatteryLowPercentageTitle">Status Battery Low Percentage</string>
 
-    <string id="FieldManagementTitle">Field Management (turn off/on or retrieve the field settings below)</string>
-    <string id="FieldNumberTitle">Field Number To Manage (1-8, each field has 6 elements below)</string>
-    <string id="FieldYOffsetTitle">Field Vertical Offset (+-120 pixels from centre)</string>
-    <string id="FieldXOffsetTitle">Field Horizontal Offset (+-120 pixels from centre)</string>
-    <string id="FieldJustificationTitle">Field Horizontal Justification</string>
-    <string id="FieldElement1Title">Element 1 (of field)</string>
-    <string id="FieldElement2Title">Element 2 (of field)</string>
-    <string id="FieldElement3Title">Element 3 (of field)</string>
-    <string id="FieldElement4Title">Element 4 (of field)</string>
-    <string id="FieldElement5Title">Element 5 (of field)</string>
-    <string id="FieldElement6Title">Element 6 (of field)</string>
+    <string id="FieldManagementTitle">Field 1 On/Off</string>
+    <string id="FieldYOffsetTitle">Field 1 Vertical Offset (+-120 pixels from centre)</string>
+    <string id="FieldXOffsetTitle">Field 1 Horizontal Offset (+-120 pixels from centre)</string>
+    <string id="FieldJustificationTitle">Field 1 Horizontal Justification</string>
+    <string id="FieldElement1Title">Field 1 Element 1</string>
+    <string id="FieldElement2Title">Field 1 Element 2</string>
+    <string id="FieldElement3Title">Field 1 Element 3</string>
+    <string id="FieldElement4Title">Field 1 Element 4</string>
+    <string id="FieldElement5Title">Field 1 Element 5</string>
+    <string id="FieldElement6Title">Field 1 Element 6</string>
 
-    <string id="ItemVisibilityTitle">Visible If ... (for item above)</string>
+    <string id="Field2ManagementTitle">Field 2 On/Off</string>
+    <string id="Field2YOffsetTitle">Field 2 Vertical Offset (+-120 pixels from centre)</string>
+    <string id="Field2XOffsetTitle">Field 2 Horizontal Offset (+-120 pixels from centre)</string>
+    <string id="Field2JustificationTitle">Field 2 Horizontal Justification</string>
+    <string id="Field2Element1Title">Field 2 Element 1</string>
+    <string id="Field2Element2Title">Field 2 Element 2</string>
+    <string id="Field2Element3Title">Field 2 Element 3</string>
+    <string id="Field2Element4Title">Field 2 Element 4</string>
+    <string id="Field2Element5Title">Field 2 Element 5</string>
+    <string id="Field2Element6Title">Field 2 Element 6</string>
+
+    <string id="Field3ManagementTitle">Field 3 On/Off</string>
+    <string id="Field3YOffsetTitle">Field 3 Vertical Offset (+-120 pixels from centre)</string>
+    <string id="Field3XOffsetTitle">Field 3 Horizontal Offset (+-120 pixels from centre)</string>
+    <string id="Field3JustificationTitle">Field 3 Horizontal Justification</string>
+    <string id="Field3Element1Title">Field 3 Element 1</string>
+    <string id="Field3Element2Title">Field 3 Element 2</string>
+    <string id="Field3Element3Title">Field 3 Element 3</string>
+    <string id="Field3Element4Title">Field 3 Element 4</string>
+    <string id="Field3Element5Title">Field 3 Element 5</string>
+    <string id="Field3Element6Title">Field 3 Element 6</string>
+
+    <string id="ItemVisibilityTitle">Visible If ... (for element above)</string>
+    <string id="ItemColorTitle">Color (of element above)</string>
     <string id="ItemAlwaysOn">Always On</string>
-    <string id="ItemColorTitle">Color (of item above)</string>
 
     <string id="FieldDoNotDisturbOn">Do Not Disturb On</string>
     <string id="FieldDoNotDisturbOff">Do Not Disturb Off</string>
@@ -84,34 +109,6 @@
     <string id="DemoSecondStylesTitle">Demo Second Styles (cycle through second indicator styles)</string>
     <string id="DemoDisplayTitle">Demo Display (show all colors, shapes and icons)</string>
 
-    <string id="GlanceProfileTitle">Gesture Profile (0 for none, or profile number for gesture)</string>
-
-    <string id="ProfileNameTitle">Profile Name (limited to 20 characters)</string>
-    <string id="ProfileManagementTitle">Profile Management (save/load settings above to watch/profile)</string>
-    <string id="ProfileNumberTitle">Profile Number To Save/Load (1-24) (or presets 25+)</string>
-    <string id="ProfileDaysTitle">Profile Activation Days (of week 1-7, e.g. 456 or 71 or 1234567)</string>
-    <string id="ProfileStartTimeTitle">Profile Start Time (HH:MM activate from this time)</string>
-    <string id="ProfileEndTimeTitle">Profile End Time (HH:MM activate until this time)</string>
-    <string id="ProfileBlockTitle">Profile Block Random (while this profile is active, block random events)</string>
-    <string id="ProfileRandomTitle">Profile Random Events (number per day for this profile)</string>
-
-    <string id="DemoProfilesTitle">Demo Profiles (cycle profiles in specified range, if no other profile active)</string>
-    <string id="DemoProfilesRangeTitle">Demo Profiles Start And End (e.g. 25-99 for preset profiles)</string>
-
-    <string id="ExportProfileTitle">Export/Import Profile Text (use profile management above)</string>
-    <string id="ExportFieldsTitle">Export/Import Fields Text (use profile management above)</string>
-
-    <string id="FieldRetrieveSettings">Retrieve (settings will not be updated)</string>
-
-    <string id="ProfileUpdateSettings">Update Watch Settings</string>
-    <string id="ProfileRetrieveSettings">Retrieve Watch Settings</string>
-    <string id="ProfileSave">Save Profile</string>
-    <string id="ProfileLoad">Load Profile</string>
-    <string id="ProfileCopy">Copy Profile To Watch Settings</string>
-    <string id="ProfileExport">Export Profile (to text fields below)</string>
-    <string id="ProfileImport">Import Profile (from text fields below)</string>
-    <string id="ProfileWasActive">Profile Was Active (settings will not be updated)</string>
-
     <string id="MenuNotSet">-Not Set-</string>
     <string id="MenuBlank"> </string>
     <string id="MenuLine">------------------------------------</string>
@@ -128,82 +125,82 @@
     <string id="MenuDark">DARK COLORS</string>
     <string id="MenuDarkest">DARKEST COLORS</string>
     
-    <string id="Color0">Black (0)</string>
-    <string id="Color1">Dark Gray (1)</string>
-    <string id="Color2">Light Gray (2)</string>
-	<string id="Color3">White (3)</string>
+    <string id="Color0">Black</string>
+    <string id="Color1">Dark Gray</string>
+    <string id="Color2">Light Gray</string>
+	<string id="Color3">White</string>
     
     <!-- Bright Colors -->
-    <string id="Color4">Yellow (4)</string>
-    <string id="Color5">Lime (5)</string>
-    <string id="Color6">Bright Green (6)</string>
-    <string id="Color7">Green (7)</string>
-    <string id="Color8">Spring Green (8)</string>
-    <string id="Color9">Bright Aquamarine (9)</string>
-    <string id="Color10">Cyan (10)</string>
-    <string id="Color11">Azure (11)</string>
-    <string id="Color12">Denim Blue (12)</string>
-    <string id="Color13">Blue (13)</string>
-    <string id="Color14">Electric Indigo (14)</string>
-    <string id="Color15">Violet (15)</string>
-    <string id="Color16">Magenta (16)</string>
-    <string id="Color17">Pink (17)</string>
-    <string id="Color18">Torch Red (18)</string>
-    <string id="Color19">Red (19)</string>
-    <string id="Color20">Strong Orange (20)</string>
-    <string id="Color21">Orange (21)</string>
+    <string id="Color4">Yellow</string>
+    <string id="Color5">Lime</string>
+    <string id="Color6">Bright Green</string>
+    <string id="Color7">Green</string>
+    <string id="Color8">Spring Green</string>
+    <string id="Color9">Bright Aquamarine</string>
+    <string id="Color10">Cyan</string>
+    <string id="Color11">Azure</string>
+    <string id="Color12">Denim Blue</string>
+    <string id="Color13">Blue</string>
+    <string id="Color14">Electric Indigo</string>
+    <string id="Color15">Violet</string>
+    <string id="Color16">Magenta</string>
+    <string id="Color17">Pink</string>
+    <string id="Color18">Torch Red</string>
+    <string id="Color19">Red</string>
+    <string id="Color20">Strong Orange</string>
+    <string id="Color21">Orange</string>
 
 	<!-- Dim Colors -->
-    <string id="Color22">Olive Green (22)</string>
-    <string id="Color23">Fruit Salad (23)</string>
-    <string id="Color24">Tradewind Blue (24)</string>
-    <string id="Color25">Rich Blue (25)</string>
-    <string id="Color26">Tapestry Purple (26)</string>
-    <string id="Color27">Blossom Red (27)</string>
+    <string id="Color22">Olive Green</string>
+    <string id="Color23">Fruit Salad</string>
+    <string id="Color24">Tradewind Blue</string>
+    <string id="Color25">Rich Blue</string>
+    <string id="Color26">Tapestry Purple</string>
+    <string id="Color27">Blossom Red</string>
 
     <!-- Pale Colors -->
-    <string id="Color28">Lemon (28)</string>
-    <string id="Color29">Green Yellow (29)</string>
-    <string id="Color30">Screamin' Green (30)</string>
-    <string id="Color31">Aquamarine (31)</string>
-    <string id="Color32">Baby Blue (32)</string>
-    <string id="Color33">Maya Blue (33)</string>
-    <string id="Color34">Neon Blue (34)</string>
-    <string id="Color35">Pale Violet (35)</string>
-    <string id="Color36">Flamingo (36)</string>
-    <string id="Color37">Brilliant Rose (37)</string>
-    <string id="Color38">Tomato (38)</string>
-    <string id="Color39">Pale Orange (39)</string>
+    <string id="Color28">Lemon</string>
+    <string id="Color29">Green Yellow</string>
+    <string id="Color30">Screamin' Green</string>
+    <string id="Color31">Aquamarine</string>
+    <string id="Color32">Baby Blue</string>
+    <string id="Color33">Maya Blue</string>
+    <string id="Color34">Neon Blue</string>
+    <string id="Color35">Pale Violet</string>
+    <string id="Color36">Flamingo</string>
+    <string id="Color37">Brilliant Rose</string>
+    <string id="Color38">Tomato</string>
+    <string id="Color39">Pale Orange</string>
     
     <!-- Palest Colors -->
-    <string id="Color40">Canary (40)</string>
-    <string id="Color41">Mint (41)</string>
-    <string id="Color42">Pale Blue (42)</string>
-    <string id="Color43">Lavender (43)</string>
-    <string id="Color44">Rose (44)</string>
-    <string id="Color45">Lilac (45)</string>
+    <string id="Color40">Canary</string>
+    <string id="Color41">Mint</string>
+    <string id="Color42">Pale Blue</string>
+    <string id="Color43">Lavender</string>
+    <string id="Color44">Rose</string>
+    <string id="Color45">Lilac</string>
 
     <!-- Dark Colors -->
-    <string id="Color46">Citrus (46)</string>
-    <string id="Color47">Limeade (47)</string>
-    <string id="Color48">Dark Green (48)</string>
-    <string id="Color49">Green Haze (49)</string>
-    <string id="Color50">Persian Green (50)</string>
-    <string id="Color51">Cobalt (51)</string>
-    <string id="Color52">Dark Blue (52)</string>
-    <string id="Color53">Purple (53)</string>
-    <string id="Color54">Dark Magenta (54)</string>
-    <string id="Color55">Lipstick (55)</string>
-    <string id="Color56">Dark Red (56)</string>    
-    <string id="Color57">Tawny Orange (57)</string>
+    <string id="Color46">Citrus</string>
+    <string id="Color47">Limeade</string>
+    <string id="Color48">Dark Green</string>
+    <string id="Color49">Green Haze</string>
+    <string id="Color50">Persian Green</string>
+    <string id="Color51">Cobalt</string>
+    <string id="Color52">Dark Blue</string>
+    <string id="Color53">Purple</string>
+    <string id="Color54">Dark Magenta</string>
+    <string id="Color55">Lipstick</string>
+    <string id="Color56">Dark Red</string>    
+    <string id="Color57">Tawny Orange</string>
 
     <!-- Darkest Colors -->
-    <string id="Color58">Verdun Green (58)</string>
-    <string id="Color59">Darkest Green (59)</string>
-    <string id="Color60">Sherpa Blue (60)</string>
-    <string id="Color61">Navy Blue (61)</string>
-    <string id="Color62">Tyrian Purple (62)</string>
-    <string id="Color63">Maroon (63)</string>
+    <string id="Color58">Verdun Green</string>
+    <string id="Color59">Darkest Green</string>
+    <string id="Color60">Sherpa Blue</string>
+    <string id="Color61">Navy Blue</string>
+    <string id="Color62">Tyrian Purple</string>
+    <string id="Color63">Maroon</string>
 
     <string id="SecondRefreshEverySecond">Every Second</string>
     <string id="SecondRefreshEveryMinute">Every Minute</string>

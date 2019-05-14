@@ -628,7 +628,15 @@ class test1View extends WatchUi.WatchFace
 		{
 			if (next==4)	// 1-4
 			{
-				if (appFontCur==4/*APPFONT_BOLD*/)
+				if (appFontCur<=1/*APPFONT_EXTRA_LIGHT*/)
+				{
+					val += (narrow?0:2);
+				}
+				else if (appFontCur==2/*APPFONT_LIGHT*/)
+				{
+					val += (narrow?0:1);
+				}
+				else if (appFontCur==4/*APPFONT_BOLD*/)
 				{
 					val -= 1;
 				}
@@ -642,7 +650,11 @@ class test1View extends WatchUi.WatchFace
 		{
 			if (next==4)	// 2-4
 			{
-				if (appFontCur==5/*APPFONT_HEAVY*/)
+				if (appFontCur<=1/*APPFONT_EXTRA_LIGHT*/)
+				{
+					val += (narrow?0:1);
+				}
+				else if (appFontCur==5/*APPFONT_HEAVY*/)
 				{
 					val -= 1;
 				}

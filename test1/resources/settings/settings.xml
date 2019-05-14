@@ -383,7 +383,7 @@
         </settingConfig>
     </setting>
 
-    <setting propertyKey="@Properties.7" title="@Strings.TimeMinuteFontTitle">
+    <setting propertyKey="@Properties.7" title="@Strings.TimeMinuteColorTitle">
         <settingConfig type="list">
             <listEntry value="0">@Strings.Color0</listEntry>
             <listEntry value="1">@Strings.Color1</listEntry>

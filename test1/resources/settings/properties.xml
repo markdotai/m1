@@ -1,5 +1,17 @@
 <properties>
 
+<!--
+[, 0, 1, false, 4, 3, 1, 40, true, 0, 1, 5, 2, 5, -1, -1, -1, -1, false, false, 1, 1, 3, 58, 12, 2, 0, 24, -1, 1, 75, 25, false, false, false, 0, -1]
+[56, 120, 1, 3, 0, 3, 21, 0, 3, 5, 0, 3, 0, 0, 3, 0, 0, 3, 0, 0, 3, 
+184, 120, 1, 31, 0, 3, 62, 0, 5, 0, 0, 3, 0, 0, 3, 0, 0, 3, 0, 0, 3, 
+210, 120, 1, 57, 15, 5, 0, 0, 3, 0, 0, 3, 0, 0, 3, 0, 0, 3, 0, 0, 3, 
+120, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+120, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+120, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+120, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+120, 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]b 
+ -->
+
     <property id="1" type="number">0x000000</property>		<!-- background color -->
     
     <property id="2" type="number">1</property>				<!-- time on -->
@@ -13,22 +25,22 @@
     <property id="9" type="number">0</property>				<!-- time y offset -->
 
     <property id="10" type="number">1</property>			<!-- second indicator on -->
-    <property id="11" type="number">0</property>			<!-- second indicator style -->
+    <property id="11" type="number">4</property>			<!-- second indicator style -->
     <property id="12" type="number">2</property>			<!-- second refresh style -->
-    <property id="13" type="number">1</property>			<!-- second color -->
-    <property id="14" type="number">2</property>			<!-- second color 5 -->
-    <property id="15" type="number">2</property>			<!-- second color 10 -->
-    <property id="16" type="number">5</property>			<!-- second color 15 -->
-    <property id="17" type="number">3</property>			<!-- second color 0 -->
+    <property id="13" type="number">5</property>			<!-- second color -->
+    <property id="14" type="number">-1</property>			<!-- second color 5 -->
+    <property id="15" type="number">-1</property>			<!-- second color 10 -->
+    <property id="16" type="number">-1</property>			<!-- second color 15 -->
+    <property id="17" type="number">-1</property>			<!-- second color 0 -->
     <property id="18" type="boolean">false</property>		<!-- second color demo -->
-    <property id="19" type="boolean">false</property>		<!-- second move in a bit -->
+    <property id="19" type="boolean">true</property>		<!-- second move in a bit -->
 
-    <property id="20" type="number">0</property>			<!-- outer on -->
-    <property id="21" type="number">0</property>			<!-- outer mode -->
-    <property id="22" type="number">19</property>			<!-- outer color filled -->
-    <property id="23" type="number">63</property>			<!-- outer color unfilled -->
+    <property id="20" type="number">1</property>			<!-- outer on -->
+    <property id="21" type="number">1</property>			<!-- outer mode -->
+    <property id="22" type="number">3</property>			<!-- outer color filled -->
+    <property id="23" type="number">-1</property>			<!-- outer color unfilled -->
 
-    <property id="24" type="number">6</property>			<!-- field font -->
+    <property id="24" type="number">12</property>			<!-- field font -->
     <property id="25" type="number">2</property>			<!-- field custom weight -->
     <property id="26" type="number">0</property>			<!-- field system case -->
     <property id="27" type="number">24</property>			<!-- field names font for unsupported languages -->
@@ -67,10 +79,10 @@
     <property id="G3" type="number">31</property>			<!-- field element 1 -->
     <property id="G4" type="number">0</property>			<!-- visible if -->
     <property id="G5" type="number">3</property>			<!-- color -->
-    <property id="G6" type="number">22</property>			<!-- field element 2 -->
+    <property id="G6" type="number">62</property>			<!-- field element 2 -->
     <property id="G7" type="number">0</property>			<!-- visible if -->
     <property id="G8" type="number">5</property>			<!-- color -->
-    <property id="G9" type="number">32</property>			<!-- field element 3 -->
+    <property id="G9" type="number">0</property>			<!-- field element 3 -->
     <property id="G10" type="number">0</property>			<!-- visible if -->
     <property id="G11" type="number">3</property>			<!-- color -->
     <property id="G12" type="number">0</property>			<!-- field element 4 -->
@@ -88,7 +100,7 @@
     <property id="H1" type="number">0</property>			<!-- field x offset -->
     <property id="H2" type="number">0</property>			<!-- field justification -->
     <property id="H3" type="number">57</property>			<!-- field element 1 -->
-    <property id="H4" type="number">0</property>			<!-- visible if -->
+    <property id="H4" type="number">15</property>			<!-- visible if -->
     <property id="H5" type="number">5</property>			<!-- color -->
     <property id="H6" type="number">0</property>			<!-- field element 2 -->
     <property id="H7" type="number">0</property>			<!-- visible if -->

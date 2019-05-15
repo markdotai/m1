@@ -491,10 +491,10 @@ class test1View extends WatchUi.WatchFace
 
 	//var worldBitmap;
 
+    var backgroundTimeArrayLength;
+	var backgroundTimeArrayMinuteStart;
     var backgroundTimeCharArray = new[5];        
-    var backgroundTimeCharArrayLength;
     var backgroundTimeColorArray = new[5];        
-	var backgroundTimeCharArrayMinuteStart;
     var backgroundTimeWidthArray = new[5];	        	        
 	var backgroundTimeTotalWidth;
 	var backgroundTimeXOffset;
@@ -1847,7 +1847,7 @@ class test1View extends WatchUi.WatchFace
 		
     	var fieldFont = propertiesGetNumber("24");
    		propFieldFont = ((fieldFont<24/*APPFONT_SYSTEM_XTINY*/) ? (fieldFont + propertiesGetNumber("25")) : fieldFont);		// add weight to non system fonts 
-		if (propFieldFont<0 || propFieldFont>=33/*APPFONT_NUMBER_OF_FONTS*/)
+		if (propFieldFont<6/*APPFONT_ULTRA_LIGHT_TINY*/ || propFieldFont>=33/*APPFONT_NUMBER_OF_FONTS*/)
 		{
 			propFieldFont = 15/*APPFONT_REGULAR_SMALL*/;
 		}
@@ -1864,10 +1864,10 @@ class test1View extends WatchUi.WatchFace
     function releaseDynamicResources()
     {
 		// allow all old resources to be freed immediately and at same time
+	   	fontFieldResource = null;
     	fontTimeHourResource = null;
     	fontTimeMinuteResource = null;
 		propSecondFontResource = null;
-	   	fontFieldResource = null;
     }
     
     function loadDynamicResources()
@@ -1998,6 +1998,9 @@ class test1View extends WatchUi.WatchFace
 		//System.println("onUpdate");
     
         var clockTime = System.getClockTime();	// get as first thing so we know it is correct and won't change later on
+        var hour = clockTime.hour;
+        var minute = clockTime.min;
+        var second = clockTime.sec;
 		var timeNow = Time.now();
 		var profileToActivate;
 		var demoSettingsChanged;
@@ -2006,7 +2009,7 @@ class test1View extends WatchUi.WatchFace
 				
         //View.onUpdate(dc);        // Call the parent onUpdate function to redraw the layout
 
-        //if (clockTime.min == updateLastMin && clockTime.sec == updateLastSec)
+        //if (minute == updateLastMin && second == updateLastSec)
         //{
         //	//System.println("multiple onUpdate");
         //	return;
@@ -2014,15 +2017,15 @@ class test1View extends WatchUi.WatchFace
 		//
 		//if ((onOrGlanceActive&ITEM_ONGLANCE)==0)		// if not during glance
 		//{        
-	    //    updateLastSec = clockTime.sec;
-	    //    updateLastMin = clockTime.min;
+	    //    updateLastSec = second;
+	    //    updateLastMin = minute;
 	    //}
 	    
-		//System.println("update rest sec=" + clockTime.sec);
+		//System.println("update rest sec=" + second);
 
 		if (settingsHaveChanged || firstUpdateSinceInitialize)
 		{
-			profileRandomLastMin = clockTime.min;	// don't do a random profile change on first minute (after initialize or settings change)
+			profileRandomLastMin = minute;	// don't do a random profile change on first minute (after initialize or settings change)
 
 			releaseDynamicResources();						// also done in onSettingsChanged()
 			doGetPropertiesAndDynamicResources = true;
@@ -2047,7 +2050,7 @@ class test1View extends WatchUi.WatchFace
 			profileGlance = doActivateGlanceCheck;		// set this after loadProfile, so it gets remembered
 		}
 
-    	demoSettingsChanged = checkDemoSettings(clockTime.hour*60 + clockTime.min, forceDemoSettingsChange);
+    	demoSettingsChanged = checkDemoSettings(hour*60 + minute, forceDemoSettingsChange);
     	if (demoSettingsChanged)
     	{
 			releaseDynamicResources();
@@ -2061,7 +2064,7 @@ class test1View extends WatchUi.WatchFace
 			loadDynamicResources();
         }
         
-        //System.println("onUpdate sec=" + clockTime.sec);
+        //System.println("onUpdate sec=" + second);
 
 	    //dc.drawBitmap(0, 0, worldBitmap);
 
@@ -2091,26 +2094,17 @@ class test1View extends WatchUi.WatchFace
 		var dateInfoShort = gregorian.info(timeNow, Time.FORMAT_SHORT);
 		var dateInfoMedium = gregorian.info(timeNow, Time.FORMAT_MEDIUM);
                 
-        // Get the current time and format it correctly       
-        var hour = clockTime.hour;
-        if (!deviceSettings.is24Hour)	// 12 hours
-        {
-            hour += ((hour > 12) ? -12 : 0);
-        }
-
-		// check for adding a leading zero
-        if (propertiesGetBoolean("3"))	// time military on
-        {
-            hour = hour.format("%02d");
-        }
-        
-        var minuteString = clockTime.min.format("%02d");
-        var hourString = "" + hour;
+        // Get the current time and format it correctly
+        var addLeadingZero = propertiesGetBoolean("3");
+        var hourDisplay = hour + ((!deviceSettings.is24Hour && hour>12) ? -12 : 0);			// 12 or 24 hour
+        var minuteString = minute.format("%02d");
+        var hourString = hourDisplay.format(addLeadingZero ? "%02d" : "%d");		// check for adding a leading zero
 
 		// calculate main time display
 		if ((propTimeOn & onOrGlanceActive)!=0 && !propDemoDisplayOn)
         {
         	var hasColon = (propTimeColon!=COLOR_NOTSET);
+        	
 			backgroundTimeColorArray[0] = propTimeHourColor;
 			backgroundTimeColorArray[1] = propTimeHourColor;	// set element 1 even if hour is only 1 digit - saves having an if statement
 			var curLength = addStringToCharArray(hourString, backgroundTimeCharArray, 0, 5);
@@ -2118,33 +2112,33 @@ class test1View extends WatchUi.WatchFace
 			{
 				backgroundTimeColorArray[curLength] = propTimeColon;
 				curLength = addStringToCharArray(":", backgroundTimeCharArray, curLength, 5);
-				backgroundTimeCharArrayMinuteStart = ((propTimeHourFont <= propTimeMinuteFont) ? curLength : (curLength-1));
+				backgroundTimeArrayMinuteStart = ((propTimeHourFont <= propTimeMinuteFont) ? curLength : (curLength-1));
 			}
 			else
 			{
-				backgroundTimeCharArrayMinuteStart = curLength;
+				backgroundTimeArrayMinuteStart = curLength;
 			}
 			backgroundTimeColorArray[curLength] = propTimeMinuteColor;
 			backgroundTimeColorArray[curLength+1] = propTimeMinuteColor;
-			backgroundTimeCharArrayLength = addStringToCharArray(minuteString, backgroundTimeCharArray, curLength, 5);
+			backgroundTimeArrayLength = addStringToCharArray(minuteString, backgroundTimeCharArray, curLength, 5);
 			
 			backgroundTimeTotalWidth = 0;
 			backgroundTimeXOffset = (propTimeItalic ? 1 : 0);
 
-	        for (var i=0; i<backgroundTimeCharArrayLength; i++)
+	        for (var i=0; i<backgroundTimeArrayLength; i++)
 	        {
-	        	var w = dc.getTextWidthInPixels(backgroundTimeCharArray[i].toString(), ((i<backgroundTimeCharArrayMinuteStart) ? fontTimeHourResource : fontTimeMinuteResource));
+	        	var w = dc.getTextWidthInPixels(backgroundTimeCharArray[i].toString(), ((i<backgroundTimeArrayMinuteStart) ? fontTimeHourResource : fontTimeMinuteResource));
 
 				// make sure both fonts are our custom ones
 				if (propTimeHourFont<=5/*APPFONT_HEAVY*/ && propTimeMinuteFont<=5/*APPFONT_HEAVY*/)
 				{
 					var curNum = backgroundTimeCharArray[i].toNumber() - 48/*APPCHAR_0*/;
 
-	    			if (i < backgroundTimeCharArrayLength-1)
+	    			if (i < backgroundTimeArrayLength-1)
 	    			{
 						var nextNum = backgroundTimeCharArray[i+1].toNumber() - 48/*APPCHAR_0*/;
-						var appFontCur = ((i<backgroundTimeCharArrayMinuteStart) ? propTimeHourFont : propTimeMinuteFont);
-						var appFontNext = ((i<(backgroundTimeCharArrayMinuteStart-1)) ? propTimeHourFont : propTimeMinuteFont);
+						var appFontCur = ((i<backgroundTimeArrayMinuteStart) ? propTimeHourFont : propTimeMinuteFont);
+						var appFontNext = ((i<(backgroundTimeArrayMinuteStart-1)) ? propTimeHourFont : propTimeMinuteFont);
 						
 						w -= getKern(curNum, nextNum, appFontCur, appFontNext, hasColon);
 				    }
@@ -2541,18 +2535,18 @@ class test1View extends WatchUi.WatchFace
 			}
 			else if (outerMode==2)			// minutes
 			{
-	    		backgroundOuterFillEnd = (clockTime.min * 2) - 1;
+	    		backgroundOuterFillEnd = (minute * 2) - 1;
 			}
 			else if (outerMode==3)			// hours
 			{
 		        if (deviceSettings.is24Hour)
 		        {
-	        		//backgroundOuterFillEnd = ((clockTime.hour*60 + clockTime.min) * 120) / (24 * 60);
-	        		backgroundOuterFillEnd = (clockTime.hour*60 + clockTime.min) / 12 - 1;
+	        		//backgroundOuterFillEnd = ((hour*60 + minute) * 120) / (24 * 60);
+	        		backgroundOuterFillEnd = (hour*60 + minute) / 12 - 1;
 		        }
 		        else        	// 12 hours
 		        {
-	        		backgroundOuterFillEnd = ((clockTime.hour%12)*60 + clockTime.min) / 6 - 1;
+	        		backgroundOuterFillEnd = ((hour%12)*60 + minute) / 6 - 1;
 		        }
 	   		}
 	   		else if (outerMode==4)			// battery percentage
@@ -2568,7 +2562,7 @@ class test1View extends WatchUi.WatchFace
 		// draw the background to main display
         drawBackgroundToDc(dc);
 
-        lastPartialUpdateSec = clockTime.sec;
+        lastPartialUpdateSec = second;
 		bufferIndex = -1;		// clear any background buffer being known
 
 		// draw the seconds indicator to the screen
@@ -2576,22 +2570,22 @@ class test1View extends WatchUi.WatchFace
 		{
         	if (propSecondRefreshStyle==0/*REFRESH_EVERY_SECOND*/)
         	{
-    			drawSecond(dc, clockTime.sec, clockTime.sec);
+    			drawSecond(dc, second, second);
     		}
     		else if ((propSecondRefreshStyle==1/*REFRESH_EVERY_MINUTE*/) ||
-    			(propSecondRefreshStyle==2/*REFRESH_ALTERNATE_MINUTES*/ && (clockTime.min%2)==0))
+    			(propSecondRefreshStyle==2/*REFRESH_ALTERNATE_MINUTES*/ && (minute%2)==0))
     		{
     			// draw all the seconds up to this point in the minute
-   				drawSecond(dc, 0, clockTime.sec);
+   				drawSecond(dc, 0, second);
     		}
-    		else if (propSecondRefreshStyle==2/*REFRESH_ALTERNATE_MINUTES*/ && (clockTime.min%2)==1)
+    		else if (propSecondRefreshStyle==2/*REFRESH_ALTERNATE_MINUTES*/ && (minute%2)==1)
 			{
 				// always draw indicator at 0 in this mode
 				// (it covers up frame slowdown when drawing all the rest of the seconds coming next ...)
    				drawSecond(dc, 0, 0);
 
     			// draw all the seconds after this point in the minute
-   				drawSecond(dc, clockTime.sec+1, 59);
+   				drawSecond(dc, second+1, 59);
     		}
 		}
     }
@@ -2778,11 +2772,11 @@ class test1View extends WatchUi.WatchFace
 			    //useDc.setColor(graphics.COLOR_DK_BLUE, graphics.COLOR_TRANSPARENT);
 				//useDc.fillRectangle(timeX, (timeYOffset-32), backgroundTimeTotalWidth, 64);
 		
-		        for (var i=0; i<backgroundTimeCharArrayLength; i++)
+		        for (var i=0; i<backgroundTimeArrayLength; i++)
 		        {
 					if (timeX<=dcWidth && (timeX+backgroundTimeWidthArray[i])>=0)		// check digit x overlaps buffer
 					{
-						var beforeMinuteStart = (i<backgroundTimeCharArrayMinuteStart); 
+						var beforeMinuteStart = (i<backgroundTimeArrayMinuteStart); 
 			        	var fontTimeResource = (beforeMinuteStart ? fontTimeHourResource : fontTimeMinuteResource);			// sometimes onPartialUpdate is called between onSettingsChanged and onUpdate - so this resource could be null
 			   			var fontTypeCur = (beforeMinuteStart ? propTimeHourFont : propTimeMinuteFont);
 
@@ -3098,22 +3092,24 @@ class test1View extends WatchUi.WatchFace
 		if ((propSecondIndicatorOn&ITEM_ON)!=0)
 		{ 
         	var clockTime = System.getClockTime();
+        	var minute = clockTime.min;
+        	var second = clockTime.sec;
 
 	 		// it seems as though occasionally onPartialUpdate can skip a second
 	 		// so check whether that has happened, and within the same minute since last full update
 	 		// - but only for certain refresh styles
     		if ((propSecondRefreshStyle==1/*REFRESH_EVERY_MINUTE*/) || (propSecondRefreshStyle==2/*REFRESH_ALTERNATE_MINUTES*/))
     		{
-		 		var prevSec = ((clockTime.sec+59)%60);
-		 		if (prevSec<clockTime.sec && prevSec!=lastPartialUpdateSec)	// check earlier second in same minute
+		 		var prevSec = ((second+59)%60);
+		 		if (prevSec<second && prevSec!=lastPartialUpdateSec)	// check earlier second in same minute
 		 		{
-		 			doPartialUpdateSec(dc, prevSec, clockTime.min);
+		 			doPartialUpdateSec(dc, prevSec, minute);
 		 		}
 			}
 
 	 		// do the partial update for this current second
-	 		doPartialUpdateSec(dc, clockTime.sec, clockTime.min);
-	 		lastPartialUpdateSec = clockTime.sec;	// set after calling doPartialUpdateSec
+	 		doPartialUpdateSec(dc, second, minute);
+	 		lastPartialUpdateSec = second;	// set after calling doPartialUpdateSec
         }
     }
 

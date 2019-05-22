@@ -10,6 +10,7 @@ using Application.Storage as applicationStorage;
 
 class test1View extends WatchUi.WatchFace
 {
+	//var forceMemoryTest = new[1024*6]b;
 	//const forceTestFont = false;
 	//const forceClearStorage = false;
 	//const forceDemoProfiles = false;
@@ -251,8 +252,10 @@ class test1View extends WatchUi.WatchFace
 	//	STATUS_BATTERY_LOW = 14,
 	//	STATUS_MOVEBARALERT_TRIGGERED = 15,
 	//	STATUS_MOVEBARALERT_NOT = 16,
+	//	STATUS_AM = 17,
+	//	STATUS_PM = 18,
 	//
-	//	STATUS_NUM = 17
+	//	STATUS_NUM = 19
 	//}
 	
 	//enum
@@ -277,6 +280,8 @@ class test1View extends WatchUi.WatchFace
 	//	FIELD_YEAR_ISO_WEEK_XXXX = 16,
 	//	FIELD_WEEK_CALENDAR_XX = 17,
 	//	FIELD_YEAR_CALENDAR_WEEK_XXXX = 18,
+	//	FIELD_AM = 19,
+	//	FIELD_PM = 20,
 	//
 	//	FIELD_SEPARATOR_SPACE = 21,
 	//	//!FIELD_SEPARATOR_SLASH_FORWARD = 22,
@@ -323,6 +328,8 @@ class test1View extends WatchUi.WatchFace
 	//	//!FIELD_UNUSED
 	//}
 	
+	var colorArray = new[64]b;
+
 	const COLOR_NOTSET = -1;	// just used in the code to indicate no color set
 	
 	function getColorArray(i)
@@ -342,67 +349,86 @@ class test1View extends WatchUi.WatchFace
 		// 0x0C = 0F0, 0x0D = 0F5, 0x0E = 0FA, 0x0F = 0FF
 		//
 		// 0x10 = 500, 0x20 = A00, 0x30 = F00
-		var colorArray = [
-			// grayscale......
-			//      0            1            2           3
-			// 000000       555555       AAAAAA      FFFFFF
-			(0x00<<24) | (0x15<<16) | (0x2A<<8) | (0x3F),
-	
-			// bright......
-			//      4            5            6           7
-			// FFFF00       AAFF00       55FF00      00FF00
-			(0x3C<<24) | (0x2C<<16) | (0x1C<<8) | (0x0C),
-			//      8            9           10          11
-			// 00FF55       00FFAA       00FFFF      00AAFF
-			(0x0D<<24) | (0x0E<<16) | (0x0F<<8) | (0x0B),
-			//     12           13           14          15
-			// 0055FF       0000FF       5500FF      AA00FF
-			(0x07<<24) | (0x03<<16) | (0x13<<8) | (0x23),
-			//     16           17           18          19
-			// FF00FF       FF00AA       FF0055      FF0000
-			(0x33<<24) | (0x32<<16) | (0x31<<8) | (0x30),
-							          // dim.......
-			//     20           21           22          23
-			// FF5500       FFAA00       AAAA55      55AA55
-			(0x34<<24) | (0x38<<16) | (0x29<<8) | (0x19),
-			//     24           25           26          27
-			// 55AAAA       5555AA       AA55AA      AA5555
-			(0x1A<<24) | (0x16<<16) | (0x26<<8) | (0x25),
-			// pale......
-			//     28           29           30          31
-			// FFFF55       AAFF55       55FF55      55FFAA
-			(0x3D<<24) | (0x2D<<16) | (0x1D<<8) | (0x1E),
-			//     32           33           34          35
-			// 55FFFF       55AAFF       5555FF      AA55FF
-			(0x1F<<24) | (0x1B<<16) | (0x17<<8) | (0x27),
-			//     36           37           38          39
-			// FF55FF       FF55AA       FF5555      FFAA55
-			(0x37<<24) | (0x36<<16) | (0x35<<8) | (0x39),
-			// palest......
-			//     40           41           42          43
-			// FFFFAA       AAFFAA       AAFFFF      AAAAFF
-			(0x3E<<24) | (0x2E<<16) | (0x2F<<8) | (0x2B),
-									  // dark......
-			//     44           45           46          47
-			// FFAAFF       FFAAAA       AAAA00      55AA00
-			(0x3B<<24) | (0x3A<<16) | (0x28<<8) | (0x18),
-			//     48           49           50          51
-			// 00AA00       00AA55       00AAAA      0055AA
-			(0x08<<24) | (0x09<<16) | (0x0A<<8) | (0x06),
-			//     52           53           54          55
-			// 0000AA       5500AA       AA00AA      AA0055
-			(0x02<<24) | (0x12<<16) | (0x22<<8) | (0x21),
-									  // darkest......
-			//     56           57           58          59
-			// AA0000       AA5500       555500      005500
-			(0x20<<24) | (0x24<<16) | (0x14<<8) | (0x04),
-			//     60           61           62          63
-			// 005555       000055       550055      550000
-			(0x05<<24) | (0x01<<16) | (0x11<<8) | (0x10),
-		];
-			
-		var byte = 3 - (i%4);
-		var shortCol = (colorArray[i/4] >> (byte*8));
+//		var colorArray = [
+//			// grayscale......
+//			//      0            1            2           3
+//			// 000000       555555       AAAAAA      FFFFFF
+//			(0x00<<24) | (0x15<<16) | (0x2A<<8) | (0x3F),
+//			// bright......
+//			//      4            5            6           7
+//			// FFFF00       AAFF00       55FF00      00FF00
+//			(0x3C<<24) | (0x2C<<16) | (0x1C<<8) | (0x0C),
+//			//      8            9           10          11
+//			// 00FF55       00FFAA       00FFFF      00AAFF
+//			(0x0D<<24) | (0x0E<<16) | (0x0F<<8) | (0x0B),
+//			//     12           13           14          15
+//			// 0055FF       0000FF       5500FF      AA00FF
+//			(0x07<<24) | (0x03<<16) | (0x13<<8) | (0x23),
+//			//     16           17           18          19
+//			// FF00FF       FF00AA       FF0055      FF0000
+//			(0x33<<24) | (0x32<<16) | (0x31<<8) | (0x30),
+//							          // dim.......
+//			//     20           21           22          23
+//			// FF5500       FFAA00       AAAA55      55AA55
+//			(0x34<<24) | (0x38<<16) | (0x29<<8) | (0x19),
+//			//     24           25           26          27
+//			// 55AAAA       5555AA       AA55AA      AA5555
+//			(0x1A<<24) | (0x16<<16) | (0x26<<8) | (0x25),
+//			// pale......
+//			//     28           29           30          31
+//			// FFFF55       AAFF55       55FF55      55FFAA
+//			(0x3D<<24) | (0x2D<<16) | (0x1D<<8) | (0x1E),
+//			//     32           33           34          35
+//			// 55FFFF       55AAFF       5555FF      AA55FF
+//			(0x1F<<24) | (0x1B<<16) | (0x17<<8) | (0x27),
+//			//     36           37           38          39
+//			// FF55FF       FF55AA       FF5555      FFAA55
+//			(0x37<<24) | (0x36<<16) | (0x35<<8) | (0x39),
+//			// palest......
+//			//     40           41           42          43
+//			// FFFFAA       AAFFAA       AAFFFF      AAAAFF
+//			(0x3E<<24) | (0x2E<<16) | (0x2F<<8) | (0x2B),
+//									  // dark......
+//			//     44           45           46          47
+//			// FFAAFF       FFAAAA       AAAA00      55AA00
+//			(0x3B<<24) | (0x3A<<16) | (0x28<<8) | (0x18),
+//			//     48           49           50          51
+//			// 00AA00       00AA55       00AAAA      0055AA
+//			(0x08<<24) | (0x09<<16) | (0x0A<<8) | (0x06),
+//			//     52           53           54          55
+//			// 0000AA       5500AA       AA00AA      AA0055
+//			(0x02<<24) | (0x12<<16) | (0x22<<8) | (0x21),
+//									  // darkest......
+//			//     56           57           58          59
+//			// AA0000       AA5500       555500      005500
+//			(0x20<<24) | (0x24<<16) | (0x14<<8) | (0x04),
+//			//     60           61           62          63
+//			// 005555       000055       550055      550000
+//			(0x05<<24) | (0x01<<16) | (0x11<<8) | (0x10),
+//		];
+
+//			[
+//			<!-- (0x00<<24) | (0x15<<16) | (0x2A<<8) | (0x3F) --> 1387071,
+//			<!-- (0x3C<<24) | (0x2C<<16) | (0x1C<<8) | (0x0C) --> 1009523724,
+//			<!-- (0x0D<<24) | (0x0E<<16) | (0x0F<<8) | (0x0B) --> 219025163,
+//			<!-- (0x07<<24) | (0x03<<16) | (0x13<<8) | (0x23) --> 117642019,
+//			<!-- (0x33<<24) | (0x32<<16) | (0x31<<8) | (0x30) --> 858927408,
+//			<!-- (0x34<<24) | (0x38<<16) | (0x29<<8) | (0x19) --> 876095769,
+//			<!-- (0x1A<<24) | (0x16<<16) | (0x26<<8) | (0x25) --> 437659173,
+//			<!-- (0x3D<<24) | (0x2D<<16) | (0x1D<<8) | (0x1E) --> 1026366750,
+//			<!-- (0x1F<<24) | (0x1B<<16) | (0x17<<8) | (0x27) --> 521869095,
+//			<!-- (0x37<<24) | (0x36<<16) | (0x35<<8) | (0x39) --> 926299449,
+//			<!-- (0x3E<<24) | (0x2E<<16) | (0x2F<<8) | (0x2B) --> 1043214123,
+//			<!-- (0x3B<<24) | (0x3A<<16) | (0x28<<8) | (0x18) --> 993667096,
+//			<!-- (0x08<<24) | (0x09<<16) | (0x0A<<8) | (0x06) --> 134810118,
+//			<!-- (0x02<<24) | (0x12<<16) | (0x22<<8) | (0x21) --> 34742817,
+//			<!-- (0x20<<24) | (0x24<<16) | (0x14<<8) | (0x04) --> 539235332,
+//			<!-- (0x05<<24) | (0x01<<16) | (0x11<<8) | (0x10) --> 83955984
+//			],
+//		var byte = 3 - (i%4);
+//		var shortCol = (colorArray[i/4] >> (byte*8));
+
+		var shortCol = colorArray[i];
 		var c0 = (shortCol & 0x003) * 5;			// 0x0, 0x5, 0xA, 0xF	
 		var c1 = ((shortCol<<2) & 0x030) * 5;		// 0x00, 0x50, 0xA0, 0xF0
 		var c2 = ((shortCol<<4) & 0x300) * 5;		// 0x000, 0x500, 0xA00, 0xF00
@@ -410,29 +436,32 @@ class test1View extends WatchUi.WatchFace
 		return col;
 	}
 
-	//function colorHexToIndex(col) not tested but may work ...
-	//{	
-	//	var r = ((col>>20) & 0x0F) / 5;	// 0-3
-	//	var g = ((col>>12) & 0x0F) / 5;	// 0-3
-	//	var b = ((col>>4) & 0x0F) / 5;	// 0-3
-	//	
-	//	var shortTest = (r<<4) | (g<<2) | b;
-	//	
-	//	var index = 0;
-	//
-	//	for (var i=0; i<64; i++)
-	//	{
-	//		var byte = 3 - (i%4);
-	//		var shortCol = (colorArray[i/4] >> (byte*8));
-	//		if (shortCol == shortTest)
-	//		{
-	//			index = i;
-	//			break;
-	//		}
-	//	}
-	//	
-	//	return index;
-	//}
+//	function colorHexToIndex(col) not tested but may work ...
+//	{
+//		var r = ((col>>20) & 0x0F) / 5;	// 0-3
+//		var g = ((col>>12) & 0x0F) / 5;	// 0-3
+//		var b = ((col>>4) & 0x0F) / 5;	// 0-3
+//		
+//		var shortTest = (r<<4) | (g<<2) | b;
+//		
+//		var index = colorArray.indexOf(shortTest);
+//		if (index < 0)
+//		{
+//			index = 0;
+//		}
+//	
+//		var index = 0;
+//		for (var i=0; i<64; i++)
+//		{
+//			if (shortTest == colorArray[i])
+//			{
+//				index = i;
+//				break;
+//			}
+//		}
+//		
+//		return index;
+//	}
 
 	//const SECONDS_FIRST_CHAR_ID = 21;
 	//const SECONDS_SIZE_HALF = 8;
@@ -507,6 +536,48 @@ class test1View extends WatchUi.WatchFace
 	var backgroundFieldInfoColor = new[FIELD_NUM*FIELD_NUM_ELEMENTS_DRAW];
 	var backgroundFieldTotalWidth = new[FIELD_NUM];
 
+	// index 0==day, 1==month
+	var backgroundFieldDiacriticsArray = new[2*5];
+	var backgroundFieldDiacriticsWidth = new[2*5]b;
+
+	function addBackgroundFieldDiacritics(dc, fontResource, sLen, eLen, nameIndex)
+	{
+		var startIndex = nameIndex*5;
+		var i = 0;
+		var width = 0;
+		for (var k=sLen; k<eLen; k++)
+		{
+			var c = getMyCharDiacritic(backgroundFieldInfoCharArray[k]);
+
+			backgroundFieldInfoCharArray[k] = c[0];	// replace the character
+
+			if (i<5)
+			{
+				backgroundFieldDiacriticsArray[startIndex+i] = ((c[1]>700) ? c[1].toChar() : 0);
+				backgroundFieldDiacriticsWidth[startIndex+i] = width;
+			}
+						
+			width += dc.getTextWidthInPixels(c[0].toString(), fontResource);
+			i++;
+		}
+		
+		return width;
+	}
+	
+	function drawBackgroundFieldDiacritics(dc, fontResource, len, nameIndex, dateX, dateY)
+	{
+		var startIndex = nameIndex*5;
+		len = ((len<=5) ? len : 5);
+		for (var i=0; i<len; i++)
+		{ 
+			var c = backgroundFieldDiacriticsArray[startIndex+i];
+			if (c!=0)
+			{
+				dc.drawText(dateX + backgroundFieldDiacriticsWidth[startIndex+i], dateY, fontResource, c.toString(), Graphics.TEXT_JUSTIFY_LEFT);
+			}
+		}
+	}	
+
 	var backgroundOuterFillStart;	// first segment of outer ring to draw as filled (-1 to 119)
 	var backgroundOuterFillEnd;		// last segment of outer ring to draw as filled (-1 to 119)
 
@@ -571,6 +642,9 @@ class test1View extends WatchUi.WatchFace
 	//	APPCHAR_9 = 57,		// digit 9
 	//	//!APPCHAR_COLON = 58,	// call this digit 10!
 	//
+	//	APPCHAR_A = 65,		// letter A
+	//	APPCHAR_F = 70,		// letter F
+	//
 	//	APPCHAR_SPACE = 32,
 	//	APPCHAR_COMMA = 44,
 	//	APPCHAR_MINUS = 45,
@@ -583,30 +657,29 @@ class test1View extends WatchUi.WatchFace
 	//	APPCHAR_CLOSE_SQUARE_BRACKET = 93,
 	//}
 	
+	var kernTable;
+	
 	function getKern(cur, next, appFontCur, appFontNext, narrow)
 	{
 		var val = 0;
 		
-		var kernTable = [
-			[
-						/*76543210    3210 :98     :987654 */
-			/* 0 & 1 */	0x10F01010, 0x01010000, 0x04218104,
-			/* 2 & 3 */	0x10F20000, 0x10100100, 0x000010F0,
-			/* 4 & 5 */	0x30001020, 0x10100110, 0x011010F0,
-			/* 6 & 7 */	0x10F01010, 0x12400110, 0x020010F6,
-			/* 8 & 9 */	0x10F01010, 0x10100000, 0x000010F0,
-			/* :     */	0x00012140, 0x00000000,
-			],
-			[			/* NARROW / COLON */
-						/*76543210    3210 :98     :987654 */
-			/* 0 & 1 */	0x10000010, 0x00010000, 0x02217104,
-			/* 2 & 3 */	0x10020000, 0x00100000, 0x00001000,
-			/* 4 & 5 */	0x30102020, 0x00100030, 0x00201000,
-			/* 6 & 7 */	0x10000010, 0x12400010, 0x01001006,
-			/* 8 & 9 */	0x10000010, 0x00100000, 0x00001000,
-			/* :     */	0x00001020, 0x00000000,
-			]
-		];
+//		var kernTable = [		// 480 bytes of code to initialize (136 byte array)
+//						/*76543210    3210 :98     :987654 */
+//			/* 0 & 1 */	0x10F01010, 0x01010000, 0x04218104,
+//			/* 2 & 3 */	0x10F20000, 0x10100100, 0x000010F0,
+//			/* 4 & 5 */	0x30001020, 0x10100110, 0x011010F0,
+//			/* 6 & 7 */	0x10F01010, 0x12400110, 0x020010F6,
+//			/* 8 & 9 */	0x10F01010, 0x10100000, 0x000010F0,
+//			/* :     */	0x00012140, 0x00000000,
+//						/* NARROW / COLON */
+//						/*76543210    3210 :98     :987654 */
+//			/* 0 & 1 */	0x10000010, 0x00010000, 0x02217104,
+//			/* 2 & 3 */	0x10020000, 0x00100000, 0x00001000,
+//			/* 4 & 5 */	0x30102020, 0x00100030, 0x00201000,
+//			/* 6 & 7 */	0x10000010, 0x12400010, 0x01001006,
+//			/* 8 & 9 */	0x10000010, 0x00100000, 0x00001000,
+//			/* :     */	0x00001020, 0x00000000,
+//		];
 	
 		var bits = cur*48 + next*4;
 		var byte4 = bits/32;
@@ -616,7 +689,7 @@ class test1View extends WatchUi.WatchFace
 		{
 			bits = bits%32;
 			
-			val = (kernTable[narrow?1:0][byte4] >> bits) & 0xF;
+			val = (kernTable[byte4 + (narrow?17:0)] >> bits) & 0xF;
 			if (val > 0x8)
 			{
 				val -= 0x10;
@@ -664,6 +737,8 @@ class test1View extends WatchUi.WatchFace
 		return val + (narrow?3:0);
 	}
 	
+    var bitsSupported;
+
 	function useUnsupportedFieldFont(s)
 	{
 //		var bits = [
@@ -691,8 +766,8 @@ class test1View extends WatchUi.WatchFace
         
 		if (propFieldFont < 24/*APPFONT_SYSTEM_XTINY*/)		// custom fonts
 		{
-	        var bits = [0, 134213665, 402653182, 0, 0, 0, 1028141746, 0, 67112976, 536870912, 83951626, 570425345];
-	        var bitsSize = bits.size();
+	        //var bitsSupported = [0, 134213665, 402653182, 0, 0, 0, 1028141746, 0, 67112976, 536870912, 83951626, 570425345];
+	        var bitsSize = bitsSupported.size();
 	        
 	        var sArray = s.toCharArray();
 	        var sArraySize = sArray.size();
@@ -702,7 +777,7 @@ class test1View extends WatchUi.WatchFace
 				var byte = c / 32;
 				var bit = c % 32;
 		       	//System.println("c=" + c + " byte=" + byte + " bit=" + bit);
-				if (byte<0 || byte>=bitsSize || (bits[byte]&(0x1<<bit))==0)
+				if (byte<0 || byte>=bitsSize || (bitsSupported[byte]&(0x1<<bit))==0)
 				{
 					return true;
 				}
@@ -710,6 +785,32 @@ class test1View extends WatchUi.WatchFace
 		}
 				
 		return false;
+	}
+	
+	var myChars = new[78]b;
+
+	function getMyCharDiacritic(c)
+	{
+		var diacritic = 700;
+		var cNum = c.toNumber() - 190;
+		if (cNum>0)		// only search array if it's a character with diacritic
+		{
+			// 650 bytes of code to initialize 52 values - so moved to jsonData instead
+			//var c1 = [ 3,  6,  7,  9, 11, 14, 15, 21, 24,  26, 28, 29, 30, 31, 70, 78, 92, 127, 131, 133, 146, 154, 156, 162, 187, 191]b;		// -190
+			//var c2 = [65, 65, 65, 67, 69, 73, 73, 79, 79, 216, 85, 85, 85, 89, 65, 67, 69,  76,  76,  78,  79,  82,  83,  83,  90,  90]b;
+			//var c3 = [69, 70, 71, 72, 69, 73, 74, 69, 70,   0, 69, 75, 70, 69, 76, 77, 77,  78,  79,  69,  80,  77,  69,  77,  69,  77]b;		// -700
+			for (var i=0; i<26; i++)
+			{
+				if (myChars[i] == cNum)
+				{
+					c = myChars[i+26].toChar();
+					diacritic += myChars[i+52];
+					break;
+				}
+			}
+		}
+		
+		return [c, diacritic];
 	}
 	
 	function lteConnected()
@@ -955,6 +1056,13 @@ class test1View extends WatchUi.WatchFace
 
 		//worldBitmap = WatchUi.loadResource(Rez.Drawables.id_world);
 
+		// load in permanent global data
+		{
+			var dataResource = watchUi.loadResource(Rez.JsonData.id_data);
+			kernTable = dataResource[0];
+			bitsSupported = dataResource[1];
+		}
+
         // If this device supports BufferedBitmap, allocate the buffer for what's behind the seconds indicator 
         //if (Toybox.Graphics has :BufferedBitmap)
 		// This full color buffer is needed because anti-aliased fonts cannot be drawn into a buffer with a reduced color palette
@@ -986,16 +1094,40 @@ class test1View extends WatchUi.WatchFace
 			}
 		}
 		
-		// load in second indicator & outer ring positions
+		// load in data values which are stored as byte arrays (to save memory) 
 		{
-			var tempResource = watchUi.loadResource(Rez.JsonData.id_coordsXY);
+			var tempResource = watchUi.loadResource(Rez.JsonData.id_dataBytes);
+			
+			// second indicator & outer ring positions
 			for (var i=0; i<120; i++)
 			{
 				secondsX[i] = tempResource[0][i];
 				secondsY[i] = tempResource[1][i];
 				outerX[i] = tempResource[2][i];
 				outerY[i] = tempResource[3][i];
+
+				// table for characters with diacritics
+				if (i<78)
+				{
+					myChars[i] = tempResource[4][i];
+
+					if (i<64)
+					{
+						colorArray[i] = tempResource[5][i];
+
+						if (i<40)
+						{
+							outerValues[i] = tempResource[6][i];
+
+							if (i<36)
+							{
+    							bufferValues[i] = tempResource[7][i];
+    						}
+						}
+					}
+				}
 			}
+			
 			tempResource = null;
 		}
 
@@ -2007,6 +2139,8 @@ class test1View extends WatchUi.WatchFace
 		var doGetPropertiesAndDynamicResources = false;
 		var forceDemoSettingsChange = false;
 				
+		//calculateSun();
+
         //View.onUpdate(dc);        // Call the parent onUpdate function to redraw the layout
 
         //if (minute == updateLastMin && second == updateLastSec)
@@ -2093,10 +2227,14 @@ class test1View extends WatchUi.WatchFace
 		var gregorian = Time.Gregorian;
 		var dateInfoShort = gregorian.info(timeNow, Time.FORMAT_SHORT);
 		var dateInfoMedium = gregorian.info(timeNow, Time.FORMAT_MEDIUM);
-                
+
+		//System.println("hour=" + gregorian.info(timeNow, Time.FORMAT_SHORT).hour + " utc=" + gregorian.utcInfo(timeNow, Time.FORMAT_SHORT).hour);
+		// does not change with time simulation in simulator:
+		//System.println("hour2=" + gregorian.info(Time.getCurrentTime(null), Time.FORMAT_SHORT).hour + " utc2=" + gregorian.utcInfo(Time.getCurrentTime(null), Time.FORMAT_SHORT).hour);
+        
         // Get the current time and format it correctly
         var addLeadingZero = propertiesGetBoolean("3");
-        var hourDisplay = hour + ((!deviceSettings.is24Hour && hour>12) ? -12 : 0);			// 12 or 24 hour
+        var hourDisplay = (deviceSettings.is24Hour ? hour : (((hour+11)%12) + 1));			// 12 or 24 hour
         var minuteString = minute.format("%02d");
         var hourString = hourDisplay.format(addLeadingZero ? "%02d" : "%d");		// check for adding a leading zero
 
@@ -2158,7 +2296,7 @@ class test1View extends WatchUi.WatchFace
 		}
 
 		// calculate fields to display
-		var visibilityStatus = new[17/*STATUS_NUM*/];
+		var visibilityStatus = new[19/*STATUS_NUM*/];
 		visibilityStatus[0/*STATUS_ALWAYSON*/] = true;
 	    visibilityStatus[1/*STATUS_DONOTDISTURB_ON*/] = (hasDoNotDisturb && deviceSettings.doNotDisturb);
 	    visibilityStatus[2/*STATUS_DONOTDISTURB_OFF*/] = (hasDoNotDisturb && !deviceSettings.doNotDisturb);
@@ -2188,6 +2326,8 @@ class test1View extends WatchUi.WatchFace
 	    var moveBarAlertTriggered = (activityMonitorInfo.moveBarLevel >= propertiesGetNumber("29")); 
 	    visibilityStatus[15/*STATUS_MOVEBARALERT_TRIGGERED*/] = (activityTrackingOn && moveBarAlertTriggered);
 	    visibilityStatus[16/*STATUS_MOVEBARALERT_NOT*/] = (activityTrackingOn && !moveBarAlertTriggered);
+	    visibilityStatus[17/*STATUS_AM*/] = (hour < 12);
+	    visibilityStatus[18/*STATUS_PM*/] = (hour >= 12);
 
 		fieldActivePhoneStatus = null;
 		fieldActiveNotificationsStatus = null;
@@ -2217,7 +2357,7 @@ class test1View extends WatchUi.WatchFace
 					var eVisible = propFieldData[elementStart + 1];
 
 					// don't need to test >=0 as it's a byte array
-					if (eDisplay!=0/*FIELD_EMPTY*/ && /*eVisible>=0 &&*/ eVisible<17/*STATUS_NUM*/)
+					if (eDisplay!=0/*FIELD_EMPTY*/ && /*eVisible>=0 &&*/ eVisible<19/*STATUS_NUM*/)
 					{
 						if (eVisible==5/*STATUS_NOTIFICATIONS_PENDING*/ || eVisible==6/*STATUS_NOTIFICATIONS_NONE*/)
 						{
@@ -2239,6 +2379,7 @@ class test1View extends WatchUi.WatchFace
 	 						var eStr = null;		// null means empty if nothing below sets it
 							var eIsIcon = false;
 							var eUseUnsupportedFont = false;
+							var eDiacritics = -1;
 		
 							//if (e==FIELD_EMPTY)			// empty
 						    //{
@@ -2281,7 +2422,7 @@ class test1View extends WatchUi.WatchFace
 								    {
 										eStr = ((eDisplay==3/*FIELD_DAY_NAME*/) ? dateInfoMedium.day_of_week : dateInfoMedium.month);
 			
-										//eStr = "0\u0158\u015a\u00c7\u0179\u0104";		// test string for diacritics & bounding rectangle (use system large)
+										//eStr = "\u0158\u015a\u00c7Z\u0179\u0104";		// test string for diacritics & bounding rectangle (use system large)
 										//eStr = "A\u042d\u03b8\u05e9\u069b";			// test string for other languages
 			
 										if (propFieldFont < 24/*APPFONT_SYSTEM_XTINY*/)		// custom font
@@ -2307,6 +2448,7 @@ class test1View extends WatchUi.WatchFace
 											else
 											{
 												eStr = tempStr;		// ok to use
+												eDiacritics = ((eDisplay==3/*FIELD_DAY_NAME*/) ? 0 : 1);
 											}
 										}
 										else
@@ -2399,6 +2541,18 @@ class test1View extends WatchUi.WatchFace
 										break;
 									}
 				
+									case 19/*FIELD_AM*/:
+								    {
+										eStr = "AM";
+										break;
+									}
+				
+									case 20/*FIELD_PM*/:
+								    {
+										eStr = "PM";
+										break;
+									}
+				
 									case 31/*FIELD_STEPSCOUNT*/:
 									{
 										eStr = "" + activityMonitorInfo.steps;
@@ -2448,7 +2602,7 @@ class test1View extends WatchUi.WatchFace
 											var jDisplay = propFieldData[jStart];
 											var jVisible = propFieldData[jStart + 1];
 											// don't need to test >=0 as it's a byte array
-											if (jDisplay!=0/*FIELD_EMPTY*/ && /*jVisible>=0 &&*/ jVisible<17/*STATUS_NUM*/ && visibilityStatus[jVisible])
+											if (jDisplay!=0/*FIELD_EMPTY*/ && /*jVisible>=0 &&*/ jVisible<19/*STATUS_NUM*/ && visibilityStatus[jVisible])
 											{
 												if (jDisplay==37/*FIELD_MOVEBAR*/)
 												{
@@ -2489,7 +2643,7 @@ class test1View extends WatchUi.WatchFace
 											// moveBarNum goes from 1 to 5
 											var barIsOn = (moveBarNum <= activityMonitorInfo.moveBarLevel);
 											var eKern = ((j<numToAdd-1 || nextIsMoveBar==1) ? -5 : 0);
-											addBackgroundField(dc, f, fieldInfoIndexEnd, (barIsOn ? "Z" : "Y"), true, false, (barIsOn ? eColor : offColor), eKern);
+											addBackgroundField(dc, f, fieldInfoIndexEnd, (barIsOn ? "Z" : "Y"), true, false, (barIsOn ? eColor : offColor), eKern, -1);
 										}
 										
 										// leave eStr as null so doesn't get added again below
@@ -2502,7 +2656,7 @@ class test1View extends WatchUi.WatchFace
 							
 							if (eStr != null)
 							{
-								addBackgroundField(dc, f, fieldInfoIndexEnd, eStr, eIsIcon, eUseUnsupportedFont, eColor, 0);
+								addBackgroundField(dc, f, fieldInfoIndexEnd, eStr, eIsIcon, eUseUnsupportedFont, eColor, 0, eDiacritics);
 							}
 						}
 					}
@@ -2590,7 +2744,7 @@ class test1View extends WatchUi.WatchFace
 		}
     }
 
-	function addBackgroundField(dc, f, fieldInfoIndexEnd, eStr, eIsIcon, eUseUnsupportedFont, eColor, eKern)
+	function addBackgroundField(dc, f, fieldInfoIndexEnd, eStr, eIsIcon, eUseUnsupportedFont, eColor, eKern, eDiacritics)
 	{
 		// add the background field info (precalculate stuff so don't need to do it for the offscreen buffer)
 		var fieldInfoIndex = backgroundFieldInfoIndex[f];
@@ -2602,8 +2756,21 @@ class test1View extends WatchUi.WatchFace
 			{
 				backgroundFieldInfoCharArrayLength[f] = eLen;
 	
-				var width = eKern + dc.getTextWidthInPixels(eStr, (eIsIcon ? iconsFontResource : (eUseUnsupportedFont ? fontFieldUnsupportedResource : fontFieldResource)));
-				backgroundFieldInfoData[fieldInfoIndex] = (width | (sLen << 24) | (eLen << 16) | (eIsIcon?0x1000:0x0000) | (eUseUnsupportedFont?0x2000:0x0000));
+				var infoData = (sLen << 24) | (eLen << 16) | (eIsIcon?0x1000:0x0000) | (eUseUnsupportedFont?0x2000:0x0000);
+								
+				var width = eKern;
+				var fontResource = (eIsIcon ? iconsFontResource : (eUseUnsupportedFont ? fontFieldUnsupportedResource : fontFieldResource));
+				if (eDiacritics>=0)
+				{
+					width += addBackgroundFieldDiacritics(dc, fontResource, sLen, eLen, eDiacritics);
+					infoData |= ((eDiacritics==0)?0x4000:0x8000);
+				}
+				else
+				{
+					width += dc.getTextWidthInPixels(eStr, fontResource);
+				}
+				
+				backgroundFieldInfoData[fieldInfoIndex] = (width | infoData);
 	
 				backgroundFieldInfoColor[fieldInfoIndex] = eColor;
 		
@@ -2612,6 +2779,15 @@ class test1View extends WatchUi.WatchFace
 			}
 		}
 	}
+
+//	<!-- outer ring values (outerBigXY, outerOffscreenStart, outerOffscreenEnd) -->
+//	[118, -3, 200, 33, 200, 117, 118, 199, 34, 199, -2, 117, -2, 33, 34, -3],
+//	[  -2,   7,  19,  28,  37,  49,  58,  67,  79,  88,  97, 109 ],
+//	[   9,  22,  30,  39,  52,  59,  69,  82,  89,  99, 112, 120 ],
+//	var outerBigXY;
+//	var outerOffscreenStart;
+//	var outerOffscreenEnd;
+	var outerValues = new[40]b;
 
 	function drawBackgroundToDc(useDc)
 	{ 
@@ -2718,7 +2894,7 @@ class test1View extends WatchUi.WatchFace
 									// align bottom of text with bottom of icons
 									if (propFieldFont<24/*APPFONT_SYSTEM_XTINY*/)		// custom font?
 									{
-										var fieldYAdjustFontCustom = [
+										var fieldYAdjustFontCustom = [			// 60 code bytes to initialise
 											0,		// APPFONT_ULTRA_LIGHT
 											-12,	// APPFONT_ULTRA_LIGHT_TINY
 											-16,	// APPFONT_ULTRA_LIGHT_SMALL
@@ -2740,8 +2916,14 @@ class test1View extends WatchUi.WatchFace
 	
 								var sLen = ((w>>24) & 0xFF);
 								var eLen = ((w>>16) & 0xFF);
+
 								var s = StringUtil.charArrayToString(backgroundFieldInfoCharArray.slice(sLen, eLen));
 				        		useDc.drawText(dateX, dateY, curFont, s, graphics.TEXT_JUSTIFY_LEFT);
+				        		
+				        		if ((w&(0x4000|0x8000))!=0)
+				        		{
+				        			drawBackgroundFieldDiacritics(useDc, curFont, eLen-sLen, (((w&0x4000)!=0)?0:1), dateX, dateY);
+				        		}
 				        	}
 						}
 								
@@ -2810,7 +2992,8 @@ class test1View extends WatchUi.WatchFace
 		{
 			// positions of the outerBig segments (from fnt file)
 			// y are all adjusted -1 as usual
-			var outerBigXY = [118, -2-1, 200, 34-1, 200, 118-1, 118, 200-1, 34, 200-1, -2, 118-1, -2, 34-1, 34, -2-1];
+			//var outerBigXY = [118, -2-1, 200, 34-1, 200, 118-1, 118, 200-1, 34, 200-1, -2, 118-1, -2, 34-1, 34, -2-1];
+			//var outerBigXY = [118, -3, 200, 33, 200, 117, 118, 199, 34, 199, -2, 117, -2, 33, 34, -3];
 
 			var jStart;
 			var jEnd;
@@ -2824,11 +3007,11 @@ class test1View extends WatchUi.WatchFace
 			{
 				// these arrays contain outer ring segment numbers (0-119) for the offscreen buffer positions
 									  		// t2   tr   r1   r2   br   b1   b2   bl   l1   l2   tl   t1
-				var outerOffscreenStart = 	[  -2,   7,  19,  28,  37,  49,  58,  67,  79,  88,  97, 109 ];
-				var outerOffscreenEnd = 	[   9,  22,  30,  39,  52,  59,  69,  82,  89,  99, 112, 120 ];
+				//var outerOffscreenStart = 	[  -2,   7,  19,  28,  37,  49,  58,  67,  79,  88,  97, 109 ];
+				//var outerOffscreenEnd = 	[   9,  22,  30,  39,  52,  59,  69,  82,  89,  99, 112, 120 ];
 			
-    			jStart = outerOffscreenStart[bufferIndex];
-    			jEnd = outerOffscreenEnd[bufferIndex];
+    			jStart = outerValues[bufferIndex + 16] - 10;
+    			jEnd = outerValues[bufferIndex + 28];
 			}
 	
 			//jStart = 0;	// test draw all
@@ -2881,7 +3064,7 @@ class test1View extends WatchUi.WatchFace
 								//var s = characterString.substring(bigIndex, bigIndex+1);
 								//var s = StringUtil.charArrayToString([(bigIndex + OUTER_FIRST_CHAR_ID).toChar()]);
 								var s = (bigIndex + 12/*OUTER_FIRST_CHAR_ID*/).toChar().toString();
-					        	useDc.drawText(outerBigXY[bigIndex2] - dcX, outerBigXY[bigIndex2 + 1] - dcY, outerBigFontResource, s, graphics.TEXT_JUSTIFY_LEFT);
+					        	useDc.drawText(outerValues[bigIndex2] - 10 - dcX, outerValues[bigIndex2 + 1] - 10 - dcY, outerBigFontResource, s, graphics.TEXT_JUSTIFY_LEFT);
 					        }
 					        
 				        	j += 15;	// drawn a big segment so advance 15 small ones
@@ -2919,14 +3102,43 @@ class test1View extends WatchUi.WatchFace
 	   		useDc.setColor(propTimeHourColor, graphics.COLOR_TRANSPARENT);
 	   		if (fontFieldResource!=null)		// sometimes onPartialUpdate is called between onSettingsChanged and onUpdate - so this resource could be null
 	   		{
-				useDc.drawText(120 - dcX, 120 - 120 - dcY, fontFieldResource, " I:I1%", graphics.TEXT_JUSTIFY_CENTER);
-				useDc.drawText(120 - dcX, 120 - 95 - dcY, fontFieldResource, "2345678", graphics.TEXT_JUSTIFY_CENTER);
-				useDc.drawText(120 - dcX, 120 - 70 - dcY, fontFieldResource, "9-0\\/A.B,CD", graphics.TEXT_JUSTIFY_CENTER);
-				useDc.drawText(120 - dcX, 120 - 45 - dcY, fontFieldResource, "EFGHIJKLMNO", graphics.TEXT_JUSTIFY_CENTER);
-				useDc.drawText(120 - dcX, 120 - 20 - dcY, fontFieldResource, "PQRSTUVWXYZ", graphics.TEXT_JUSTIFY_CENTER);
-				useDc.drawText(120 - dcX, 120 + 10 - dcY, fontFieldResource, "ÁÚÄÅÇÉÌÍÓÖØ", graphics.TEXT_JUSTIFY_CENTER);
-				useDc.drawText(120 - dcX, 120 + 40 - dcY, fontFieldResource, "ÛÜÝĄČĚĽŁŃ", graphics.TEXT_JUSTIFY_CENTER);
-				useDc.drawText(120 - dcX, 120 + 70 - dcY, fontFieldResource, "ŐŘŚŠŹŽ​", graphics.TEXT_JUSTIFY_CENTER);
+				//useDc.drawText(120 - dcX, 120 - 120 - dcY, fontFieldResource, " I:I1%", graphics.TEXT_JUSTIFY_CENTER);
+				//useDc.drawText(120 - dcX, 120 - 95 - dcY, fontFieldResource, "2345678", graphics.TEXT_JUSTIFY_CENTER);
+				//useDc.drawText(120 - dcX, 120 - 70 - dcY, fontFieldResource, "9-0\\/A.B,CD", graphics.TEXT_JUSTIFY_CENTER);
+				//useDc.drawText(120 - dcX, 120 - 45 - dcY, fontFieldResource, "EFGHIJKLMNO", graphics.TEXT_JUSTIFY_CENTER);
+				//useDc.drawText(120 - dcX, 120 - 20 - dcY, fontFieldResource, "PQRSTUVWXYZ", graphics.TEXT_JUSTIFY_CENTER);
+				//useDc.drawText(120 - dcX, 120 + 10 - dcY, fontFieldResource, "ÁÚÄÅÇÉÌÍÓÖØ", graphics.TEXT_JUSTIFY_CENTER);
+				//useDc.drawText(120 - dcX, 120 + 40 - dcY, fontFieldResource, "ÛÜÝĄČĚĽŁŃ", graphics.TEXT_JUSTIFY_CENTER);
+				//useDc.drawText(120 - dcX, 120 + 70 - dcY, fontFieldResource, "ŐŘŚŠŹŽ​", graphics.TEXT_JUSTIFY_CENTER);
+
+	   			var yOffsets = [-120, -95, -70, -45, -20, 10, 40, 70];
+	   			var sArray = [" I:I1%", "2345678", "9-0\\/A.B,CD", "EFGHIJKLMNO", "PQRSTUVWXYZ", "ÁÚÄÅÇÉÌÍÓÖØ", "ÛÜÝĄČĚĽŁŃ", "ŐŘŚŠŹŽ​"];
+
+				for (var i=0; i<sArray.size(); i++)
+				{
+					var charArray = sArray[i].toCharArray();
+					
+					// calculate total width first
+					var totalWidth = 0;
+					for (var j=0; j<charArray.size(); j++)
+					{
+						var c = getMyCharDiacritic(charArray[j]);
+	        			totalWidth += useDc.getTextWidthInPixels(c[0].toString(), fontFieldResource);
+					}
+					
+					// draw each character + any diacritic
+					var xOffset = 0;
+					for (var j=0; j<charArray.size(); j++)
+					{
+						var c = getMyCharDiacritic(charArray[j]);						
+						useDc.drawText(120 - dcX - totalWidth/2 + xOffset, 120 - dcY + yOffsets[i], fontFieldResource, c[0].toString(), graphics.TEXT_JUSTIFY_LEFT);
+		    			if (c[1]>700)
+		    			{
+							useDc.drawText(120 - dcX - totalWidth/2 + xOffset, 120 - dcY + yOffsets[i], fontFieldResource, c[1].toChar().toString(), graphics.TEXT_JUSTIFY_LEFT);
+		    			}
+						xOffset += useDc.getTextWidthInPixels(c[0].toString(), fontFieldResource);
+					}
+				}
 			}
 		/**/
  
@@ -2954,8 +3166,8 @@ class test1View extends WatchUi.WatchFace
 
 			var x = 120 - dcX;
 			var y;
-			var iconStrings = ["ACEGIK", "BDFHJL", "NMPOWRS", "QTVXU"];
-			var iconOffsets = [60, 80, -80, -100];
+			var iconStrings = ["ACEGIK", "BDFHJL", "NMPOWRS", "QTVXU"];		// 60 code bytes to initialise
+			var iconOffsets = [60, 80, -80, -100];		// 60 code bytes to initialise
 				
 			for (var i=0; i<4; i++)
 			{
@@ -2967,21 +3179,44 @@ class test1View extends WatchUi.WatchFace
 			}
 		/**/
 		}
+		
+// execution time approx 12000ms for 60x(setColor+drawRectangle) (outer ring is approx 7000ms)
+// only 6000ms for 1xsetColor + 60xdrawRectangle
+// 6000ms for drawLine
+// 6000ms for drawPoint
+//		{
+//			useDc.setColor(graphics.COLOR_RED, graphics.COLOR_TRANSPARENT);
+//			for (var i=0; i<60; i++)
+//			{
+//				//useDc.drawRectangle(i, 0, 1, 30);
+//				//useDc.drawLine(i, 0, i, 30);
+//				//useDc.drawPoint(i, i/2);
+//			}
+//		}
 	}
+
+//	<!-- seconds buffer values (bufferSeconds, bufferPosX, bufferPosY) -->
+//	[   0,   5,  11,  15,  20,  26,  30,  35,  41,  45,  50,  56 ],
+//	[ 112, 166, 211, 211, 166, 120,  66,  12, -33, -33,  12,  59 ],
+//	[ -33,  12,  59, 111, 165, 210, 210, 165, 120,  65,  12, -33 ]
+//    var bufferSeconds;
+//    var bufferPosX;
+//    var bufferPosY;
+    var bufferValues = new[36]b;
 
 	function drawBuffer(secondsIndex, dc)
 	{
 						  	// t2   tr   r1   r2   br   b1   b2   bl   l1   l2   tl   t1
-	    var bufferSeconds = [   0,   5,  11,  15,  20,  26,  30,  35,  41,  45,  50,  56 ];
+	    //var bufferSeconds = [   0,   5,  11,  15,  20,  26,  30,  35,  41,  45,  50,  56 ];
 	    
 	    var doUpdate = (bufferIndex < 0);	// if no buffer yet
 	    
 	    if (!doUpdate)
 	    {
 			// see if need to redraw the offscreen buffer (if clearIndex is outside it)
-			var bufferSecondsStart = bufferSeconds[bufferIndex];						// current start of range in offscreen buffer
-	    	var bufferNext = (bufferIndex + 1)%bufferSeconds.size();
-		    var bufferSecondsNextMinusOne = (bufferSeconds[bufferNext] + 59)%60;		// current end of range in offscreen buffer - do it this way to handle when end is 0
+			var bufferSecondsStart = bufferValues[bufferIndex];						// current start of range in offscreen buffer
+	    	var bufferNext = (bufferIndex + 1)%12;
+		    var bufferSecondsNextMinusOne = (bufferValues[bufferNext] + 59)%60;		// current end of range in offscreen buffer - do it this way to handle when end is 0
 
 			doUpdate = (secondsIndex<bufferSecondsStart || secondsIndex>bufferSecondsNextMinusOne);		// outside current range
 		}
@@ -2990,9 +3225,9 @@ class test1View extends WatchUi.WatchFace
 	    {
 			// find buffer which contains the indicator for specified second
 			var useIndex = -1;
-			for (var i=bufferSeconds.size()-1; i>=0; i--)
+			for (var i=12-1; i>=0; i--)
 			{
-				if (secondsIndex>=bufferSeconds[i])
+				if (secondsIndex>=bufferValues[i])
 				{
 					useIndex = i;
 					break;
@@ -3002,12 +3237,12 @@ class test1View extends WatchUi.WatchFace
 			if (useIndex>=0)
 			{
 								  	// t2   tr   r1   r2   br   b1   b2   bl   l1   l2   tl   t1
-			    var bufferPosX =    [ 112, 166, 211, 211, 166, 120,  66,  12, -33, -33,  12,  59 ];
-			    var bufferPosY =    [ -33,  12,  59, 111, 165, 210, 210, 165, 120,  65,  12, -33 ];
-	
+			    //var bufferPosX =    [ 112, 166, 211, 211, 166, 120,  66,  12, -33, -33,  12,  59 ];
+			    //var bufferPosY =    [ -33,  12,  59, 111, 165, 210, 210, 165, 120,  65,  12, -33 ];		// 160 bytes of code to initialize
+
 				bufferIndex = useIndex;		// set the buffer we are using
-				bufferX = bufferPosX[useIndex];
-				bufferY = bufferPosY[useIndex];
+				bufferX = bufferValues[useIndex + 12] - 40;
+				bufferY = bufferValues[useIndex + 24] - 40;
 				
 				drawBackgroundToDc(null);
 	
@@ -3427,6 +3662,37 @@ class test1View extends WatchUi.WatchFace
 	
 	var parseIndex;
 	
+//	function parseHexOrNumber(charArray, charArraySize)
+//	{
+//		var v = 0;
+//	
+//		if (charArraySize<6)
+//		{
+//			v = parseNumber(charArray, charArraySize);
+//		}
+//		else
+//		{
+//	    	for (; parseIndex<charArraySize; parseIndex++)
+//	    	{
+//	    		var c = charArray[parseIndex].toUpper().toNumber();
+//	    		if (c>=48/*APPCHAR_0*/ && c<=57/*APPCHAR_9*/)
+//	    		{
+//	    			v = v*16 + (c-48/*APPCHAR_0*/); 
+//	    		}
+//	    		else if (c>=65/*APPCHAR_A*/ && c<=70/*APPCHAR_F*/)
+//	    		{
+//	    			v = v*16 + 10 + (c-65/*APPCHAR_A*/); 
+//	    		}
+//	    		else
+//	    		{
+//	    			break;
+//	    		}
+//	    	}
+//		}
+//		
+//		return v;
+//	}
+
    	// find next comma or end of array
 	function parseToComma(charArray, charArraySize)
 	{	
@@ -3808,26 +4074,41 @@ class test1View extends WatchUi.WatchFace
 	var CalendarWeek;	// in Calendar format the first week of the year always includes 1st Jan
 	var CalendarYear;
 
+//	function printMoment(m, s)
+//	{
+//		var i = Time.Gregorian.info(m, Time.FORMAT_SHORT);
+//		System.println(Lang.format(s + " Local $1$-$2$-$3$ T$4$:$5$:$6$", [ i.year.format("%4d"), i.month.format("%02d"), i.day.format("%02d"), i.hour.format("%02d"), i.min.format("%02d"), i.sec.format("%02d") ]));
+//		i = Time.Gregorian.utcInfo(m, Time.FORMAT_SHORT);
+//		System.println(Lang.format(s + " UTC $1$-$2$-$3$ T$4$:$5$:$6$", [ i.year.format("%4d"), i.month.format("%02d"), i.day.format("%02d"), i.hour.format("%02d"), i.min.format("%02d"), i.sec.format("%02d") ]));
+//	}
+	
 	function calculateDayWeekYearData(index, firstDayOfWeek, dateInfoMedium)
 	{
-		var startOfToday = Time.today();
-		var startOfTodayValue = startOfToday.value();
-		if (startOfTodayValue == dayWeekYearCalculatedDay[index])
+		// use noon for all these times to be safe when getting dateInfo
+	
+		var gregorian = Time.Gregorian;
+		var halfDayOffset = gregorian.duration({:hours => 12});
+
+		var todayNoon = Time.today().add(halfDayOffset);	// 12:00 local time
+		var todayNoonValue = todayNoon.value();
+		if (todayNoonValue == dayWeekYearCalculatedDay[index])
 		{
 			return;
 		}
 
-		var gregorian = Time.Gregorian;
-	
-		var startOfYear = Time.Gregorian.moment({:year => dateInfoMedium.year, :month => 1, :day => 1, :hour => 0, :minute => 0, :second => 0 });
-		var durationToStartOfYear = startOfToday.subtract(startOfYear);
+		var timeZoneOffset = gregorian.duration({:seconds => System.getClockTime().timeZoneOffset});
+
+		var startOfYearNoon = gregorian.moment({:year => dateInfoMedium.year, :month => 1, :day => 1, :hour => 12, :minute => 0, :second => 0}).subtract(timeZoneOffset);
+		//printMoment(startOfYearNoon, "startOfYearNoon");
+		var durationToStartOfYear = todayNoon.subtract(startOfYearNoon);
 		//var secs = duration.value();
 		//var mins = secs / 60.0;
 		//var hours = mins / 60.0;
 		//var days = Math.round(hours / 24.0) + 1;
+		//System.println("days=" + durationToStartOfYear.value() / 86400.0);
 		var days = Math.round(durationToStartOfYear.value() / 86400.0).toNumber();
 
-		dayWeekYearCalculatedDay[0] = startOfTodayValue;
+		dayWeekYearCalculatedDay[0] = todayNoonValue;
 		dayOfYear = days + 1;
 		if (index==0)
 		{
@@ -3841,8 +4122,8 @@ class test1View extends WatchUi.WatchFace
 		// If first day of week is set to Sun then Jan 1 is in week 1 if Jan 1 is Sun, Mon, Tue, Wed, Thu
 		// If first day of week is set to Sat then Jan 1 is in week 1 if Jan 1 is Sat, Sun, Mon, Tue, Wed, Thu
 	       					
-		var dateInfoStartOfYear = gregorian.info(startOfYear, Time.FORMAT_SHORT);
-		var numberInWeekOfJan1 = ((dateInfoStartOfYear.day_of_week - firstDayOfWeek + 7) % 7);	// 0-6
+		var dateInfoStartOfYear = gregorian.info(startOfYearNoon, Time.FORMAT_SHORT);	// get date info for noon to be safe
+ 		var numberInWeekOfJan1 = ((dateInfoStartOfYear.day_of_week - firstDayOfWeek + 7) % 7);	// 0-6
 		var weeks = (days + numberInWeekOfJan1) / 7;
 		var year = dateInfoMedium.year;
 
@@ -3871,11 +4152,11 @@ class test1View extends WatchUi.WatchFace
 		if (checkWeeksLessThan1)		// check to find last week of previous year
 		{
 			var prevYear = dateInfoMedium.year-1;
-			var startOfPrevYear = gregorian.moment({:year => prevYear, :month => 1, :day => 1, :hour => 0, :minute => 0, :second => 0 });
-			var dateInfoStartOfPrevYear = gregorian.info(startOfPrevYear, Time.FORMAT_SHORT);
+			var startOfPrevYearNoon = gregorian.moment({:year => prevYear, :month => 1, :day => 1, :hour => 12, :minute => 0, :second => 0}).subtract(timeZoneOffset);
+			var dateInfoStartOfPrevYear = gregorian.info(startOfPrevYearNoon, Time.FORMAT_SHORT);	// get date info for noon to be safe
 			var numberInWeekOfJan1PrevYear = ((dateInfoStartOfPrevYear.day_of_week - firstDayOfWeek + 7) % 7);	// 0-6
 			
-			var durationToJan1PrevYear = startOfToday.subtract(startOfPrevYear);
+			var durationToJan1PrevYear = todayNoon.subtract(startOfPrevYearNoon);
 			var daysToJan1PrevYear = Math.round(durationToJan1PrevYear.value() / 86400.0).toNumber();
 			var daysToStartOfWeekYear = daysToJan1PrevYear + numberInWeekOfJan1PrevYear;
 			weeks = daysToStartOfWeekYear / 7;
@@ -3894,8 +4175,8 @@ class test1View extends WatchUi.WatchFace
 		else if (checkWeeksGreaterThan52)	// check to see if in first week of next year
 		{
 			var nextYear = dateInfoMedium.year+1;
-			var startOfNextYear = gregorian.moment({:year => nextYear, :month => 1, :day => 1, :hour => 0, :minute => 0, :second => 0 });
-			var dateInfoStartOfNextYear = gregorian.info(startOfNextYear, Time.FORMAT_SHORT);
+			var startOfNextYearNoon = gregorian.moment({:year => nextYear, :month => 1, :day => 1, :hour => 12, :minute => 0, :second => 0}).subtract(timeZoneOffset);
+			var dateInfoStartOfNextYear = gregorian.info(startOfNextYearNoon, Time.FORMAT_SHORT);	// get date info for noon to be safe
 			var numberInWeekOfJan1NextYear = ((dateInfoStartOfNextYear.day_of_week - firstDayOfWeek + 7) % 7);	// 0-6
 			
 			var checkInFirstWeek;
@@ -3923,7 +4204,7 @@ class test1View extends WatchUi.WatchFace
 			if (checkInFirstWeek)
 			{
 				// so see if we are in the same week as jan1 next year
-				var durationToJan1NextYear = startOfNextYear.subtract(startOfToday);
+				var durationToJan1NextYear = startOfNextYearNoon.subtract(todayNoon);
 				var daysToJan1NextYear = Math.round(durationToJan1NextYear.value() / 86400.0).toNumber();
 				if (daysToJan1NextYear <= numberInWeekOfJan1NextYear)
 				{
@@ -3933,7 +4214,7 @@ class test1View extends WatchUi.WatchFace
 			}
 		}
 
-		dayWeekYearCalculatedDay[index] = startOfTodayValue;
+		dayWeekYearCalculatedDay[index] = todayNoonValue;
 		if (index==1)
 		{
 			ISOWeek = weeks;
@@ -3945,6 +4226,143 @@ class test1View extends WatchUi.WatchFace
 			CalendarYear = year;
 		}
 	}
+	
+//	function calculateSun()
+//	{
+//		var gregorian = Time.Gregorian;
+//
+//		// this is in local time at that date
+//		// gregorian.info displays this time as 13:00
+//		// gregorian.utcInfo displays this time as 12:00
+//		//var testMoment = gregorian.moment({:year => 2019, :month => 5, :day => 1, :hour => 12, :minute => 0, :second => 0 });
+//
+//		// whereas this time in March before summer time
+//		// gregorian.info displays this time as 12:00
+//		// gregorian.utcInfo displays this time as 12:00
+//		//var testMoment = gregorian.moment({:year => 2019, :month => 3, :day => 1, :hour => 12, :minute => 0, :second => 0 });
+//
+//		// Running this in May (summer time) then timeZoneOffset is 3600 (UTC + 1)
+//		//System.println("Time zone offset = " + System.getClockTime().timeZoneOffset);
+//
+//		// Running this in May (summer time) at 20:48
+//		// gregorian.info displays this time as 20:48
+//		// gregorian.utcInfo displays this time as 19:48
+//		//var testMoment = Time.now();
+//		
+//		// Running this in May (summer time)
+//		// gregorian.info displays this time as 00:00
+//		// gregorian.utcInfo displays this time as 23:00 on previous date
+//		//var testMoment = Time.today();
+//
+////var testDate = gregorian.info(testMoment, Time.FORMAT_SHORT);
+////System.println(Lang.format("$1$-$2$-$3$ T$4$:$5$:$6$", [ testDate.year.format("%4d"), testDate.month.format("%02d"), testDate.day.format("%02d"), testDate.hour.format("%02d"), testDate.min.format("%02d"), testDate.sec.format("%02d") ]));
+////testDate = gregorian.utcInfo(testMoment, Time.FORMAT_SHORT);
+////System.println(Lang.format("UTC $1$-$2$-$3$ T$4$:$5$:$6$", [ testDate.year.format("%4d"), testDate.month.format("%02d"), testDate.day.format("%02d"), testDate.hour.format("%02d"), testDate.min.format("%02d"), testDate.sec.format("%02d") ]));
+//
+//		var jan1st2000NoonUTC = gregorian.moment({:year => 2000, :month => 1, :day => 1, :hour => 12, :minute => 0, :second => 0 });
+//		var secondsToNoonUTC = 12*60*60 + System.getClockTime().timeZoneOffset;
+//		var todayNoonUTC = Time.today().add(gregorian.duration({:seconds => secondsToNoonUTC}));
+//		var durationSinceJan1st2000 = todayNoonUTC.subtract(jan1st2000NoonUTC);
+//		//var secs = duration.value();
+//		//var mins = secs / 60.0;
+//		//var hours = mins / 60.0;
+//		//var days = Math.round(hours / 24.0) + 1;
+////		var daysSinceJan1st2000 = Math.round(durationSinceJan1st2000.value() / 86400.0).toNumber() + 0.0008d;
+////		var daysSinceJan1st2000_2 = durationSinceJan1st2000.value() / 86400.0d + 0.0008d;		// dont round!!
+////System.println("daysSinceJan1st2000=" + daysSinceJan1st2000 + " or " + daysSinceJan1st2000_2);	// 7081 and 7081.0000
+//		var daysSinceJan1st2000 = Math.round(durationSinceJan1st2000.value() / 86400.0).toNumber();
+//		//var days2 = durationSinceJan1st2000.value() / 86400.0;
+//		//System.println("daysSinceJan1st2000=" + daysSinceJan1st2000 + " days2=" + days2);
+//		//var n = daysSinceJan1st2000 + 0.0008d; 	// double for accuracy
+//		var n = daysSinceJan1st2000;
+//		//System.println("n=" + n);
+//		
+//		// Windermere lat=54.380810, long=-2.907530
+//		//var lat = 54.380810d;
+//		//var long = -2.907530d;
+//		
+//		// Windermere
+//		var lat = 54.3787142d;
+//		var long = -2.9044238d;
+//		var altitude = 140.0d;	// m
+//		
+//		// Trondheim, Trøndelag, 7011, Norway
+//		//var lat = 63.4305658d;
+//		//var long = 10.3951929d;
+//		
+//		//var lat = 68.0d;
+//		//var long = 0.0d;
+//
+//		//var lat = -70.5d;
+//		//var long = 0.0d;
+//		
+//		// Longyearbyen, Svalbard, 9170, Norway
+//		//var lat = 78.2231558d;
+//		//var long = 15.6463656d;
+//		
+//		var jStar = n - long/360;
+//		var m = 357.5291d + 0.98560028d * jStar;
+//		//System.println("m=" + m);
+//		var m360 = Math.floor(m/360).toNumber();
+//		m -= m360*360;		// modulo 360
+//		//System.println("m2=" + m + " m360=" + m360);
+//		
+//		var c = 1.9148*Math.sin(Math.toRadians(m)) + 0.0200*Math.sin(Math.toRadians(m)*2) + 0.0003*Math.sin(Math.toRadians(m)*3);
+//		//System.println("c=" + c);
+//		
+//		var lambda = m + c + 180 + 102.9372;
+//		//var lambda = m + c + 180 + 102.984378d;
+//		var lambda360 = Math.floor(lambda/360).toNumber();
+//		lambda -= lambda360*360;		// modulo 360
+//		
+//		var jTransit = /*2451545.0 +*/ jStar + 0.0053*Math.sin(Math.toRadians(m)) - 0.0069*Math.sin(Math.toRadians(lambda)*2);
+//		
+//		var sinDeclination = Math.sin(Math.toRadians(lambda)) * Math.sin(Math.toRadians(23.44));
+//		var cosDeclination = Math.sqrt(1 - sinDeclination*sinDeclination);
+//		
+//		var w1 = Math.sin(Math.toRadians(-0.83)) - Math.sin(Math.toRadians(lat))*sinDeclination;
+//		//var w1 = Math.sin(Math.toRadians(-0.83 - (2.076d/60.0d)*Math.sqrt(altitude))) - Math.sin(Math.toRadians(lat))*sinDeclination;
+//		//var w1 = Math.sin(Math.toRadians(-1.13)) - Math.sin(Math.toRadians(lat))*sinDeclination;		height adjust
+//		var w2 = Math.cos(Math.toRadians(lat))*cosDeclination;
+//		var cosW = w1/w2;
+//		
+//		if (cosW < -1.0)
+//		{
+//			// permanent day
+//		}
+//		else if (cosW > 1.0)
+//		{
+//			// permanent night
+//		}
+//		
+//		var w = Math.acos(cosW);
+//		//System.println("w=" + w + " cosW=" + cosW + " w1=" + w1 + " w2=" + w2);
+//		
+//		// days since jan1st2000NoonUTC
+//		var jRise = jTransit - Math.toDegrees(w) / 360;		// up to -0.5 day
+//		var jSet = jTransit + Math.toDegrees(w) / 360;		// up to +0.5 day
+//		//var jRise = jTransit - Math.toDegrees(w) / 360 + 0.0008d;
+//		//var jSet = jTransit + Math.toDegrees(w) / 360 + 0.0008d;
+////System.println("0.0008=" + (0.0008d*24*60*60) + "seconds");		// 69 seconds
+//		
+//		var durationTransit = gregorian.duration({:seconds => jTransit*24*60*60});
+//		var momentTransit = jan1st2000NoonUTC.add(durationTransit);		
+//
+////var testDate = gregorian.info(momentTransit, Time.FORMAT_SHORT);
+////System.println(Lang.format("Transit $1$-$2$-$3$ T$4$:$5$:$6$", [ testDate.year.format("%4d"), testDate.month.format("%02d"), testDate.day.format("%02d"), testDate.hour.format("%02d"), testDate.min.format("%02d"), testDate.sec.format("%02d") ]));		
+//
+//		var durationRise = gregorian.duration({:seconds => jRise*24*60*60});
+//		var momentRise = jan1st2000NoonUTC.add(durationRise);		
+//
+////testDate = gregorian.info(momentRise, Time.FORMAT_SHORT);
+////System.println(Lang.format("Rise $1$-$2$-$3$ T$4$:$5$:$6$", [ testDate.year.format("%4d"), testDate.month.format("%02d"), testDate.day.format("%02d"), testDate.hour.format("%02d"), testDate.min.format("%02d"), testDate.sec.format("%02d") ]));		
+//
+//		var durationSet = gregorian.duration({:seconds => jSet*24*60*60});
+//		var momentSet = jan1st2000NoonUTC.add(durationSet);
+//		
+////testDate = gregorian.info(momentSet, Time.FORMAT_SHORT);
+////System.println(Lang.format("Set $1$-$2$-$3$ T$4$:$5$:$6$", [ testDate.year.format("%4d"), testDate.month.format("%02d"), testDate.day.format("%02d"), testDate.hour.format("%02d"), testDate.min.format("%02d"), testDate.sec.format("%02d") ]));		
+//	}
 }
 
 //class TestDelegate extends WatchUi.WatchFaceDelegate

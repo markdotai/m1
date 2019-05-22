@@ -1344,7 +1344,7 @@
 
     <setting propertyKey="@Properties.26" title="@Strings.FieldFontCaseTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.SystemCaseAny</listEntry>
+            <listEntry value="0">@Strings.ItemOff</listEntry>
             <listEntry value="1">@Strings.SystemCaseUpper</listEntry>
             <listEntry value="2">@Strings.SystemCaseLower</listEntry>
         </settingConfig>
@@ -1355,6 +1355,7 @@
             <listEntry value="84">@Strings.MenuLine</listEntry>
             <listEntry value="85">@Strings.MenuSystemFonts</listEntry>
             <listEntry value="86">@Strings.MenuLine</listEntry>
+            
             <listEntry value="24">@Strings.FontXTiny</listEntry>
             <listEntry value="25">@Strings.FontTiny</listEntry>
             <listEntry value="26">@Strings.FontSmall</listEntry>
@@ -1517,10 +1518,10 @@
         <settingConfig type="list">
             <listEntry value="0">@Strings.MenuNotSet</listEntry>
 
-            <listEntry value="80">@Strings.MenuBlank</listEntry>
-            <listEntry value="81">@Strings.MenuLine</listEntry>
-            <listEntry value="82">@Strings.MenuTimeDate</listEntry>
-            <listEntry value="83">@Strings.MenuLine</listEntry>
+            <listEntry value="-1">@Strings.MenuBlank</listEntry>
+            <listEntry value="-2">@Strings.MenuLine</listEntry>
+            <listEntry value="-3">@Strings.MenuTimeDate</listEntry>
+            <listEntry value="-4">@Strings.MenuLine</listEntry>
 
             <listEntry value="1">@Strings.ItemHours</listEntry>
             <listEntry value="2">@Strings.ItemMinutes</listEntry>
@@ -1540,11 +1541,13 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
-            <listEntry value="84">@Strings.MenuBlank</listEntry>
-            <listEntry value="85">@Strings.MenuLine</listEntry>
-            <listEntry value="86">@Strings.MenuSeparators</listEntry>
-            <listEntry value="87">@Strings.MenuLine</listEntry>
+            <listEntry value="-5">@Strings.MenuBlank</listEntry>
+            <listEntry value="-6">@Strings.MenuLine</listEntry>
+            <listEntry value="-7">@Strings.MenuSeparators</listEntry>
+            <listEntry value="-8">@Strings.MenuLine</listEntry>
  
  		    <listEntry value="21">@Strings.FieldSeparatorSpace</listEntry>
 		    <listEntry value="22">@Strings.FieldSeparatorSlashForward</listEntry>
@@ -1554,10 +1557,10 @@
 		    <listEntry value="26">@Strings.FieldSeparatorDot</listEntry>
 		    <listEntry value="27">@Strings.FieldSeparatorComma</listEntry>
 
-            <listEntry value="88">@Strings.MenuBlank</listEntry>
-            <listEntry value="89">@Strings.MenuLine</listEntry>
-            <listEntry value="90">@Strings.MenuValues</listEntry>
-            <listEntry value="91">@Strings.MenuLine</listEntry>
+            <listEntry value="-9">@Strings.MenuBlank</listEntry>
+            <listEntry value="-10">@Strings.MenuLine</listEntry>
+            <listEntry value="-11">@Strings.MenuValues</listEntry>
+            <listEntry value="-12">@Strings.MenuLine</listEntry>
             
             <listEntry value="31">@Strings.ItemSteps</listEntry>
             <listEntry value="32">@Strings.FieldStepsGoal</listEntry>
@@ -1568,10 +1571,10 @@
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
 
-            <listEntry value="92">@Strings.MenuBlank</listEntry>
-            <listEntry value="93">@Strings.MenuLine</listEntry>
-            <listEntry value="94">@Strings.MenuIcons</listEntry>
-            <listEntry value="95">@Strings.MenuLine</listEntry>
+            <listEntry value="-13">@Strings.MenuBlank</listEntry>
+            <listEntry value="-14">@Strings.MenuLine</listEntry>
+            <listEntry value="-15">@Strings.MenuIcons</listEntry>
+            <listEntry value="-16">@Strings.MenuLine</listEntry>
             
             <listEntry value="41">@Strings.IconCircle</listEntry>
             <listEntry value="42">@Strings.IconCircleSolid</listEntry>
@@ -1586,7 +1589,7 @@
             <listEntry value="51">@Strings.IconStar</listEntry>
             <listEntry value="52">@Strings.IconStarSolid</listEntry>
 
-            <listEntry value="96">@Strings.MenuBlank</listEntry>
+            <listEntry value="-17">@Strings.MenuBlank</listEntry>
 
             <listEntry value="54">@Strings.IconLock</listEntry>
             <listEntry value="53">@Strings.IconAlarm</listEntry>
@@ -1605,7 +1608,7 @@
 
     <setting propertyKey="@Properties.F4" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -1622,6 +1625,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -1632,10 +1637,10 @@
             <listEntry value="2">@Strings.Color2</listEntry>
             <listEntry value="3">@Strings.Color3</listEntry>
 
-            <listEntry value="70">@Strings.MenuBlank</listEntry>
-            <listEntry value="71">@Strings.MenuLine</listEntry>
-            <listEntry value="72">@Strings.MenuBright</listEntry>
-            <listEntry value="73">@Strings.MenuLine</listEntry>
+            <listEntry value="-1">@Strings.MenuBlank</listEntry>
+            <listEntry value="-2">@Strings.MenuLine</listEntry>
+            <listEntry value="-3">@Strings.MenuBright</listEntry>
+            <listEntry value="-4">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="4">@Strings.Color4</listEntry>
 		    <listEntry value="5">@Strings.Color5</listEntry>
@@ -1656,10 +1661,10 @@
 		    <listEntry value="20">@Strings.Color20</listEntry>
 		    <listEntry value="21">@Strings.Color21</listEntry>
 
-            <listEntry value="74">@Strings.MenuBlank</listEntry>
-            <listEntry value="75">@Strings.MenuLine</listEntry>
-            <listEntry value="76">@Strings.MenuDim</listEntry>
-            <listEntry value="77">@Strings.MenuLine</listEntry>
+            <listEntry value="-5">@Strings.MenuBlank</listEntry>
+            <listEntry value="-6">@Strings.MenuLine</listEntry>
+            <listEntry value="-7">@Strings.MenuDim</listEntry>
+            <listEntry value="-8">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="22">@Strings.Color22</listEntry>
 		    <listEntry value="23">@Strings.Color23</listEntry>
@@ -1668,10 +1673,10 @@
 		    <listEntry value="26">@Strings.Color26</listEntry>    
 		    <listEntry value="27">@Strings.Color27</listEntry>
 
-            <listEntry value="78">@Strings.MenuBlank</listEntry>
-            <listEntry value="79">@Strings.MenuLine</listEntry>
-            <listEntry value="80">@Strings.MenuPale</listEntry>
-            <listEntry value="81">@Strings.MenuLine</listEntry>
+            <listEntry value="-9">@Strings.MenuBlank</listEntry>
+            <listEntry value="-10">@Strings.MenuLine</listEntry>
+            <listEntry value="-11">@Strings.MenuPale</listEntry>
+            <listEntry value="-12">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="28">@Strings.Color28</listEntry>
 		    <listEntry value="29">@Strings.Color29</listEntry>
@@ -1686,10 +1691,10 @@
 		    <listEntry value="38">@Strings.Color38</listEntry>
 		    <listEntry value="39">@Strings.Color39</listEntry>
 
-            <listEntry value="82">@Strings.MenuBlank</listEntry>
-            <listEntry value="83">@Strings.MenuLine</listEntry>
-            <listEntry value="84">@Strings.MenuPalest</listEntry>
-            <listEntry value="85">@Strings.MenuLine</listEntry>
+            <listEntry value="-13">@Strings.MenuBlank</listEntry>
+            <listEntry value="-14">@Strings.MenuLine</listEntry>
+            <listEntry value="-15">@Strings.MenuPalest</listEntry>
+            <listEntry value="-16">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="40">@Strings.Color40</listEntry>
 		    <listEntry value="41">@Strings.Color41</listEntry>
@@ -1698,10 +1703,10 @@
 		    <listEntry value="44">@Strings.Color44</listEntry>
 		    <listEntry value="45">@Strings.Color45</listEntry>
 
-            <listEntry value="86">@Strings.MenuBlank</listEntry>
-            <listEntry value="87">@Strings.MenuLine</listEntry>
-            <listEntry value="88">@Strings.MenuDark</listEntry>
-            <listEntry value="89">@Strings.MenuLine</listEntry>
+            <listEntry value="-17">@Strings.MenuBlank</listEntry>
+            <listEntry value="-18">@Strings.MenuLine</listEntry>
+            <listEntry value="-19">@Strings.MenuDark</listEntry>
+            <listEntry value="-20">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="46">@Strings.Color46</listEntry>
 		    <listEntry value="47">@Strings.Color47</listEntry>
@@ -1716,10 +1721,10 @@
 		    <listEntry value="56">@Strings.Color56</listEntry>    
 		    <listEntry value="57">@Strings.Color57</listEntry>
 
-            <listEntry value="90">@Strings.MenuBlank</listEntry>
-            <listEntry value="91">@Strings.MenuLine</listEntry>
-            <listEntry value="92">@Strings.MenuDarkest</listEntry>
-            <listEntry value="93">@Strings.MenuLine</listEntry>
+            <listEntry value="-21">@Strings.MenuBlank</listEntry>
+            <listEntry value="-22">@Strings.MenuLine</listEntry>
+            <listEntry value="-23">@Strings.MenuDarkest</listEntry>
+            <listEntry value="-24">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="58">@Strings.Color58</listEntry>
 		    <listEntry value="59">@Strings.Color59</listEntry>
@@ -1734,10 +1739,10 @@
         <settingConfig type="list">
             <listEntry value="0">@Strings.MenuNotSet</listEntry>
 
-            <listEntry value="80">@Strings.MenuBlank</listEntry>
-            <listEntry value="81">@Strings.MenuLine</listEntry>
-            <listEntry value="82">@Strings.MenuTimeDate</listEntry>
-            <listEntry value="83">@Strings.MenuLine</listEntry>
+            <listEntry value="-1">@Strings.MenuBlank</listEntry>
+            <listEntry value="-2">@Strings.MenuLine</listEntry>
+            <listEntry value="-3">@Strings.MenuTimeDate</listEntry>
+            <listEntry value="-4">@Strings.MenuLine</listEntry>
 
             <listEntry value="1">@Strings.ItemHours</listEntry>
             <listEntry value="2">@Strings.ItemMinutes</listEntry>
@@ -1757,11 +1762,13 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
-            <listEntry value="84">@Strings.MenuBlank</listEntry>
-            <listEntry value="85">@Strings.MenuLine</listEntry>
-            <listEntry value="86">@Strings.MenuSeparators</listEntry>
-            <listEntry value="87">@Strings.MenuLine</listEntry>
+            <listEntry value="-5">@Strings.MenuBlank</listEntry>
+            <listEntry value="-6">@Strings.MenuLine</listEntry>
+            <listEntry value="-7">@Strings.MenuSeparators</listEntry>
+            <listEntry value="-8">@Strings.MenuLine</listEntry>
  
  		    <listEntry value="21">@Strings.FieldSeparatorSpace</listEntry>
 		    <listEntry value="22">@Strings.FieldSeparatorSlashForward</listEntry>
@@ -1771,10 +1778,10 @@
 		    <listEntry value="26">@Strings.FieldSeparatorDot</listEntry>
 		    <listEntry value="27">@Strings.FieldSeparatorComma</listEntry>
 
-            <listEntry value="88">@Strings.MenuBlank</listEntry>
-            <listEntry value="89">@Strings.MenuLine</listEntry>
-            <listEntry value="90">@Strings.MenuValues</listEntry>
-            <listEntry value="91">@Strings.MenuLine</listEntry>
+            <listEntry value="-9">@Strings.MenuBlank</listEntry>
+            <listEntry value="-10">@Strings.MenuLine</listEntry>
+            <listEntry value="-11">@Strings.MenuValues</listEntry>
+            <listEntry value="-12">@Strings.MenuLine</listEntry>
             
             <listEntry value="31">@Strings.ItemSteps</listEntry>
             <listEntry value="32">@Strings.FieldStepsGoal</listEntry>
@@ -1785,10 +1792,10 @@
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
 
-            <listEntry value="92">@Strings.MenuBlank</listEntry>
-            <listEntry value="93">@Strings.MenuLine</listEntry>
-            <listEntry value="94">@Strings.MenuIcons</listEntry>
-            <listEntry value="95">@Strings.MenuLine</listEntry>
+            <listEntry value="-13">@Strings.MenuBlank</listEntry>
+            <listEntry value="-14">@Strings.MenuLine</listEntry>
+            <listEntry value="-15">@Strings.MenuIcons</listEntry>
+            <listEntry value="-16">@Strings.MenuLine</listEntry>
             
             <listEntry value="41">@Strings.IconCircle</listEntry>
             <listEntry value="42">@Strings.IconCircleSolid</listEntry>
@@ -1803,7 +1810,7 @@
             <listEntry value="51">@Strings.IconStar</listEntry>
             <listEntry value="52">@Strings.IconStarSolid</listEntry>
 
-            <listEntry value="96">@Strings.MenuBlank</listEntry>
+            <listEntry value="-17">@Strings.MenuBlank</listEntry>
 
             <listEntry value="54">@Strings.IconLock</listEntry>
             <listEntry value="53">@Strings.IconAlarm</listEntry>
@@ -1822,7 +1829,7 @@
 
     <setting propertyKey="@Properties.F7" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -1839,6 +1846,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -1849,10 +1858,10 @@
             <listEntry value="2">@Strings.Color2</listEntry>
             <listEntry value="3">@Strings.Color3</listEntry>
 
-            <listEntry value="70">@Strings.MenuBlank</listEntry>
-            <listEntry value="71">@Strings.MenuLine</listEntry>
-            <listEntry value="72">@Strings.MenuBright</listEntry>
-            <listEntry value="73">@Strings.MenuLine</listEntry>
+            <listEntry value="-1">@Strings.MenuBlank</listEntry>
+            <listEntry value="-2">@Strings.MenuLine</listEntry>
+            <listEntry value="-3">@Strings.MenuBright</listEntry>
+            <listEntry value="-4">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="4">@Strings.Color4</listEntry>
 		    <listEntry value="5">@Strings.Color5</listEntry>
@@ -1873,10 +1882,10 @@
 		    <listEntry value="20">@Strings.Color20</listEntry>
 		    <listEntry value="21">@Strings.Color21</listEntry>
 
-            <listEntry value="74">@Strings.MenuBlank</listEntry>
-            <listEntry value="75">@Strings.MenuLine</listEntry>
-            <listEntry value="76">@Strings.MenuDim</listEntry>
-            <listEntry value="77">@Strings.MenuLine</listEntry>
+            <listEntry value="-5">@Strings.MenuBlank</listEntry>
+            <listEntry value="-6">@Strings.MenuLine</listEntry>
+            <listEntry value="-7">@Strings.MenuDim</listEntry>
+            <listEntry value="-8">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="22">@Strings.Color22</listEntry>
 		    <listEntry value="23">@Strings.Color23</listEntry>
@@ -1885,10 +1894,10 @@
 		    <listEntry value="26">@Strings.Color26</listEntry>    
 		    <listEntry value="27">@Strings.Color27</listEntry>
 
-            <listEntry value="78">@Strings.MenuBlank</listEntry>
-            <listEntry value="79">@Strings.MenuLine</listEntry>
-            <listEntry value="80">@Strings.MenuPale</listEntry>
-            <listEntry value="81">@Strings.MenuLine</listEntry>
+            <listEntry value="-9">@Strings.MenuBlank</listEntry>
+            <listEntry value="-10">@Strings.MenuLine</listEntry>
+            <listEntry value="-11">@Strings.MenuPale</listEntry>
+            <listEntry value="-12">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="28">@Strings.Color28</listEntry>
 		    <listEntry value="29">@Strings.Color29</listEntry>
@@ -1903,10 +1912,10 @@
 		    <listEntry value="38">@Strings.Color38</listEntry>
 		    <listEntry value="39">@Strings.Color39</listEntry>
 
-            <listEntry value="82">@Strings.MenuBlank</listEntry>
-            <listEntry value="83">@Strings.MenuLine</listEntry>
-            <listEntry value="84">@Strings.MenuPalest</listEntry>
-            <listEntry value="85">@Strings.MenuLine</listEntry>
+            <listEntry value="-13">@Strings.MenuBlank</listEntry>
+            <listEntry value="-14">@Strings.MenuLine</listEntry>
+            <listEntry value="-15">@Strings.MenuPalest</listEntry>
+            <listEntry value="-16">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="40">@Strings.Color40</listEntry>
 		    <listEntry value="41">@Strings.Color41</listEntry>
@@ -1915,10 +1924,10 @@
 		    <listEntry value="44">@Strings.Color44</listEntry>
 		    <listEntry value="45">@Strings.Color45</listEntry>
 
-            <listEntry value="86">@Strings.MenuBlank</listEntry>
-            <listEntry value="87">@Strings.MenuLine</listEntry>
-            <listEntry value="88">@Strings.MenuDark</listEntry>
-            <listEntry value="89">@Strings.MenuLine</listEntry>
+            <listEntry value="-17">@Strings.MenuBlank</listEntry>
+            <listEntry value="-18">@Strings.MenuLine</listEntry>
+            <listEntry value="-19">@Strings.MenuDark</listEntry>
+            <listEntry value="-20">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="46">@Strings.Color46</listEntry>
 		    <listEntry value="47">@Strings.Color47</listEntry>
@@ -1933,10 +1942,10 @@
 		    <listEntry value="56">@Strings.Color56</listEntry>    
 		    <listEntry value="57">@Strings.Color57</listEntry>
 
-            <listEntry value="90">@Strings.MenuBlank</listEntry>
-            <listEntry value="91">@Strings.MenuLine</listEntry>
-            <listEntry value="92">@Strings.MenuDarkest</listEntry>
-            <listEntry value="93">@Strings.MenuLine</listEntry>
+            <listEntry value="-21">@Strings.MenuBlank</listEntry>
+            <listEntry value="-22">@Strings.MenuLine</listEntry>
+            <listEntry value="-23">@Strings.MenuDarkest</listEntry>
+            <listEntry value="-24">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="58">@Strings.Color58</listEntry>
 		    <listEntry value="59">@Strings.Color59</listEntry>
@@ -1951,10 +1960,10 @@
         <settingConfig type="list">
             <listEntry value="0">@Strings.MenuNotSet</listEntry>
 
-            <listEntry value="80">@Strings.MenuBlank</listEntry>
-            <listEntry value="81">@Strings.MenuLine</listEntry>
-            <listEntry value="82">@Strings.MenuTimeDate</listEntry>
-            <listEntry value="83">@Strings.MenuLine</listEntry>
+            <listEntry value="-1">@Strings.MenuBlank</listEntry>
+            <listEntry value="-2">@Strings.MenuLine</listEntry>
+            <listEntry value="-3">@Strings.MenuTimeDate</listEntry>
+            <listEntry value="-4">@Strings.MenuLine</listEntry>
 
             <listEntry value="1">@Strings.ItemHours</listEntry>
             <listEntry value="2">@Strings.ItemMinutes</listEntry>
@@ -1974,11 +1983,13 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
-            <listEntry value="84">@Strings.MenuBlank</listEntry>
-            <listEntry value="85">@Strings.MenuLine</listEntry>
-            <listEntry value="86">@Strings.MenuSeparators</listEntry>
-            <listEntry value="87">@Strings.MenuLine</listEntry>
+            <listEntry value="-5">@Strings.MenuBlank</listEntry>
+            <listEntry value="-6">@Strings.MenuLine</listEntry>
+            <listEntry value="-7">@Strings.MenuSeparators</listEntry>
+            <listEntry value="-8">@Strings.MenuLine</listEntry>
  
  		    <listEntry value="21">@Strings.FieldSeparatorSpace</listEntry>
 		    <listEntry value="22">@Strings.FieldSeparatorSlashForward</listEntry>
@@ -1988,10 +1999,10 @@
 		    <listEntry value="26">@Strings.FieldSeparatorDot</listEntry>
 		    <listEntry value="27">@Strings.FieldSeparatorComma</listEntry>
 
-            <listEntry value="88">@Strings.MenuBlank</listEntry>
-            <listEntry value="89">@Strings.MenuLine</listEntry>
-            <listEntry value="90">@Strings.MenuValues</listEntry>
-            <listEntry value="91">@Strings.MenuLine</listEntry>
+            <listEntry value="-9">@Strings.MenuBlank</listEntry>
+            <listEntry value="-10">@Strings.MenuLine</listEntry>
+            <listEntry value="-11">@Strings.MenuValues</listEntry>
+            <listEntry value="-12">@Strings.MenuLine</listEntry>
             
             <listEntry value="31">@Strings.ItemSteps</listEntry>
             <listEntry value="32">@Strings.FieldStepsGoal</listEntry>
@@ -2002,10 +2013,10 @@
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
 
-            <listEntry value="92">@Strings.MenuBlank</listEntry>
-            <listEntry value="93">@Strings.MenuLine</listEntry>
-            <listEntry value="94">@Strings.MenuIcons</listEntry>
-            <listEntry value="95">@Strings.MenuLine</listEntry>
+            <listEntry value="-13">@Strings.MenuBlank</listEntry>
+            <listEntry value="-14">@Strings.MenuLine</listEntry>
+            <listEntry value="-15">@Strings.MenuIcons</listEntry>
+            <listEntry value="-16">@Strings.MenuLine</listEntry>
             
             <listEntry value="41">@Strings.IconCircle</listEntry>
             <listEntry value="42">@Strings.IconCircleSolid</listEntry>
@@ -2020,7 +2031,7 @@
             <listEntry value="51">@Strings.IconStar</listEntry>
             <listEntry value="52">@Strings.IconStarSolid</listEntry>
 
-            <listEntry value="96">@Strings.MenuBlank</listEntry>
+            <listEntry value="-17">@Strings.MenuBlank</listEntry>
 
             <listEntry value="54">@Strings.IconLock</listEntry>
             <listEntry value="53">@Strings.IconAlarm</listEntry>
@@ -2039,7 +2050,7 @@
 
     <setting propertyKey="@Properties.F10" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -2056,6 +2067,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -2066,10 +2079,10 @@
             <listEntry value="2">@Strings.Color2</listEntry>
             <listEntry value="3">@Strings.Color3</listEntry>
 
-            <listEntry value="70">@Strings.MenuBlank</listEntry>
-            <listEntry value="71">@Strings.MenuLine</listEntry>
-            <listEntry value="72">@Strings.MenuBright</listEntry>
-            <listEntry value="73">@Strings.MenuLine</listEntry>
+            <listEntry value="-1">@Strings.MenuBlank</listEntry>
+            <listEntry value="-2">@Strings.MenuLine</listEntry>
+            <listEntry value="-3">@Strings.MenuBright</listEntry>
+            <listEntry value="-4">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="4">@Strings.Color4</listEntry>
 		    <listEntry value="5">@Strings.Color5</listEntry>
@@ -2090,10 +2103,10 @@
 		    <listEntry value="20">@Strings.Color20</listEntry>
 		    <listEntry value="21">@Strings.Color21</listEntry>
 
-            <listEntry value="74">@Strings.MenuBlank</listEntry>
-            <listEntry value="75">@Strings.MenuLine</listEntry>
-            <listEntry value="76">@Strings.MenuDim</listEntry>
-            <listEntry value="77">@Strings.MenuLine</listEntry>
+            <listEntry value="-5">@Strings.MenuBlank</listEntry>
+            <listEntry value="-6">@Strings.MenuLine</listEntry>
+            <listEntry value="-7">@Strings.MenuDim</listEntry>
+            <listEntry value="-8">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="22">@Strings.Color22</listEntry>
 		    <listEntry value="23">@Strings.Color23</listEntry>
@@ -2102,10 +2115,10 @@
 		    <listEntry value="26">@Strings.Color26</listEntry>    
 		    <listEntry value="27">@Strings.Color27</listEntry>
 
-            <listEntry value="78">@Strings.MenuBlank</listEntry>
-            <listEntry value="79">@Strings.MenuLine</listEntry>
-            <listEntry value="80">@Strings.MenuPale</listEntry>
-            <listEntry value="81">@Strings.MenuLine</listEntry>
+            <listEntry value="-9">@Strings.MenuBlank</listEntry>
+            <listEntry value="-10">@Strings.MenuLine</listEntry>
+            <listEntry value="-11">@Strings.MenuPale</listEntry>
+            <listEntry value="-12">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="28">@Strings.Color28</listEntry>
 		    <listEntry value="29">@Strings.Color29</listEntry>
@@ -2120,10 +2133,10 @@
 		    <listEntry value="38">@Strings.Color38</listEntry>
 		    <listEntry value="39">@Strings.Color39</listEntry>
 
-            <listEntry value="82">@Strings.MenuBlank</listEntry>
-            <listEntry value="83">@Strings.MenuLine</listEntry>
-            <listEntry value="84">@Strings.MenuPalest</listEntry>
-            <listEntry value="85">@Strings.MenuLine</listEntry>
+            <listEntry value="-13">@Strings.MenuBlank</listEntry>
+            <listEntry value="-14">@Strings.MenuLine</listEntry>
+            <listEntry value="-15">@Strings.MenuPalest</listEntry>
+            <listEntry value="-16">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="40">@Strings.Color40</listEntry>
 		    <listEntry value="41">@Strings.Color41</listEntry>
@@ -2132,10 +2145,10 @@
 		    <listEntry value="44">@Strings.Color44</listEntry>
 		    <listEntry value="45">@Strings.Color45</listEntry>
 
-            <listEntry value="86">@Strings.MenuBlank</listEntry>
-            <listEntry value="87">@Strings.MenuLine</listEntry>
-            <listEntry value="88">@Strings.MenuDark</listEntry>
-            <listEntry value="89">@Strings.MenuLine</listEntry>
+            <listEntry value="-17">@Strings.MenuBlank</listEntry>
+            <listEntry value="-18">@Strings.MenuLine</listEntry>
+            <listEntry value="-19">@Strings.MenuDark</listEntry>
+            <listEntry value="-20">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="46">@Strings.Color46</listEntry>
 		    <listEntry value="47">@Strings.Color47</listEntry>
@@ -2150,10 +2163,10 @@
 		    <listEntry value="56">@Strings.Color56</listEntry>    
 		    <listEntry value="57">@Strings.Color57</listEntry>
 
-            <listEntry value="90">@Strings.MenuBlank</listEntry>
-            <listEntry value="91">@Strings.MenuLine</listEntry>
-            <listEntry value="92">@Strings.MenuDarkest</listEntry>
-            <listEntry value="93">@Strings.MenuLine</listEntry>
+            <listEntry value="-21">@Strings.MenuBlank</listEntry>
+            <listEntry value="-22">@Strings.MenuLine</listEntry>
+            <listEntry value="-23">@Strings.MenuDarkest</listEntry>
+            <listEntry value="-24">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="58">@Strings.Color58</listEntry>
 		    <listEntry value="59">@Strings.Color59</listEntry>
@@ -2168,10 +2181,10 @@
         <settingConfig type="list">
             <listEntry value="0">@Strings.MenuNotSet</listEntry>
 
-            <listEntry value="80">@Strings.MenuBlank</listEntry>
-            <listEntry value="81">@Strings.MenuLine</listEntry>
-            <listEntry value="82">@Strings.MenuTimeDate</listEntry>
-            <listEntry value="83">@Strings.MenuLine</listEntry>
+            <listEntry value="-1">@Strings.MenuBlank</listEntry>
+            <listEntry value="-2">@Strings.MenuLine</listEntry>
+            <listEntry value="-3">@Strings.MenuTimeDate</listEntry>
+            <listEntry value="-4">@Strings.MenuLine</listEntry>
 
             <listEntry value="1">@Strings.ItemHours</listEntry>
             <listEntry value="2">@Strings.ItemMinutes</listEntry>
@@ -2191,11 +2204,13 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
-            <listEntry value="84">@Strings.MenuBlank</listEntry>
-            <listEntry value="85">@Strings.MenuLine</listEntry>
-            <listEntry value="86">@Strings.MenuSeparators</listEntry>
-            <listEntry value="87">@Strings.MenuLine</listEntry>
+            <listEntry value="-5">@Strings.MenuBlank</listEntry>
+            <listEntry value="-6">@Strings.MenuLine</listEntry>
+            <listEntry value="-7">@Strings.MenuSeparators</listEntry>
+            <listEntry value="-8">@Strings.MenuLine</listEntry>
  
  		    <listEntry value="21">@Strings.FieldSeparatorSpace</listEntry>
 		    <listEntry value="22">@Strings.FieldSeparatorSlashForward</listEntry>
@@ -2205,10 +2220,10 @@
 		    <listEntry value="26">@Strings.FieldSeparatorDot</listEntry>
 		    <listEntry value="27">@Strings.FieldSeparatorComma</listEntry>
 
-            <listEntry value="88">@Strings.MenuBlank</listEntry>
-            <listEntry value="89">@Strings.MenuLine</listEntry>
-            <listEntry value="90">@Strings.MenuValues</listEntry>
-            <listEntry value="91">@Strings.MenuLine</listEntry>
+            <listEntry value="-9">@Strings.MenuBlank</listEntry>
+            <listEntry value="-10">@Strings.MenuLine</listEntry>
+            <listEntry value="-11">@Strings.MenuValues</listEntry>
+            <listEntry value="-12">@Strings.MenuLine</listEntry>
             
             <listEntry value="31">@Strings.ItemSteps</listEntry>
             <listEntry value="32">@Strings.FieldStepsGoal</listEntry>
@@ -2219,10 +2234,10 @@
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
 
-            <listEntry value="92">@Strings.MenuBlank</listEntry>
-            <listEntry value="93">@Strings.MenuLine</listEntry>
-            <listEntry value="94">@Strings.MenuIcons</listEntry>
-            <listEntry value="95">@Strings.MenuLine</listEntry>
+            <listEntry value="-13">@Strings.MenuBlank</listEntry>
+            <listEntry value="-14">@Strings.MenuLine</listEntry>
+            <listEntry value="-15">@Strings.MenuIcons</listEntry>
+            <listEntry value="-16">@Strings.MenuLine</listEntry>
             
             <listEntry value="41">@Strings.IconCircle</listEntry>
             <listEntry value="42">@Strings.IconCircleSolid</listEntry>
@@ -2237,7 +2252,7 @@
             <listEntry value="51">@Strings.IconStar</listEntry>
             <listEntry value="52">@Strings.IconStarSolid</listEntry>
 
-            <listEntry value="96">@Strings.MenuBlank</listEntry>
+            <listEntry value="-17">@Strings.MenuBlank</listEntry>
 
             <listEntry value="54">@Strings.IconLock</listEntry>
             <listEntry value="53">@Strings.IconAlarm</listEntry>
@@ -2256,7 +2271,7 @@
 
     <setting propertyKey="@Properties.F13" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -2273,6 +2288,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -2283,10 +2300,10 @@
             <listEntry value="2">@Strings.Color2</listEntry>
             <listEntry value="3">@Strings.Color3</listEntry>
 
-            <listEntry value="70">@Strings.MenuBlank</listEntry>
-            <listEntry value="71">@Strings.MenuLine</listEntry>
-            <listEntry value="72">@Strings.MenuBright</listEntry>
-            <listEntry value="73">@Strings.MenuLine</listEntry>
+            <listEntry value="-1">@Strings.MenuBlank</listEntry>
+            <listEntry value="-2">@Strings.MenuLine</listEntry>
+            <listEntry value="-3">@Strings.MenuBright</listEntry>
+            <listEntry value="-4">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="4">@Strings.Color4</listEntry>
 		    <listEntry value="5">@Strings.Color5</listEntry>
@@ -2307,10 +2324,10 @@
 		    <listEntry value="20">@Strings.Color20</listEntry>
 		    <listEntry value="21">@Strings.Color21</listEntry>
 
-            <listEntry value="74">@Strings.MenuBlank</listEntry>
-            <listEntry value="75">@Strings.MenuLine</listEntry>
-            <listEntry value="76">@Strings.MenuDim</listEntry>
-            <listEntry value="77">@Strings.MenuLine</listEntry>
+            <listEntry value="-5">@Strings.MenuBlank</listEntry>
+            <listEntry value="-6">@Strings.MenuLine</listEntry>
+            <listEntry value="-7">@Strings.MenuDim</listEntry>
+            <listEntry value="-8">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="22">@Strings.Color22</listEntry>
 		    <listEntry value="23">@Strings.Color23</listEntry>
@@ -2319,10 +2336,10 @@
 		    <listEntry value="26">@Strings.Color26</listEntry>    
 		    <listEntry value="27">@Strings.Color27</listEntry>
 
-            <listEntry value="78">@Strings.MenuBlank</listEntry>
-            <listEntry value="79">@Strings.MenuLine</listEntry>
-            <listEntry value="80">@Strings.MenuPale</listEntry>
-            <listEntry value="81">@Strings.MenuLine</listEntry>
+            <listEntry value="-9">@Strings.MenuBlank</listEntry>
+            <listEntry value="-10">@Strings.MenuLine</listEntry>
+            <listEntry value="-11">@Strings.MenuPale</listEntry>
+            <listEntry value="-12">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="28">@Strings.Color28</listEntry>
 		    <listEntry value="29">@Strings.Color29</listEntry>
@@ -2337,10 +2354,10 @@
 		    <listEntry value="38">@Strings.Color38</listEntry>
 		    <listEntry value="39">@Strings.Color39</listEntry>
 
-            <listEntry value="82">@Strings.MenuBlank</listEntry>
-            <listEntry value="83">@Strings.MenuLine</listEntry>
-            <listEntry value="84">@Strings.MenuPalest</listEntry>
-            <listEntry value="85">@Strings.MenuLine</listEntry>
+            <listEntry value="-13">@Strings.MenuBlank</listEntry>
+            <listEntry value="-14">@Strings.MenuLine</listEntry>
+            <listEntry value="-15">@Strings.MenuPalest</listEntry>
+            <listEntry value="-16">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="40">@Strings.Color40</listEntry>
 		    <listEntry value="41">@Strings.Color41</listEntry>
@@ -2349,10 +2366,10 @@
 		    <listEntry value="44">@Strings.Color44</listEntry>
 		    <listEntry value="45">@Strings.Color45</listEntry>
 
-            <listEntry value="86">@Strings.MenuBlank</listEntry>
-            <listEntry value="87">@Strings.MenuLine</listEntry>
-            <listEntry value="88">@Strings.MenuDark</listEntry>
-            <listEntry value="89">@Strings.MenuLine</listEntry>
+            <listEntry value="-17">@Strings.MenuBlank</listEntry>
+            <listEntry value="-18">@Strings.MenuLine</listEntry>
+            <listEntry value="-19">@Strings.MenuDark</listEntry>
+            <listEntry value="-20">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="46">@Strings.Color46</listEntry>
 		    <listEntry value="47">@Strings.Color47</listEntry>
@@ -2367,10 +2384,10 @@
 		    <listEntry value="56">@Strings.Color56</listEntry>    
 		    <listEntry value="57">@Strings.Color57</listEntry>
 
-            <listEntry value="90">@Strings.MenuBlank</listEntry>
-            <listEntry value="91">@Strings.MenuLine</listEntry>
-            <listEntry value="92">@Strings.MenuDarkest</listEntry>
-            <listEntry value="93">@Strings.MenuLine</listEntry>
+            <listEntry value="-21">@Strings.MenuBlank</listEntry>
+            <listEntry value="-22">@Strings.MenuLine</listEntry>
+            <listEntry value="-23">@Strings.MenuDarkest</listEntry>
+            <listEntry value="-24">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="58">@Strings.Color58</listEntry>
 		    <listEntry value="59">@Strings.Color59</listEntry>
@@ -2385,10 +2402,10 @@
         <settingConfig type="list">
             <listEntry value="0">@Strings.MenuNotSet</listEntry>
 
-            <listEntry value="80">@Strings.MenuBlank</listEntry>
-            <listEntry value="81">@Strings.MenuLine</listEntry>
-            <listEntry value="82">@Strings.MenuTimeDate</listEntry>
-            <listEntry value="83">@Strings.MenuLine</listEntry>
+            <listEntry value="-1">@Strings.MenuBlank</listEntry>
+            <listEntry value="-2">@Strings.MenuLine</listEntry>
+            <listEntry value="-3">@Strings.MenuTimeDate</listEntry>
+            <listEntry value="-4">@Strings.MenuLine</listEntry>
 
             <listEntry value="1">@Strings.ItemHours</listEntry>
             <listEntry value="2">@Strings.ItemMinutes</listEntry>
@@ -2408,11 +2425,13 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
-            <listEntry value="84">@Strings.MenuBlank</listEntry>
-            <listEntry value="85">@Strings.MenuLine</listEntry>
-            <listEntry value="86">@Strings.MenuSeparators</listEntry>
-            <listEntry value="87">@Strings.MenuLine</listEntry>
+            <listEntry value="-5">@Strings.MenuBlank</listEntry>
+            <listEntry value="-6">@Strings.MenuLine</listEntry>
+            <listEntry value="-7">@Strings.MenuSeparators</listEntry>
+            <listEntry value="-8">@Strings.MenuLine</listEntry>
  
  		    <listEntry value="21">@Strings.FieldSeparatorSpace</listEntry>
 		    <listEntry value="22">@Strings.FieldSeparatorSlashForward</listEntry>
@@ -2422,10 +2441,10 @@
 		    <listEntry value="26">@Strings.FieldSeparatorDot</listEntry>
 		    <listEntry value="27">@Strings.FieldSeparatorComma</listEntry>
 
-            <listEntry value="88">@Strings.MenuBlank</listEntry>
-            <listEntry value="89">@Strings.MenuLine</listEntry>
-            <listEntry value="90">@Strings.MenuValues</listEntry>
-            <listEntry value="91">@Strings.MenuLine</listEntry>
+            <listEntry value="-9">@Strings.MenuBlank</listEntry>
+            <listEntry value="-10">@Strings.MenuLine</listEntry>
+            <listEntry value="-11">@Strings.MenuValues</listEntry>
+            <listEntry value="-12">@Strings.MenuLine</listEntry>
             
             <listEntry value="31">@Strings.ItemSteps</listEntry>
             <listEntry value="32">@Strings.FieldStepsGoal</listEntry>
@@ -2436,10 +2455,10 @@
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
 
-            <listEntry value="92">@Strings.MenuBlank</listEntry>
-            <listEntry value="93">@Strings.MenuLine</listEntry>
-            <listEntry value="94">@Strings.MenuIcons</listEntry>
-            <listEntry value="95">@Strings.MenuLine</listEntry>
+            <listEntry value="-13">@Strings.MenuBlank</listEntry>
+            <listEntry value="-14">@Strings.MenuLine</listEntry>
+            <listEntry value="-15">@Strings.MenuIcons</listEntry>
+            <listEntry value="-16">@Strings.MenuLine</listEntry>
             
             <listEntry value="41">@Strings.IconCircle</listEntry>
             <listEntry value="42">@Strings.IconCircleSolid</listEntry>
@@ -2454,7 +2473,7 @@
             <listEntry value="51">@Strings.IconStar</listEntry>
             <listEntry value="52">@Strings.IconStarSolid</listEntry>
 
-            <listEntry value="96">@Strings.MenuBlank</listEntry>
+            <listEntry value="-17">@Strings.MenuBlank</listEntry>
 
             <listEntry value="54">@Strings.IconLock</listEntry>
             <listEntry value="53">@Strings.IconAlarm</listEntry>
@@ -2473,7 +2492,7 @@
 
     <setting propertyKey="@Properties.F16" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -2490,6 +2509,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -2500,10 +2521,10 @@
             <listEntry value="2">@Strings.Color2</listEntry>
             <listEntry value="3">@Strings.Color3</listEntry>
 
-            <listEntry value="70">@Strings.MenuBlank</listEntry>
-            <listEntry value="71">@Strings.MenuLine</listEntry>
-            <listEntry value="72">@Strings.MenuBright</listEntry>
-            <listEntry value="73">@Strings.MenuLine</listEntry>
+            <listEntry value="-1">@Strings.MenuBlank</listEntry>
+            <listEntry value="-2">@Strings.MenuLine</listEntry>
+            <listEntry value="-3">@Strings.MenuBright</listEntry>
+            <listEntry value="-4">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="4">@Strings.Color4</listEntry>
 		    <listEntry value="5">@Strings.Color5</listEntry>
@@ -2524,10 +2545,10 @@
 		    <listEntry value="20">@Strings.Color20</listEntry>
 		    <listEntry value="21">@Strings.Color21</listEntry>
 
-            <listEntry value="74">@Strings.MenuBlank</listEntry>
-            <listEntry value="75">@Strings.MenuLine</listEntry>
-            <listEntry value="76">@Strings.MenuDim</listEntry>
-            <listEntry value="77">@Strings.MenuLine</listEntry>
+            <listEntry value="-5">@Strings.MenuBlank</listEntry>
+            <listEntry value="-6">@Strings.MenuLine</listEntry>
+            <listEntry value="-7">@Strings.MenuDim</listEntry>
+            <listEntry value="-8">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="22">@Strings.Color22</listEntry>
 		    <listEntry value="23">@Strings.Color23</listEntry>
@@ -2536,10 +2557,10 @@
 		    <listEntry value="26">@Strings.Color26</listEntry>    
 		    <listEntry value="27">@Strings.Color27</listEntry>
 
-            <listEntry value="78">@Strings.MenuBlank</listEntry>
-            <listEntry value="79">@Strings.MenuLine</listEntry>
-            <listEntry value="80">@Strings.MenuPale</listEntry>
-            <listEntry value="81">@Strings.MenuLine</listEntry>
+            <listEntry value="-9">@Strings.MenuBlank</listEntry>
+            <listEntry value="-10">@Strings.MenuLine</listEntry>
+            <listEntry value="-11">@Strings.MenuPale</listEntry>
+            <listEntry value="-12">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="28">@Strings.Color28</listEntry>
 		    <listEntry value="29">@Strings.Color29</listEntry>
@@ -2554,10 +2575,10 @@
 		    <listEntry value="38">@Strings.Color38</listEntry>
 		    <listEntry value="39">@Strings.Color39</listEntry>
 
-            <listEntry value="82">@Strings.MenuBlank</listEntry>
-            <listEntry value="83">@Strings.MenuLine</listEntry>
-            <listEntry value="84">@Strings.MenuPalest</listEntry>
-            <listEntry value="85">@Strings.MenuLine</listEntry>
+            <listEntry value="-13">@Strings.MenuBlank</listEntry>
+            <listEntry value="-14">@Strings.MenuLine</listEntry>
+            <listEntry value="-15">@Strings.MenuPalest</listEntry>
+            <listEntry value="-16">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="40">@Strings.Color40</listEntry>
 		    <listEntry value="41">@Strings.Color41</listEntry>
@@ -2566,10 +2587,10 @@
 		    <listEntry value="44">@Strings.Color44</listEntry>
 		    <listEntry value="45">@Strings.Color45</listEntry>
 
-            <listEntry value="86">@Strings.MenuBlank</listEntry>
-            <listEntry value="87">@Strings.MenuLine</listEntry>
-            <listEntry value="88">@Strings.MenuDark</listEntry>
-            <listEntry value="89">@Strings.MenuLine</listEntry>
+            <listEntry value="-17">@Strings.MenuBlank</listEntry>
+            <listEntry value="-18">@Strings.MenuLine</listEntry>
+            <listEntry value="-19">@Strings.MenuDark</listEntry>
+            <listEntry value="-20">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="46">@Strings.Color46</listEntry>
 		    <listEntry value="47">@Strings.Color47</listEntry>
@@ -2584,10 +2605,10 @@
 		    <listEntry value="56">@Strings.Color56</listEntry>    
 		    <listEntry value="57">@Strings.Color57</listEntry>
 
-            <listEntry value="90">@Strings.MenuBlank</listEntry>
-            <listEntry value="91">@Strings.MenuLine</listEntry>
-            <listEntry value="92">@Strings.MenuDarkest</listEntry>
-            <listEntry value="93">@Strings.MenuLine</listEntry>
+            <listEntry value="-21">@Strings.MenuBlank</listEntry>
+            <listEntry value="-22">@Strings.MenuLine</listEntry>
+            <listEntry value="-23">@Strings.MenuDarkest</listEntry>
+            <listEntry value="-24">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="58">@Strings.Color58</listEntry>
 		    <listEntry value="59">@Strings.Color59</listEntry>
@@ -2602,10 +2623,10 @@
         <settingConfig type="list">
             <listEntry value="0">@Strings.MenuNotSet</listEntry>
 
-            <listEntry value="80">@Strings.MenuBlank</listEntry>
-            <listEntry value="81">@Strings.MenuLine</listEntry>
-            <listEntry value="82">@Strings.MenuTimeDate</listEntry>
-            <listEntry value="83">@Strings.MenuLine</listEntry>
+            <listEntry value="-1">@Strings.MenuBlank</listEntry>
+            <listEntry value="-2">@Strings.MenuLine</listEntry>
+            <listEntry value="-3">@Strings.MenuTimeDate</listEntry>
+            <listEntry value="-4">@Strings.MenuLine</listEntry>
 
             <listEntry value="1">@Strings.ItemHours</listEntry>
             <listEntry value="2">@Strings.ItemMinutes</listEntry>
@@ -2625,11 +2646,13 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
-            <listEntry value="84">@Strings.MenuBlank</listEntry>
-            <listEntry value="85">@Strings.MenuLine</listEntry>
-            <listEntry value="86">@Strings.MenuSeparators</listEntry>
-            <listEntry value="87">@Strings.MenuLine</listEntry>
+            <listEntry value="-5">@Strings.MenuBlank</listEntry>
+            <listEntry value="-6">@Strings.MenuLine</listEntry>
+            <listEntry value="-7">@Strings.MenuSeparators</listEntry>
+            <listEntry value="-8">@Strings.MenuLine</listEntry>
  
  		    <listEntry value="21">@Strings.FieldSeparatorSpace</listEntry>
 		    <listEntry value="22">@Strings.FieldSeparatorSlashForward</listEntry>
@@ -2639,10 +2662,10 @@
 		    <listEntry value="26">@Strings.FieldSeparatorDot</listEntry>
 		    <listEntry value="27">@Strings.FieldSeparatorComma</listEntry>
 
-            <listEntry value="88">@Strings.MenuBlank</listEntry>
-            <listEntry value="89">@Strings.MenuLine</listEntry>
-            <listEntry value="90">@Strings.MenuValues</listEntry>
-            <listEntry value="91">@Strings.MenuLine</listEntry>
+            <listEntry value="-9">@Strings.MenuBlank</listEntry>
+            <listEntry value="-10">@Strings.MenuLine</listEntry>
+            <listEntry value="-11">@Strings.MenuValues</listEntry>
+            <listEntry value="-12">@Strings.MenuLine</listEntry>
             
             <listEntry value="31">@Strings.ItemSteps</listEntry>
             <listEntry value="32">@Strings.FieldStepsGoal</listEntry>
@@ -2653,10 +2676,10 @@
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
 
-            <listEntry value="92">@Strings.MenuBlank</listEntry>
-            <listEntry value="93">@Strings.MenuLine</listEntry>
-            <listEntry value="94">@Strings.MenuIcons</listEntry>
-            <listEntry value="95">@Strings.MenuLine</listEntry>
+            <listEntry value="-13">@Strings.MenuBlank</listEntry>
+            <listEntry value="-14">@Strings.MenuLine</listEntry>
+            <listEntry value="-15">@Strings.MenuIcons</listEntry>
+            <listEntry value="-16">@Strings.MenuLine</listEntry>
             
             <listEntry value="41">@Strings.IconCircle</listEntry>
             <listEntry value="42">@Strings.IconCircleSolid</listEntry>
@@ -2671,7 +2694,7 @@
             <listEntry value="51">@Strings.IconStar</listEntry>
             <listEntry value="52">@Strings.IconStarSolid</listEntry>
 
-            <listEntry value="96">@Strings.MenuBlank</listEntry>
+            <listEntry value="-17">@Strings.MenuBlank</listEntry>
 
             <listEntry value="54">@Strings.IconLock</listEntry>
             <listEntry value="53">@Strings.IconAlarm</listEntry>
@@ -2690,7 +2713,7 @@
 
     <setting propertyKey="@Properties.F19" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -2707,6 +2730,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -2717,10 +2742,10 @@
             <listEntry value="2">@Strings.Color2</listEntry>
             <listEntry value="3">@Strings.Color3</listEntry>
 
-            <listEntry value="70">@Strings.MenuBlank</listEntry>
-            <listEntry value="71">@Strings.MenuLine</listEntry>
-            <listEntry value="72">@Strings.MenuBright</listEntry>
-            <listEntry value="73">@Strings.MenuLine</listEntry>
+            <listEntry value="-1">@Strings.MenuBlank</listEntry>
+            <listEntry value="-2">@Strings.MenuLine</listEntry>
+            <listEntry value="-3">@Strings.MenuBright</listEntry>
+            <listEntry value="-4">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="4">@Strings.Color4</listEntry>
 		    <listEntry value="5">@Strings.Color5</listEntry>
@@ -2741,10 +2766,10 @@
 		    <listEntry value="20">@Strings.Color20</listEntry>
 		    <listEntry value="21">@Strings.Color21</listEntry>
 
-            <listEntry value="74">@Strings.MenuBlank</listEntry>
-            <listEntry value="75">@Strings.MenuLine</listEntry>
-            <listEntry value="76">@Strings.MenuDim</listEntry>
-            <listEntry value="77">@Strings.MenuLine</listEntry>
+            <listEntry value="-5">@Strings.MenuBlank</listEntry>
+            <listEntry value="-6">@Strings.MenuLine</listEntry>
+            <listEntry value="-7">@Strings.MenuDim</listEntry>
+            <listEntry value="-8">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="22">@Strings.Color22</listEntry>
 		    <listEntry value="23">@Strings.Color23</listEntry>
@@ -2753,10 +2778,10 @@
 		    <listEntry value="26">@Strings.Color26</listEntry>    
 		    <listEntry value="27">@Strings.Color27</listEntry>
 
-            <listEntry value="78">@Strings.MenuBlank</listEntry>
-            <listEntry value="79">@Strings.MenuLine</listEntry>
-            <listEntry value="80">@Strings.MenuPale</listEntry>
-            <listEntry value="81">@Strings.MenuLine</listEntry>
+            <listEntry value="-9">@Strings.MenuBlank</listEntry>
+            <listEntry value="-10">@Strings.MenuLine</listEntry>
+            <listEntry value="-11">@Strings.MenuPale</listEntry>
+            <listEntry value="-12">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="28">@Strings.Color28</listEntry>
 		    <listEntry value="29">@Strings.Color29</listEntry>
@@ -2771,10 +2796,10 @@
 		    <listEntry value="38">@Strings.Color38</listEntry>
 		    <listEntry value="39">@Strings.Color39</listEntry>
 
-            <listEntry value="82">@Strings.MenuBlank</listEntry>
-            <listEntry value="83">@Strings.MenuLine</listEntry>
-            <listEntry value="84">@Strings.MenuPalest</listEntry>
-            <listEntry value="85">@Strings.MenuLine</listEntry>
+            <listEntry value="-13">@Strings.MenuBlank</listEntry>
+            <listEntry value="-14">@Strings.MenuLine</listEntry>
+            <listEntry value="-15">@Strings.MenuPalest</listEntry>
+            <listEntry value="-16">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="40">@Strings.Color40</listEntry>
 		    <listEntry value="41">@Strings.Color41</listEntry>
@@ -2783,10 +2808,10 @@
 		    <listEntry value="44">@Strings.Color44</listEntry>
 		    <listEntry value="45">@Strings.Color45</listEntry>
 
-            <listEntry value="86">@Strings.MenuBlank</listEntry>
-            <listEntry value="87">@Strings.MenuLine</listEntry>
-            <listEntry value="88">@Strings.MenuDark</listEntry>
-            <listEntry value="89">@Strings.MenuLine</listEntry>
+            <listEntry value="-17">@Strings.MenuBlank</listEntry>
+            <listEntry value="-18">@Strings.MenuLine</listEntry>
+            <listEntry value="-19">@Strings.MenuDark</listEntry>
+            <listEntry value="-20">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="46">@Strings.Color46</listEntry>
 		    <listEntry value="47">@Strings.Color47</listEntry>
@@ -2801,10 +2826,10 @@
 		    <listEntry value="56">@Strings.Color56</listEntry>    
 		    <listEntry value="57">@Strings.Color57</listEntry>
 
-            <listEntry value="90">@Strings.MenuBlank</listEntry>
-            <listEntry value="91">@Strings.MenuLine</listEntry>
-            <listEntry value="92">@Strings.MenuDarkest</listEntry>
-            <listEntry value="93">@Strings.MenuLine</listEntry>
+            <listEntry value="-21">@Strings.MenuBlank</listEntry>
+            <listEntry value="-22">@Strings.MenuLine</listEntry>
+            <listEntry value="-23">@Strings.MenuDarkest</listEntry>
+            <listEntry value="-24">@Strings.MenuLine</listEntry>
             
 		    <listEntry value="58">@Strings.Color58</listEntry>
 		    <listEntry value="59">@Strings.Color59</listEntry>

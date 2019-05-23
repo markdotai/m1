@@ -214,8 +214,10 @@ class test1View extends WatchUi.WatchFace
 	//	STATUS_BATTERY_LOW = 14,
 	//	STATUS_MOVEBARALERT_TRIGGERED = 15,
 	//	STATUS_MOVEBARALERT_NOT = 16,
+	//	STATUS_AM = 17,
+	//	STATUS_PM = 18,
 	//
-	//	STATUS_NUM = 17
+	//	STATUS_NUM = 19
 	//}
 	
 	//enum
@@ -240,6 +242,8 @@ class test1View extends WatchUi.WatchFace
 	//	FIELD_YEAR_ISO_WEEK_XXXX = 16,
 	//	FIELD_WEEK_CALENDAR_XX = 17,
 	//	FIELD_YEAR_CALENDAR_WEEK_XXXX = 18,
+	//	FIELD_AM = 19,
+	//	FIELD_PM = 20,
 	//
 	//	FIELD_SEPARATOR_SPACE = 21,
 	//	//!FIELD_SEPARATOR_SLASH_FORWARD = 22,
@@ -1627,7 +1631,7 @@ class test1View extends WatchUi.WatchFace
         var hour = clockTime.hour;
         if (!deviceSettings.is24Hour)	// 12 hours
         {
-            hour += ((hour > 12) ? -12 : 0);
+			hour = (((hour+11)%12) + 1);
         }
 
 		// check for adding a leading zero
@@ -1696,7 +1700,7 @@ class test1View extends WatchUi.WatchFace
 		}
 
 		// calculate fields to display
-		var visibilityStatus = new[17/*STATUS_NUM*/];
+		var visibilityStatus = new[19/*STATUS_NUM*/];
 		visibilityStatus[0/*STATUS_ALWAYSON*/] = true;
 	    visibilityStatus[1/*STATUS_DONOTDISTURB_ON*/] = (hasDoNotDisturb && deviceSettings.doNotDisturb);
 	    visibilityStatus[2/*STATUS_DONOTDISTURB_OFF*/] = (hasDoNotDisturb && !deviceSettings.doNotDisturb);
@@ -1726,6 +1730,8 @@ class test1View extends WatchUi.WatchFace
 	    var moveBarAlertTriggered = (activityMonitorInfo.moveBarLevel >= propertiesGetNumber("29")); 
 	    visibilityStatus[15/*STATUS_MOVEBARALERT_TRIGGERED*/] = (activityTrackingOn && moveBarAlertTriggered);
 	    visibilityStatus[16/*STATUS_MOVEBARALERT_NOT*/] = (activityTrackingOn && !moveBarAlertTriggered);
+	    visibilityStatus[17/*STATUS_AM*/] = (clockTime.hour < 12);
+	    visibilityStatus[18/*STATUS_PM*/] = (clockTime.hour >= 12);
 
 		fieldActivePhoneStatus = null;
 		fieldActiveNotificationsStatus = null;
@@ -1755,7 +1761,7 @@ class test1View extends WatchUi.WatchFace
 					var eVisible = propFieldData[elementStart + 1];
 
 					// don't need to test >=0 as it's a byte array
-					if (eDisplay!=0/*FIELD_EMPTY*/ && /*eVisible>=0 &&*/ eVisible<17/*STATUS_NUM*/)
+					if (eDisplay!=0/*FIELD_EMPTY*/ && /*eVisible>=0 &&*/ eVisible<19/*STATUS_NUM*/)
 					{
 						if (eVisible==5/*STATUS_NOTIFICATIONS_PENDING*/ || eVisible==6/*STATUS_NOTIFICATIONS_NONE*/)
 						{
@@ -1937,6 +1943,18 @@ class test1View extends WatchUi.WatchFace
 										break;
 									}
 				
+									case 19/*FIELD_AM*/:
+								    {
+										eStr = "AM";
+										break;
+									}
+				
+									case 20/*FIELD_PM*/:
+								    {
+										eStr = "PM";
+										break;
+									}
+				
 									case 31/*FIELD_STEPSCOUNT*/:
 									{
 										eStr = "" + activityMonitorInfo.steps;
@@ -1986,7 +2004,7 @@ class test1View extends WatchUi.WatchFace
 											var jDisplay = propFieldData[jStart];
 											var jVisible = propFieldData[jStart + 1];
 											// don't need to test >=0 as it's a byte array
-											if (jDisplay!=0/*FIELD_EMPTY*/ && /*jVisible>=0 &&*/ jVisible<17/*STATUS_NUM*/ && visibilityStatus[jVisible])
+											if (jDisplay!=0/*FIELD_EMPTY*/ && /*jVisible>=0 &&*/ jVisible<19/*STATUS_NUM*/ && visibilityStatus[jVisible])
 											{
 												if (jDisplay==37/*FIELD_MOVEBAR*/)
 												{
@@ -2756,26 +2774,41 @@ class test1View extends WatchUi.WatchFace
 	var CalendarWeek;	// in Calendar format the first week of the year always includes 1st Jan
 	var CalendarYear;
 
+//	function printMoment(m, s)
+//	{
+//		var i = Time.Gregorian.info(m, Time.FORMAT_SHORT);
+//		System.println(Lang.format(s + " Local $1$-$2$-$3$ T$4$:$5$:$6$", [ i.year.format("%4d"), i.month.format("%02d"), i.day.format("%02d"), i.hour.format("%02d"), i.min.format("%02d"), i.sec.format("%02d") ]));
+//		i = Time.Gregorian.utcInfo(m, Time.FORMAT_SHORT);
+//		System.println(Lang.format(s + " UTC $1$-$2$-$3$ T$4$:$5$:$6$", [ i.year.format("%4d"), i.month.format("%02d"), i.day.format("%02d"), i.hour.format("%02d"), i.min.format("%02d"), i.sec.format("%02d") ]));
+//	}
+	
 	function calculateDayWeekYearData(index, firstDayOfWeek, dateInfoMedium)
 	{
-		var startOfToday = Time.today();
-		var startOfTodayValue = startOfToday.value();
-		if (startOfTodayValue == dayWeekYearCalculatedDay[index])
+		// use noon for all these times to be safe when getting dateInfo
+	
+		var gregorian = Time.Gregorian;
+		var halfDayOffset = gregorian.duration({:hours => 12});
+
+		var todayNoon = Time.today().add(halfDayOffset);	// 12:00 local time
+		var todayNoonValue = todayNoon.value();
+		if (todayNoonValue == dayWeekYearCalculatedDay[index])
 		{
 			return;
 		}
 
-		var gregorian = Time.Gregorian;
-	
-		var startOfYear = Time.Gregorian.moment({:year => dateInfoMedium.year, :month => 1, :day => 1, :hour => 0, :minute => 0, :second => 0 });
-		var durationToStartOfYear = startOfToday.subtract(startOfYear);
+		var timeZoneOffset = gregorian.duration({:seconds => System.getClockTime().timeZoneOffset});
+
+		var startOfYearNoon = gregorian.moment({:year => dateInfoMedium.year, :month => 1, :day => 1, :hour => 12, :minute => 0, :second => 0}).subtract(timeZoneOffset);
+		//printMoment(startOfYearNoon, "startOfYearNoon");
+		var durationToStartOfYear = todayNoon.subtract(startOfYearNoon);
 		//var secs = duration.value();
 		//var mins = secs / 60.0;
 		//var hours = mins / 60.0;
 		//var days = Math.round(hours / 24.0) + 1;
+		//System.println("days=" + durationToStartOfYear.value() / 86400.0);
 		var days = Math.round(durationToStartOfYear.value() / 86400.0).toNumber();
 
-		dayWeekYearCalculatedDay[0] = startOfTodayValue;
+		dayWeekYearCalculatedDay[0] = todayNoonValue;
 		dayOfYear = days + 1;
 		if (index==0)
 		{
@@ -2789,8 +2822,8 @@ class test1View extends WatchUi.WatchFace
 		// If first day of week is set to Sun then Jan 1 is in week 1 if Jan 1 is Sun, Mon, Tue, Wed, Thu
 		// If first day of week is set to Sat then Jan 1 is in week 1 if Jan 1 is Sat, Sun, Mon, Tue, Wed, Thu
 	       					
-		var dateInfoStartOfYear = gregorian.info(startOfYear, Time.FORMAT_SHORT);
-		var numberInWeekOfJan1 = ((dateInfoStartOfYear.day_of_week - firstDayOfWeek + 7) % 7);	// 0-6
+		var dateInfoStartOfYear = gregorian.info(startOfYearNoon, Time.FORMAT_SHORT);	// get date info for noon to be safe
+ 		var numberInWeekOfJan1 = ((dateInfoStartOfYear.day_of_week - firstDayOfWeek + 7) % 7);	// 0-6
 		var weeks = (days + numberInWeekOfJan1) / 7;
 		var year = dateInfoMedium.year;
 
@@ -2819,11 +2852,11 @@ class test1View extends WatchUi.WatchFace
 		if (checkWeeksLessThan1)		// check to find last week of previous year
 		{
 			var prevYear = dateInfoMedium.year-1;
-			var startOfPrevYear = gregorian.moment({:year => prevYear, :month => 1, :day => 1, :hour => 0, :minute => 0, :second => 0 });
-			var dateInfoStartOfPrevYear = gregorian.info(startOfPrevYear, Time.FORMAT_SHORT);
+			var startOfPrevYearNoon = gregorian.moment({:year => prevYear, :month => 1, :day => 1, :hour => 12, :minute => 0, :second => 0}).subtract(timeZoneOffset);
+			var dateInfoStartOfPrevYear = gregorian.info(startOfPrevYearNoon, Time.FORMAT_SHORT);	// get date info for noon to be safe
 			var numberInWeekOfJan1PrevYear = ((dateInfoStartOfPrevYear.day_of_week - firstDayOfWeek + 7) % 7);	// 0-6
 			
-			var durationToJan1PrevYear = startOfToday.subtract(startOfPrevYear);
+			var durationToJan1PrevYear = todayNoon.subtract(startOfPrevYearNoon);
 			var daysToJan1PrevYear = Math.round(durationToJan1PrevYear.value() / 86400.0).toNumber();
 			var daysToStartOfWeekYear = daysToJan1PrevYear + numberInWeekOfJan1PrevYear;
 			weeks = daysToStartOfWeekYear / 7;
@@ -2842,8 +2875,8 @@ class test1View extends WatchUi.WatchFace
 		else if (checkWeeksGreaterThan52)	// check to see if in first week of next year
 		{
 			var nextYear = dateInfoMedium.year+1;
-			var startOfNextYear = gregorian.moment({:year => nextYear, :month => 1, :day => 1, :hour => 0, :minute => 0, :second => 0 });
-			var dateInfoStartOfNextYear = gregorian.info(startOfNextYear, Time.FORMAT_SHORT);
+			var startOfNextYearNoon = gregorian.moment({:year => nextYear, :month => 1, :day => 1, :hour => 12, :minute => 0, :second => 0}).subtract(timeZoneOffset);
+			var dateInfoStartOfNextYear = gregorian.info(startOfNextYearNoon, Time.FORMAT_SHORT);	// get date info for noon to be safe
 			var numberInWeekOfJan1NextYear = ((dateInfoStartOfNextYear.day_of_week - firstDayOfWeek + 7) % 7);	// 0-6
 			
 			var checkInFirstWeek;
@@ -2871,7 +2904,7 @@ class test1View extends WatchUi.WatchFace
 			if (checkInFirstWeek)
 			{
 				// so see if we are in the same week as jan1 next year
-				var durationToJan1NextYear = startOfNextYear.subtract(startOfToday);
+				var durationToJan1NextYear = startOfNextYearNoon.subtract(todayNoon);
 				var daysToJan1NextYear = Math.round(durationToJan1NextYear.value() / 86400.0).toNumber();
 				if (daysToJan1NextYear <= numberInWeekOfJan1NextYear)
 				{
@@ -2881,7 +2914,7 @@ class test1View extends WatchUi.WatchFace
 			}
 		}
 
-		dayWeekYearCalculatedDay[index] = startOfTodayValue;
+		dayWeekYearCalculatedDay[index] = todayNoonValue;
 		if (index==1)
 		{
 			ISOWeek = weeks;

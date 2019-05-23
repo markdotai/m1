@@ -1344,7 +1344,7 @@
 
     <setting propertyKey="@Properties.26" title="@Strings.FieldFontCaseTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.SystemCaseAny</listEntry>
+            <listEntry value="0">@Strings.ItemOff</listEntry>
             <listEntry value="1">@Strings.SystemCaseUpper</listEntry>
             <listEntry value="2">@Strings.SystemCaseLower</listEntry>
         </settingConfig>
@@ -1355,6 +1355,7 @@
             <listEntry value="84">@Strings.MenuLine</listEntry>
             <listEntry value="85">@Strings.MenuSystemFonts</listEntry>
             <listEntry value="86">@Strings.MenuLine</listEntry>
+            
             <listEntry value="24">@Strings.FontXTiny</listEntry>
             <listEntry value="25">@Strings.FontTiny</listEntry>
             <listEntry value="26">@Strings.FontSmall</listEntry>
@@ -1535,6 +1536,8 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
             <listEntry value="84">@Strings.MenuBlank</listEntry>
             <listEntry value="85">@Strings.MenuLine</listEntry>
@@ -1600,7 +1603,7 @@
 
     <setting propertyKey="@Properties.F4" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -1617,6 +1620,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -1752,6 +1757,8 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
             <listEntry value="84">@Strings.MenuBlank</listEntry>
             <listEntry value="85">@Strings.MenuLine</listEntry>
@@ -1817,7 +1824,7 @@
 
     <setting propertyKey="@Properties.F7" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -1834,6 +1841,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -1969,6 +1978,8 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
             <listEntry value="84">@Strings.MenuBlank</listEntry>
             <listEntry value="85">@Strings.MenuLine</listEntry>
@@ -2034,7 +2045,7 @@
 
     <setting propertyKey="@Properties.F10" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -2051,6 +2062,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -2186,6 +2199,8 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
             <listEntry value="84">@Strings.MenuBlank</listEntry>
             <listEntry value="85">@Strings.MenuLine</listEntry>
@@ -2251,7 +2266,7 @@
 
     <setting propertyKey="@Properties.F13" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -2268,6 +2283,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -2403,6 +2420,8 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
             <listEntry value="84">@Strings.MenuBlank</listEntry>
             <listEntry value="85">@Strings.MenuLine</listEntry>
@@ -2468,7 +2487,7 @@
 
     <setting propertyKey="@Properties.F16" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -2485,6 +2504,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -2620,6 +2641,8 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
             <listEntry value="84">@Strings.MenuBlank</listEntry>
             <listEntry value="85">@Strings.MenuLine</listEntry>
@@ -2685,7 +2708,7 @@
 
     <setting propertyKey="@Properties.F19" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -2702,6 +2725,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -2861,6 +2886,8 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
             <listEntry value="84">@Strings.MenuBlank</listEntry>
             <listEntry value="85">@Strings.MenuLine</listEntry>
@@ -2926,7 +2953,7 @@
 
     <setting propertyKey="@Properties.G4" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -2943,6 +2970,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -3078,6 +3107,8 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
             <listEntry value="84">@Strings.MenuBlank</listEntry>
             <listEntry value="85">@Strings.MenuLine</listEntry>
@@ -3143,7 +3174,7 @@
 
     <setting propertyKey="@Properties.G7" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -3160,6 +3191,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -3295,6 +3328,8 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
             <listEntry value="84">@Strings.MenuBlank</listEntry>
             <listEntry value="85">@Strings.MenuLine</listEntry>
@@ -3360,7 +3395,7 @@
 
     <setting propertyKey="@Properties.G10" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -3377,6 +3412,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -3512,6 +3549,8 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
             <listEntry value="84">@Strings.MenuBlank</listEntry>
             <listEntry value="85">@Strings.MenuLine</listEntry>
@@ -3577,7 +3616,7 @@
 
     <setting propertyKey="@Properties.G13" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -3594,6 +3633,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -3729,6 +3770,8 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
             <listEntry value="84">@Strings.MenuBlank</listEntry>
             <listEntry value="85">@Strings.MenuLine</listEntry>
@@ -3794,7 +3837,7 @@
 
     <setting propertyKey="@Properties.G16" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -3811,6 +3854,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -3946,6 +3991,8 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
             <listEntry value="84">@Strings.MenuBlank</listEntry>
             <listEntry value="85">@Strings.MenuLine</listEntry>
@@ -4011,7 +4058,7 @@
 
     <setting propertyKey="@Properties.G19" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -4028,6 +4075,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -4187,6 +4236,8 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
             <listEntry value="84">@Strings.MenuBlank</listEntry>
             <listEntry value="85">@Strings.MenuLine</listEntry>
@@ -4252,7 +4303,7 @@
 
     <setting propertyKey="@Properties.H4" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -4269,6 +4320,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -4404,6 +4457,8 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
             <listEntry value="84">@Strings.MenuBlank</listEntry>
             <listEntry value="85">@Strings.MenuLine</listEntry>
@@ -4469,7 +4524,7 @@
 
     <setting propertyKey="@Properties.H7" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -4486,6 +4541,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -4621,6 +4678,8 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
             <listEntry value="84">@Strings.MenuBlank</listEntry>
             <listEntry value="85">@Strings.MenuLine</listEntry>
@@ -4686,7 +4745,7 @@
 
     <setting propertyKey="@Properties.H10" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -4703,6 +4762,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -4838,6 +4899,8 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
             <listEntry value="84">@Strings.MenuBlank</listEntry>
             <listEntry value="85">@Strings.MenuLine</listEntry>
@@ -4903,7 +4966,7 @@
 
     <setting propertyKey="@Properties.H13" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -4920,6 +4983,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -5055,6 +5120,8 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
             <listEntry value="84">@Strings.MenuBlank</listEntry>
             <listEntry value="85">@Strings.MenuLine</listEntry>
@@ -5120,7 +5187,7 @@
 
     <setting propertyKey="@Properties.H16" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -5137,6 +5204,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 
@@ -5272,6 +5341,8 @@
             <listEntry value="16">@Strings.FieldYearISOWeekXXXX</listEntry>
             <listEntry value="17">@Strings.FieldWeekCalendarXX</listEntry>
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
+            <listEntry value="19">@Strings.FieldAM</listEntry>
+            <listEntry value="20">@Strings.FieldPM</listEntry>
 
             <listEntry value="84">@Strings.MenuBlank</listEntry>
             <listEntry value="85">@Strings.MenuLine</listEntry>
@@ -5337,7 +5408,7 @@
 
     <setting propertyKey="@Properties.H19" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.ItemAlwaysOn</listEntry>
+            <listEntry value="0">@Strings.ItemOn</listEntry>
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -5354,6 +5425,8 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+            <listEntry value="17">@Strings.FieldAM</listEntry>
+            <listEntry value="18">@Strings.FieldPM</listEntry>
         </settingConfig>
     </setting>
 

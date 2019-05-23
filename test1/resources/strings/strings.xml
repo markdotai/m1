@@ -44,7 +44,7 @@
 
     <string id="FieldFontTitle">Field Font</string>
     <string id="FieldFontWeightTitle">Field Custom Fonts Weight</string>
-    <string id="FieldFontCaseTitle">Field System Fonts Case</string>
+    <string id="FieldFontCaseTitle">Field System Fonts Case Override</string>
     <string id="FieldFontNotSupportedTitle">Field Name Font When Custom Unsupported (day and month names)</string>
     <string id="FieldMoveBarOffColorTitle">Field Move Bar Off Color</string>
 	<string id="FieldMoveBarAlertTriggerLevelTitle">Status Move Bar Alert Trigger Level (1-5)</string>
@@ -86,7 +86,6 @@
 
     <string id="ItemVisibilityTitle">Visible If ... (for element above)</string>
     <string id="ItemColorTitle">Color (of element above)</string>
-    <string id="ItemAlwaysOn">Always On</string>
 
     <string id="FieldDoNotDisturbOn">Do Not Disturb On</string>
     <string id="FieldDoNotDisturbOff">Do Not Disturb Off</string>
@@ -104,6 +103,8 @@
     <string id="FieldBatteryLow">Battery Low</string>
     <string id="FieldMoveBarAlertTriggered">Move Bar Alert Triggered</string>
     <string id="FieldMoveBarAlertNot">Move Bar Alert Not Triggered</string>
+    <string id="FieldAM">AM (morning)</string>
+    <string id="FieldPM">PM (afternoon)</string>
 
     <string id="DemoFontStylesTitle">Demo Font Styles (cycle through custom font styles)</string>
     <string id="DemoSecondStylesTitle">Demo Second Styles (cycle through second indicator styles)</string>
@@ -219,7 +220,6 @@
     <string id="CustomFontBold">Bold</string>
     <string id="CustomFontHeavy">Heavy</string>
        
-    <string id="SystemCaseAny">Any</string>
     <string id="SystemCaseUpper">Upper Case Names</string>
     <string id="SystemCaseLower">Lower Case Names</string>
 
@@ -228,7 +228,7 @@
     <string id="JustifyRight">Right</string>
 
    	<string id="ItemOff">Off</string>
-    <string id="ItemOn">On</string>
+    <string id="ItemOn">On (always)</string>
     <string id="ItemOnGlance">Show On Gesture</string>
     
     <string id="ItemSteps">Steps</string>

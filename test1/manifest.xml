@@ -28,7 +28,10 @@
             <iq:product id="vivoactive3mlte"/>
             <iq:product id="vivolife"/>
         </iq:products>
-        <iq:permissions/>
+        <iq:permissions>
+            <iq:uses-permission id="Positioning"/>
+            <iq:uses-permission id="SensorHistory"/>
+        </iq:permissions>
         <iq:languages>
             <iq:language>ara</iq:language>
             <iq:language>bul</iq:language>

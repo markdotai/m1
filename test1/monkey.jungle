@@ -1,4 +1,6 @@
 project.manifest = manifest.xml
 
+base.excludeAnnotations = exclude
+#fenix5xplus.excludeAnnotations = older
 
 

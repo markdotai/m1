@@ -4,6 +4,7 @@ using Toybox.System;
 using Toybox.Lang;
 using Toybox.Application;
 using Toybox.StringUtil;
+using Toybox.Time;
 
 using Application.Properties as applicationProperties;
 using Application.Storage as applicationStorage;
@@ -15,6 +16,7 @@ class test1View extends WatchUi.WatchFace
 	//const forceClearStorage = false;
 	//const forceDemoProfiles = false;
 	//const forceDemoFontStyles = false;
+	//const forceFieldTest = true;
 
 	const PROFILE_VERSION = 13;			// a version number
 	const PROFILE_NUM_PRESET = 14;		// number of preset profiles (in the jsondata resource)
@@ -82,6 +84,8 @@ class test1View extends WatchUi.WatchFace
 	
 	var propDemoDisplayOn;
 	
+	var propSunAdjustAltitude = false;
+	
 	const FIELD_NUM = 8;		// number of fields
 	const FIELD_NUM_ELEMENTS = 6;
 	const FIELD_NUM_ELEMENTS_DRAW = 10;		// 4 extra for 5 move bar icons + 5 other icons
@@ -124,6 +128,8 @@ class test1View extends WatchUi.WatchFace
     
 	var hasDoNotDisturb;
 	var hasLTE;
+	var hasElevationHistory;
+	var hasPressureHistory;
 
 	var fieldActivePhoneStatus = null;
 	var fieldActiveNotificationsStatus = null;
@@ -150,6 +156,10 @@ class test1View extends WatchUi.WatchFace
 	const PROFILE_END_SHIFT = 21;
 	// 2nd number:
 	const PROFILE_EVENTS_MASK = 0xFF;			// number of random events per day 0-255
+	const PROFILE_START_SUNRISE = 0x0100;
+	const PROFILE_START_SUNSET = 0x0200;
+	const PROFILE_END_SUNRISE = 0x0400;
+	const PROFILE_END_SUNSET = 0x0800;
 	
 	var profileActive = PROFILE_PRIVATE_INDEX;	// currently active profile
 	var profileDelayEnd = 0;		// after manually changing settings then any automatic profile loads get delayed until this moment
@@ -325,6 +335,25 @@ class test1View extends WatchUi.WatchFace
 	//	//!FIELD_SHAPE_NETWORK = 63,
 	//	FIELD_SHAPE_STAIRS = 64,
 	//
+	//	FIELD_SUNRISE_HOUR = 82,
+	//	FIELD_SUNRISE_MINUTE = 83,
+	//	FIELD_SUNSET_HOUR = 84,
+	//	FIELD_SUNSET_MINUTE = 85,
+	//	FIELD_SUNEVENT_HOUR = 86,
+	//	FIELD_SUNEVENT_MINUTE = 87,
+	//	FIELD_2ND_HOUR = 88,
+	//	FIELD_CALORIES = 89,
+	//	FIELD_ACTIVE_CALORIES = 90,
+	//	FIELD_INTENSITY = 91,
+	//	FIELD_INTENSITY_GOAL = 92,
+	//	FIELD_SMART_GOAL = 93,
+	//	FIELD_DISTANCE = 94,
+	//	FIELD_DISTANCE_UNITS = 95,
+	//	FIELD_PRESSURE = 96,
+	//	FIELD_PRESSURE_UNITS = 97,
+	//	FIELD_ALTITUDE = 98,
+	//	FIELD_ALTITUDE_UNITS = 99,
+	//
 	//	//!FIELD_UNUSED
 	//}
 	
@@ -436,20 +465,20 @@ class test1View extends WatchUi.WatchFace
 		return col;
 	}
 
-//	function colorHexToIndex(col) not tested but may work ...
-//	{
-//		var r = ((col>>20) & 0x0F) / 5;	// 0-3
-//		var g = ((col>>12) & 0x0F) / 5;	// 0-3
-//		var b = ((col>>4) & 0x0F) / 5;	// 0-3
-//		
-//		var shortTest = (r<<4) | (g<<2) | b;
-//		
-//		var index = colorArray.indexOf(shortTest);
-//		if (index < 0)
-//		{
-//			index = 0;
-//		}
-//	
+	function colorHexToIndex(col)
+	{
+		var r = ((col>>20) & 0x0F) / 5;	// 0-3
+		var g = ((col>>12) & 0x0F) / 5;	// 0-3
+		var b = ((col>>4) & 0x0F) / 5;	// 0-3
+		
+		var shortTest = (r<<4) | (g<<2) | b;
+		
+		var index = colorArray.indexOf(shortTest);
+		if (index < 0)
+		{
+			index = 0;
+		}
+	
 //		var index = 0;
 //		for (var i=0; i<64; i++)
 //		{
@@ -459,9 +488,9 @@ class test1View extends WatchUi.WatchFace
 //				break;
 //			}
 //		}
-//		
-//		return index;
-//	}
+		
+		return index;
+	}
 
 	//const SECONDS_FIRST_CHAR_ID = 21;
 	//const SECONDS_SIZE_HALF = 8;
@@ -647,6 +676,7 @@ class test1View extends WatchUi.WatchFace
 	//
 	//	APPCHAR_SPACE = 32,
 	//	APPCHAR_COMMA = 44,
+	//	APPCHAR_PLUS = 43,
 	//	APPCHAR_MINUS = 45,
 	//	//!APPCHAR_DOT = 46,
 	//	//!APPCHAR_f = 102,
@@ -818,6 +848,19 @@ class test1View extends WatchUi.WatchFace
 		return (hasLTE && (System.getDeviceSettings().connectionInfo[:lte].state==System.CONNECTION_STATE_CONNECTED));
     }
         	
+	function getMinMax(v, min, max)
+	{
+		if (v<min)
+		{
+			v = min;
+		}
+		else if (v>max)
+		{
+			v = max;
+		}
+		return v;
+	}
+
 	function propertiesGetBoolean(p)
 	{
 		// this test code for null works fine
@@ -856,7 +899,7 @@ class test1View extends WatchUi.WatchFace
 		return v;
 	}
 	
-	function propertiesGetCharArray(p)
+	function propertiesGetString(p)
 	{	
 		var v = applicationProperties.getValue(p);
 		if (v == null)
@@ -867,62 +910,58 @@ class test1View extends WatchUi.WatchFace
 		{
 			v = v.toString();
 		}
-		return v.toCharArray();
+		return v;
+	}
+	
+	function propertiesGetCharArray(p)
+	{	
+		return propertiesGetString(p).toCharArray();
 	}
 	
 	// Parse 2 numbers (number seperator number) from a string
 	function propertiesGetTwoNumbers(p)
 	{
-		var n = new[2];
-		
 		var charArray = propertiesGetCharArray(p);
 		var charArraySize = charArray.size();
 		parseIndex = 0;
 		
-		n[0] = parseNumber(charArray, charArraySize);
-
-       	// find next non-numeric character
-    	for (; parseIndex<charArraySize; parseIndex++)
-    	{
-    		var c = charArray[parseIndex].toNumber();
-       		if (c<48/*APPCHAR_0*/ || c>57/*APPCHAR_9*/)
-    		{
-    			break;
-    		}
-    	}
-		
-		parseIndex++;		// step over the separator
-		
-    	// then find next numeric character
-    	for (; parseIndex<charArraySize; parseIndex++)
-    	{
-    		var c = charArray[parseIndex].toNumber();
-       		if (c>=48/*APPCHAR_0*/ && c<=57/*APPCHAR_9*/)
-    		{
-    			break;
-    		}
-    	}
-
-		n[1] = parseNumber(charArray, charArraySize);
-		
-		//System.println("parseTwoNumbers=" + n[0] + " and " + n[1]);
-
-		return n;
+		return parseTwoNumbers(charArray, charArraySize);
 	}
 	
 	// Parse a time (hours & minutes) from a string
 	function propertiesGetTime(p)
 	{
-		var n = propertiesGetTwoNumbers(p);
+		var t = new[2];		// 0/1/2 for nothing/sunrise/sunset, then a time
+		var adjust = 12*60;	// for sunrise/sunset add 12 hours to the time so we can store +-12 hours in a positive number
 
-		var t = n[0]*60 + n[1];  	// convert hours to minutes
-	
-		if (t<0 || t>=(24*60))		// check in correct range
+		// look for "sunrise" and "sunset" at the start
+		var s = propertiesGetString(p).toUpper();
+		if (s.find("SUNRISE")==0)
 		{
-			t = 0;
+			t[0] = PROFILE_START_SUNRISE;
+			s = s.substring(7, s.length());
 		}
+		else if (s.find("SUNSET")==0)
+		{
+			t[0] = PROFILE_START_SUNSET;
+			s = s.substring(6, s.length());
+		}
+		else
+		{
+			t[0] = 0;
+			adjust = 0;
+		}
+
+		var charArray = s.toCharArray();
+		var charArraySize = charArray.size();
+		parseIndex = 0;
 		
-		return t;
+		var sign = parseSign(charArray, charArraySize);
+		var n = parseTwoNumbers(charArray, charArraySize);
+
+		t[1] = getMinMax(adjust + sign*(n[0]*60 + n[1]), 0, 24*60);		// convert hours to minutes and check in correct range
+
+		return t;		
 	}
 	
 	function propertiesGetColor(p)
@@ -1040,6 +1079,8 @@ class test1View extends WatchUi.WatchFace
         var deviceSettings = System.getDeviceSettings();	// 960 bytes, but uses less code memory 
 		hasDoNotDisturb = (deviceSettings has :doNotDisturb);
 		hasLTE = (deviceSettings.connectionInfo[:lte]!=null);
+		hasElevationHistory = SensorHistory has :getElevationHistory;
+		hasPressureHistory = SensorHistory has :getPressureHistory;
 
 		// need to seed the random number generator?
 		//var clockTime = System.getClockTime();
@@ -1220,6 +1261,14 @@ class test1View extends WatchUi.WatchFace
 				
 				demoProfilesOn = saveData[6];
 				demoProfilesOnPrev = demoProfilesOn; 
+
+				if (saveData.size() > 10)
+				{
+					positionGot = saveData[7]; 
+					positionLatitude = saveData[8]; 
+					positionLongitude = saveData[9]; 
+					positionAltitude = saveData[10]; 
+				}				
 			}
 			saveData = null;
 		}
@@ -1231,7 +1280,12 @@ class test1View extends WatchUi.WatchFace
 	{
 		// remember the active profile and profileDelayEnd
 		// and other variables we want to save between runs
-		var saveData = [profileActive, profileDelayEnd, profileRandom, profileRandomEnd, demoProfilesCurrentProfile, demoProfilesCurrentEnd, demoProfilesOn];
+		var saveData = [
+			/* 0 1 */ profileActive, profileDelayEnd,
+			/* 2 3 */ profileRandom, profileRandomEnd,
+			/* 4 5 6 */ demoProfilesCurrentProfile, demoProfilesCurrentEnd, demoProfilesOn,
+			/* 7 8 9 10 */ positionGot, positionLatitude, positionLongitude, positionAltitude
+		];
 		applicationStorage.setValue("C", saveData);
 		
 		// store the current field data to storage - used only when watchface next loaded
@@ -1883,16 +1937,7 @@ class test1View extends WatchUi.WatchFace
 	    				v = (fManagement%FIELD_MANAGEMENT_MODULO) + (v*FIELD_MANAGEMENT_MODULO);
 	    			}
 
-    				if (v<0)
-    				{
-    					v = 0;
-    				}
-    				else if (v>255)
-    				{
-    					v = 255;
-    				}
-
-					propFieldData[fIndex + i] = v;
+					propFieldData[fIndex + i] = getMinMax(v, 0, 255);
 	    		}
 
 				// store the current field data to storage - used only when watchface next loaded
@@ -1977,8 +2022,8 @@ class test1View extends WatchUi.WatchFace
 		    }
 		}
 		
-    	var fieldFont = propertiesGetNumber("24");
-   		propFieldFont = ((fieldFont<24/*APPFONT_SYSTEM_XTINY*/) ? (fieldFont + propertiesGetNumber("25")) : fieldFont);		// add weight to non system fonts 
+    	propFieldFont = propertiesGetNumber("24");
+   		propFieldFont += ((propFieldFont<24/*APPFONT_SYSTEM_XTINY*/) ? propertiesGetNumber("25") : 0);		// add weight to non system fonts 
 		if (propFieldFont<6/*APPFONT_ULTRA_LIGHT_TINY*/ || propFieldFont>=33/*APPFONT_NUMBER_OF_FONTS*/)
 		{
 			propFieldFont = 15/*APPFONT_REGULAR_SMALL*/;
@@ -2138,8 +2183,6 @@ class test1View extends WatchUi.WatchFace
 		var demoSettingsChanged;
 		var doGetPropertiesAndDynamicResources = false;
 		var forceDemoSettingsChange = false;
-				
-		//calculateSun();
 
         //View.onUpdate(dc);        // Call the parent onUpdate function to redraw the layout
 
@@ -2227,6 +2270,9 @@ class test1View extends WatchUi.WatchFace
 		var gregorian = Time.Gregorian;
 		var dateInfoShort = gregorian.info(timeNow, Time.FORMAT_SHORT);
 		var dateInfoMedium = gregorian.info(timeNow, Time.FORMAT_MEDIUM);
+		var dayNumberOfWeek = (((dateInfoShort.day_of_week - firstDayOfWeek + 7) % 7) + 1);		// 1-7
+
+		//calculateSun(dateInfoShort.day_of_week);
 
 		//System.println("hour=" + gregorian.info(timeNow, Time.FORMAT_SHORT).hour + " utc=" + gregorian.utcInfo(timeNow, Time.FORMAT_SHORT).hour);
 		// does not change with time simulation in simulator:
@@ -2334,7 +2380,8 @@ class test1View extends WatchUi.WatchFace
 		fieldActiveNotificationsCount = null;
 		fieldActiveLTEStatus = null;
 
-		var fontSystemCase = propertiesGetNumber("26");		// get case for system fonts 
+		var fontSystemCase = propertiesGetNumber("26");		// get case for system fonts
+		var fieldFontIsCustom = (propFieldFont < 24/*APPFONT_SYSTEM_XTINY*/);
 		
     	for (var f=0; f<FIELD_NUM; f++)
     	{
@@ -2350,6 +2397,88 @@ class test1View extends WatchUi.WatchFace
 
 				var moveBarNum = 0;
 
+//				if (forceFieldTest)
+//				{
+//					if (f==1)
+//					{
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 0] = 82/*FIELD_SUNRISE_HOUR*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 1] = 0/*STATUS_ALWAYSON*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 2] = 3;
+////
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 3] = 83/*FIELD_SUNRISE_MINUTE*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 4] = 0/*STATUS_ALWAYSON*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 5] = 3;
+////
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 6] = 21/*FIELD_SEPARATOR_SPACE*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 7] = 0/*STATUS_ALWAYSON*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 8] = 3;
+////
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 9] = 84/*FIELD_SUNSET_HOUR*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 10] = 0/*STATUS_ALWAYSON*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 11] = 3;
+////
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 12] = 85/*FIELD_SUNSET_MINUTE*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 13] = 0/*STATUS_ALWAYSON*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 14] = 3;
+//
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 0] = 86/*FIELD_SUNEVENT_HOUR*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 1] = 0/*STATUS_ALWAYSON*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 2] = 3;
+////
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 3] = 87/*FIELD_SUNEVENT_MINUTE*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 4] = 0/*STATUS_ALWAYSON*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 5] = 3;
+//
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 0] = 89/*FIELD_CALORIES*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 1] = 0/*STATUS_ALWAYSON*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 2] = 3;
+////
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 3] = 21/*FIELD_SEPARATOR_SPACE*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 4] = 0/*STATUS_ALWAYSON*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 5] = 3;
+////
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 6] = 91/*FIELD_INTENSITY*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 7] = 0/*STATUS_ALWAYSON*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 8] = 3;
+//
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 0] = 92/*FIELD_INTENSITY_GOAL*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 1] = 0/*STATUS_ALWAYSON*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 2] = 3;
+////
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 3] = 21/*FIELD_SEPARATOR_SPACE*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 4] = 0/*STATUS_ALWAYSON*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 5] = 3;
+////
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 6] = 93/*FIELD_SMART_GOAL*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 7] = 0/*STATUS_ALWAYSON*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 8] = 3;
+//
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 0] = 94/*FIELD_DISTANCE*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 1] = 0/*STATUS_ALWAYSON*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 2] = 3;
+////
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 3] = 95/*FIELD_DISTANCE_UNITS*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 4] = 0/*STATUS_ALWAYSON*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 5] = 3;
+//
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 0] = 96/*FIELD_PRESSURE*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 1] = 0/*STATUS_ALWAYSON*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 2] = 3;
+////
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 3] = 97/*FIELD_PRESSURE_UNITS*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 4] = 0/*STATUS_ALWAYSON*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 5] = 3;
+//
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 0] = 98/*FIELD_ALTITUDE*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 1] = 0/*STATUS_ALWAYSON*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 2] = 3;
+////
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 3] = 99/*FIELD_ALTITUDE_UNITS*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 4] = 0/*STATUS_ALWAYSON*/;
+////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 5] = 3;
+//					}
+//				}
+				
 				for (var i=0; i<FIELD_NUM_ELEMENTS; i++)
 				{
 					var elementStart = dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + i*3;
@@ -2372,7 +2501,7 @@ class test1View extends WatchUi.WatchFace
 							fieldActiveLTEStatus = lteState;
 						} 
 
- 						if (visibilityStatus[eVisible])		// only test this after calculating the filedActiveXXXStatus flags
+ 						if (visibilityStatus[eVisible])		// only test this after calculating the fieldActiveXXXStatus flags
 						{ 
 							var eColor = getColorArray(propFieldData[elementStart + 2]);
 
@@ -2380,6 +2509,7 @@ class test1View extends WatchUi.WatchFace
 							var eIsIcon = false;
 							var eUseUnsupportedFont = false;
 							var eDiacritics = -1;
+							var makeUpperCase = false;
 		
 							//if (e==FIELD_EMPTY)			// empty
 						    //{
@@ -2425,7 +2555,7 @@ class test1View extends WatchUi.WatchFace
 										//eStr = "\u0158\u015a\u00c7Z\u0179\u0104";		// test string for diacritics & bounding rectangle (use system large)
 										//eStr = "A\u042d\u03b8\u05e9\u069b";			// test string for other languages
 			
-										if (propFieldFont < 24/*APPFONT_SYSTEM_XTINY*/)		// custom font
+										if (fieldFontIsCustom)		// custom font
 										{ 
 											var tempStr = eStr.toUpper();				// custom fonts always upper case
 											eUseUnsupportedFont = useUnsupportedFieldFont(tempStr);
@@ -2455,7 +2585,7 @@ class test1View extends WatchUi.WatchFace
 										{
 											if (fontSystemCase==1)	// APPCASE_UPPER = 1
 											{
-												eStr = eStr.toUpper();
+												makeUpperCase = true;
 											}
 											else if (fontSystemCase==2)	// APPCASE_LOWER = 2
 											{
@@ -2467,7 +2597,7 @@ class test1View extends WatchUi.WatchFace
 				
 									case 4/*FIELD_DAY_OF_WEEK*/:			// day number of week
 								    {
-										eStr = "" + (((dateInfoShort.day_of_week - firstDayOfWeek + 7) % 7) + 1);	// 1-7
+										eStr = "" + dayNumberOfWeek;	// 1-7
 										break;
 									}
 				
@@ -2651,11 +2781,161 @@ class test1View extends WatchUi.WatchFace
 										
 										break;
 									}
+									
+									case 82/*FIELD_SUNRISE_HOUR*/:
+									case 83/*FIELD_SUNRISE_MINUTE*/:
+									case 84/*FIELD_SUNSET_HOUR*/:
+									case 85/*FIELD_SUNSET_MINUTE*/:
+									case 86/*FIELD_SUNEVENT_HOUR*/:
+									case 87/*FIELD_SUNEVENT_MINUTE*/:
+									{
+										calculateSun(dateInfoShort.day_of_week);
+
+										var t = null;
+										if (eDisplay>=86/*FIELD_SUNEVENT_HOUR*/)	// next sun event?
+										{
+											var tNow = hour*60 + minute;
+											if (sunTimes[0]!=null && tNow<sunTimes[0])	// before sunrise?
+											{
+												t = sunTimes[0];
+											}
+											else if (sunTimes[1]!=null)		// sunset occurs today
+											{
+												if (tNow<sunTimes[1])		// before sunset?
+												{
+													t = sunTimes[1];
+												}
+												else if (sunTimes[3]!=null && tNow<sunTimes[3])		// before sunrise tomorrow?
+												{
+													t = sunTimes[3];
+												}
+											}
+										}
+										else
+										{
+											// sunrise or sunset today
+											t = ((eDisplay<=83/*FIELD_SUNRISE_MINUTE*/) ? sunTimes[0] : sunTimes[1]);
+										}
+																				
+										if (t!=null)
+										{
+											t += 24*60;		// add 24 hours to make sure it is a positive number (if sunrise was before midnight ...) 
+											if ((eDisplay-82/*FIELD_SUNRISE_HOUR*/)%2==1)
+											{
+												eStr = (t%60).format("%02d");		// minutes
+											}
+											else
+											{
+												var h = (t/60)%24;					// hours
+		        								if (!deviceSettings.is24Hour)
+		        								{
+		        									h = ((h+11)%12) + 1;			// 12 or 24 hour
+		        								}
+		        								eStr = h.format(addLeadingZero ? "%02d" : "%d");		// check for adding a leading zero
+											}
+	        							}
+	        							else
+	        							{
+											eStr = "--";
+	        							}
+	        							
+										break;
+									}
+
+									case 88/*FIELD_2ND_HOUR*/:
+									{
+										break;
+									}
+
+									case 89/*FIELD_CALORIES*/:
+									{
+										eStr = "" + activityMonitorInfo.calories;
+										break;
+									}
+
+									case 90/*FIELD_ACTIVE_CALORIES*/:
+									{
+										break;
+									}
+
+									case 91/*FIELD_INTENSITY*/:
+									{
+										eStr = "" + activityMonitorInfo.activeMinutesWeek.total;
+										break;
+									}
+
+									case 92/*FIELD_INTENSITY_GOAL*/:
+									{
+										eStr = "" + activityMonitorInfo.activeMinutesWeekGoal;
+										break;
+									}
+
+									case 93/*FIELD_SMART_GOAL*/:
+									{
+										eStr = "" + (activityMonitorInfo.activeMinutesWeekGoal * dayNumberOfWeek) / 7;
+										break;
+									}
+
+									case 94/*FIELD_DISTANCE*/:
+									{
+										// convert cm to miles or km
+										var d = activityMonitorInfo.distance / ((deviceSettings.distanceUnits==System.UNIT_STATUTE) ? 160934.4 : 100000.0);
+										eStr = d.format("%.1f");
+										break;
+									}
+
+									case 95/*FIELD_DISTANCE_UNITS*/:
+									{
+										eStr = ((deviceSettings.distanceUnits==System.UNIT_STATUTE) ? "mi" : "km");
+										makeUpperCase = fieldFontIsCustom;
+										break;
+									}
+
+									case 96/*FIELD_PRESSURE*/:
+									{
+										eStr = "---";
+										if (hasPressureHistory)
+										{
+											var pressureSample = SensorHistory.getPressureHistory({:period => 1}).next();
+											if (pressureSample!=null && pressureSample.data!=null)
+											{ 
+												eStr = (pressureSample.data / 100.0).format("%.1f");	// convert Pa to mbar
+											}
+										}
+										break;
+									}
+
+									case 97/*FIELD_PRESSURE_UNITS*/:
+									{
+										eStr = "mb"; 	// mbar
+										makeUpperCase = fieldFontIsCustom;
+										break;
+									}
+
+									case 98/*FIELD_ALTITUDE*/:
+									{
+										calculatePosition();
+										// convert m to feet or m
+										eStr = ((deviceSettings.distanceUnits==System.UNIT_STATUTE) ? (positionAltitude*3.2808399) : positionAltitude).format("%d");
+										break;
+									}
+
+									case 99/*FIELD_ALTITUDE_UNITS*/:
+									{
+										eStr = ((deviceSettings.distanceUnits==System.UNIT_STATUTE) ? "ft" : "m");
+										makeUpperCase = fieldFontIsCustom;
+										break;
+									}
 			   					}
 							}
 							
 							if (eStr != null)
 							{
+								if (makeUpperCase)
+								{
+									eStr = eStr.toUpper();
+								}
+							
 								addBackgroundField(dc, f, fieldInfoIndexEnd, eStr, eIsIcon, eUseUnsupportedFont, eColor, 0, eDiacritics);
 							}
 						}
@@ -3469,6 +3749,48 @@ class test1View extends WatchUi.WatchFace
 		}
    	}
 	
+	function getProfileSunTime(time, t1, startEndShift)
+	{
+		t1 >>= startEndShift;
+		
+		if ((t1&(PROFILE_START_SUNRISE|PROFILE_START_SUNSET))!=0)
+		{
+			// remove the 12 hour offset used when it is saved to storage
+			// note we add this on rather than subtracting since we are doing modulo 24*60 later (and want the value to be positive)
+			time += 12*60;
+		
+			// riseSetIndex==0 is sunrise
+			// riseSetIndex==1 is sunset
+			var t = sunTimes[(t1&PROFILE_START_SUNSET)/PROFILE_START_SUNSET];
+			//var t = sunTimes[((t1&PROFILE_START_SUNRISE)!=0) ? 0 : 1];
+
+			if (t!=null)
+			{
+				time += t;		// add to the sunrise or sunset time
+			}
+	
+			// since we are doing modulo 24*60 below, doing the following would make no difference so don't need it ...
+			//else
+			//{			
+			//	//if ((riseSetIndex==0 && !sunTimes[3]) ||	// looking for sunrise but sun doesn't rise (so permanent night)
+			//	//	(riseSetIndex==1 && sunTimes[3]))		// looking for sunset but sun rises (so permanent day)
+			//	if ((riseSetIndex==0) != sunTimes[3])
+			//	{
+			//		time += 24*60;		// set time offset from end of day
+			//	}
+			//	//else
+			//	//{
+			//	//	time += 0;			// set time offset from start of day
+			//	//}
+			//}
+			
+			// return time modulo 24 hours
+			time = time%(24*60);
+		}
+
+		return time;
+	}
+
 	var doActivateGlanceCheck = -1;
 	
 	function checkProfileToActivate(clockTime, timeNow)
@@ -3519,11 +3841,23 @@ class test1View extends WatchUi.WatchFace
 			
 			for (var i=0; i<PROFILE_NUM_USER; i++)
 			{
+				var t1 = profileTimes[i+PROFILE_NUM_USER];
+
 				if (doActivate==PROFILE_PRIVATE_INDEX)	// not found a profile to activate yet
 				{
 					var t0 = profileTimes[i];
 					var startTime = (t0>>PROFILE_START_SHIFT)&PROFILE_START_MASK;
 					var endTime = (t0>>PROFILE_END_SHIFT)&PROFILE_END_MASK;
+
+					// see if the start or end time uses sunrise/sunset					
+					if ((t1&(PROFILE_START_SUNRISE|PROFILE_START_SUNSET|PROFILE_END_SUNRISE|PROFILE_END_SUNSET))!=0)
+					{
+						calculateSun(dateInfoShort.day_of_week);
+						
+						startTime = getProfileSunTime(startTime, t1, 0);
+						endTime = getProfileSunTime(endTime, t1, 2);
+					}
+					
 					if (startTime<endTime)		// Note: if 2 times are equal then go for 24 hours (e.g. by default both times are 0)
 					{
 						if (nowTime>=startTime && nowTime<endTime && (t0&(0x01<<nowDayNumber))!=0)	// current day set?
@@ -3542,7 +3876,6 @@ class test1View extends WatchUi.WatchFace
 					}
 				}
 
-				var t1 = profileTimes[i+PROFILE_NUM_USER];
 				var numEvents = (t1&PROFILE_EVENTS_MASK);
 				if (numEvents>0)
 				{
@@ -3705,6 +4038,23 @@ class test1View extends WatchUi.WatchFace
     	}
     }
     	
+	function parseSign(charArray, charArraySize)
+	{
+   		var c = charArray[parseIndex].toNumber();
+		if (c==45/*APPCHAR_MINUS*/)
+		{
+			parseIndex++;
+			return -1;
+		}
+		else if (c==43/*APPCHAR_PLUS*/)
+		{
+			parseIndex++;
+			// return 1; below
+		}
+
+		return 1;
+	}
+
 	function parseNumber(charArray, charArraySize)
 	{
 		var v = 0;
@@ -3730,6 +4080,34 @@ class test1View extends WatchUi.WatchFace
 		return v*vMult;
 	}
 
+	// Parse (number separator number)
+	function parseTwoNumbers(charArray, charArraySize)
+	{
+		var n = new[2];
+		
+		n[0] = parseNumber(charArray, charArraySize);
+
+		// reached non-numeric character
+
+		parseIndex++;		// step over the separator
+		
+    	// then find next numeric character
+    	for (; parseIndex<charArraySize; parseIndex++)
+    	{
+    		var c = charArray[parseIndex].toNumber();
+       		if (c>=48/*APPCHAR_0*/ && c<=57/*APPCHAR_9*/)
+    		{
+    			break;
+    		}
+    	}
+
+		n[1] = parseNumber(charArray, charArraySize);
+		
+		//System.println("parseTwoNumbers=" + n[0] + " and " + n[1]);
+
+		return n;
+	}
+	
 	function parseNumberComma(charArray, charArraySize)
 	{
 		var v = parseNumber(charArray, charArraySize);
@@ -3818,22 +4196,15 @@ class test1View extends WatchUi.WatchFace
 				
 				var startTime = propertiesGetTime("PS");
 				var endTime = propertiesGetTime("PE");
-				t0 |= (startTime<<PROFILE_START_SHIFT) | (endTime<<PROFILE_END_SHIFT);
+				t0 |= (startTime[1]<<PROFILE_START_SHIFT) | (endTime[1]<<PROFILE_END_SHIFT);
 				
 				if (propertiesGetBoolean("PB"))
 				{
 					t0 |= PROFILE_BLOCK_MASK;
 				}
 
-				var t1 = propertiesGetNumber("PR");
-				if (t1<0)
-				{
-					t1 = 0;
-				}
-				else if (t1>PROFILE_EVENTS_MASK)
-				{
-					t1 = PROFILE_EVENTS_MASK;
-				}
+				// add sunrise & sunset flags to random events number
+				var t1 = getMinMax(propertiesGetNumber("PR"), 0, PROFILE_EVENTS_MASK) | startTime[0] | (endTime[0]<<2);
 
 				// remember the profile time
 				profileTimes[profileIndex] = t0;
@@ -3877,6 +4248,33 @@ class test1View extends WatchUi.WatchFace
 		}
 	}
 
+	function loadGetProfileTimeString(t, isSunrise, isSunset)
+	{
+		var s = "";
+	
+		if (isSunrise || isSunset)
+		{
+			t -= 12*60;	// remove 12 hours added to make positive for storage
+			s = (isSunrise ? "Sunrise" : "Sunset");
+			if (t>=0)
+			{
+				s += "+";
+			}
+			else
+			{
+				s += "-";
+				t = -t;
+			}
+		}
+		
+		var hours = t/60;
+		var minutes = t%60;
+	
+		s += hours.format("%02d") + ":" + minutes.format("%02d");
+	
+		return s;
+	}
+
 	function loadProfile(profileIndex)
 	{
 		profileActive = profileIndex;		// profile now active
@@ -3911,8 +4309,8 @@ class test1View extends WatchUi.WatchFace
 				}
 				properties.setValue("PD", daysNumber);
 		
-				properties.setValue("PS", "" + (startTime/60).format("%02d") + ":" + (startTime%60).format("%02d"));
-				properties.setValue("PE", "" + (endTime/60).format("%02d") + ":" + (endTime%60).format("%02d"));
+				properties.setValue("PS", loadGetProfileTimeString(startTime, (t1&PROFILE_START_SUNRISE)!=0, (t1&PROFILE_START_SUNSET)!=0));
+				properties.setValue("PE", loadGetProfileTimeString(endTime, (t1&PROFILE_END_SUNRISE)!=0, (t1&PROFILE_END_SUNSET)!=0));
 
 				properties.setValue("PB", ((t0&PROFILE_BLOCK_MASK)!=0));
 				properties.setValue("PR", (t1&PROFILE_EVENTS_MASK));		
@@ -4031,18 +4429,7 @@ class test1View extends WatchUi.WatchFace
 
 		for (; fNum<FIELD_NUM*FIELD_NUM_PROPERTIES && parseIndex<charArraySize; fNum++)
 		{
-			var v = parseNumberComma(charArray, charArraySize);
-
-			if (v<0)
-			{
-				v = 0;
-			}
-			else if (v>255)
-			{
-				v = 255;
-			}
-
-			fArray[fNum] = v; 
+			fArray[fNum] = getMinMax(parseNumberComma(charArray, charArraySize), 0, 255); 
 		}
 				
 		return fNum;
@@ -4074,12 +4461,13 @@ class test1View extends WatchUi.WatchFace
 	var CalendarWeek;	// in Calendar format the first week of the year always includes 1st Jan
 	var CalendarYear;
 
+	// 500 code bytes + 100 data
 //	function printMoment(m, s)
 //	{
 //		var i = Time.Gregorian.info(m, Time.FORMAT_SHORT);
-//		System.println(Lang.format(s + " Local $1$-$2$-$3$ T$4$:$5$:$6$", [ i.year.format("%4d"), i.month.format("%02d"), i.day.format("%02d"), i.hour.format("%02d"), i.min.format("%02d"), i.sec.format("%02d") ]));
+//		System.println(Lang.format(s + " Local $1$-$2$-$3$ $4$:$5$:$6$", [ i.year.format("%4d"), i.month.format("%02d"), i.day.format("%02d"), i.hour.format("%02d"), i.min.format("%02d"), i.sec.format("%02d") ]));
 //		i = Time.Gregorian.utcInfo(m, Time.FORMAT_SHORT);
-//		System.println(Lang.format(s + " UTC $1$-$2$-$3$ T$4$:$5$:$6$", [ i.year.format("%4d"), i.month.format("%02d"), i.day.format("%02d"), i.hour.format("%02d"), i.min.format("%02d"), i.sec.format("%02d") ]));
+//		System.println(Lang.format(s + " UTC $1$-$2$-$3$ $4$:$5$:$6$", [ i.year.format("%4d"), i.month.format("%02d"), i.day.format("%02d"), i.hour.format("%02d"), i.min.format("%02d"), i.sec.format("%02d") ]));
 //	}
 	
 	function calculateDayWeekYearData(index, firstDayOfWeek, dateInfoMedium)
@@ -4087,18 +4475,18 @@ class test1View extends WatchUi.WatchFace
 		// use noon for all these times to be safe when getting dateInfo
 	
 		var gregorian = Time.Gregorian;
-		var halfDayOffset = gregorian.duration({:hours => 12});
 
-		var todayNoon = Time.today().add(halfDayOffset);	// 12:00 local time
+		var todayNoon = Time.today().add(gregorian.duration({:hours => 12}));	// 12:00 noon local time
 		var todayNoonValue = todayNoon.value();
 		if (todayNoonValue == dayWeekYearCalculatedDay[index])
 		{
 			return;
 		}
 
-		var timeZoneOffset = gregorian.duration({:seconds => System.getClockTime().timeZoneOffset});
+		var timeZoneOffsetDuration = gregorian.duration({:seconds => System.getClockTime().timeZoneOffset});
 
-		var startOfYearNoon = gregorian.moment({:year => dateInfoMedium.year, :month => 1, :day => 1, :hour => 12, :minute => 0, :second => 0}).subtract(timeZoneOffset);
+		var tempYear = {:year => dateInfoMedium.year, :month => 1, :day => 1, :hour => 12, :minute => 0, :second => 0};
+		var startOfYearNoon = gregorian.moment(tempYear).subtract(timeZoneOffsetDuration);
 		//printMoment(startOfYearNoon, "startOfYearNoon");
 		var durationToStartOfYear = todayNoon.subtract(startOfYearNoon);
 		//var secs = duration.value();
@@ -4152,7 +4540,10 @@ class test1View extends WatchUi.WatchFace
 		if (checkWeeksLessThan1)		// check to find last week of previous year
 		{
 			var prevYear = dateInfoMedium.year-1;
-			var startOfPrevYearNoon = gregorian.moment({:year => prevYear, :month => 1, :day => 1, :hour => 12, :minute => 0, :second => 0}).subtract(timeZoneOffset);
+			tempYear.remove(:year);
+			tempYear.put(:year, prevYear);
+			var startOfPrevYearNoon = gregorian.moment(tempYear).subtract(timeZoneOffsetDuration);
+			//var startOfPrevYearNoon = gregorian.moment({:year => prevYear, :month => 1, :day => 1, :hour => 12, :minute => 0, :second => 0}).subtract(timeZoneOffsetDuration);
 			var dateInfoStartOfPrevYear = gregorian.info(startOfPrevYearNoon, Time.FORMAT_SHORT);	// get date info for noon to be safe
 			var numberInWeekOfJan1PrevYear = ((dateInfoStartOfPrevYear.day_of_week - firstDayOfWeek + 7) % 7);	// 0-6
 			
@@ -4175,7 +4566,10 @@ class test1View extends WatchUi.WatchFace
 		else if (checkWeeksGreaterThan52)	// check to see if in first week of next year
 		{
 			var nextYear = dateInfoMedium.year+1;
-			var startOfNextYearNoon = gregorian.moment({:year => nextYear, :month => 1, :day => 1, :hour => 12, :minute => 0, :second => 0}).subtract(timeZoneOffset);
+			tempYear.remove(:year);
+			tempYear.put(:year, nextYear);
+			var startOfNextYearNoon = gregorian.moment(tempYear).subtract(timeZoneOffsetDuration);
+			//var startOfNextYearNoon = gregorian.moment({:year => nextYear, :month => 1, :day => 1, :hour => 12, :minute => 0, :second => 0}).subtract(timeZoneOffsetDuration);
 			var dateInfoStartOfNextYear = gregorian.info(startOfNextYearNoon, Time.FORMAT_SHORT);	// get date info for noon to be safe
 			var numberInWeekOfJan1NextYear = ((dateInfoStartOfNextYear.day_of_week - firstDayOfWeek + 7) % 7);	// 0-6
 			
@@ -4227,142 +4621,245 @@ class test1View extends WatchUi.WatchFace
 		}
 	}
 	
-//	function calculateSun()
-//	{
-//		var gregorian = Time.Gregorian;
-//
-//		// this is in local time at that date
-//		// gregorian.info displays this time as 13:00
-//		// gregorian.utcInfo displays this time as 12:00
-//		//var testMoment = gregorian.moment({:year => 2019, :month => 5, :day => 1, :hour => 12, :minute => 0, :second => 0 });
-//
-//		// whereas this time in March before summer time
-//		// gregorian.info displays this time as 12:00
-//		// gregorian.utcInfo displays this time as 12:00
-//		//var testMoment = gregorian.moment({:year => 2019, :month => 3, :day => 1, :hour => 12, :minute => 0, :second => 0 });
-//
-//		// Running this in May (summer time) then timeZoneOffset is 3600 (UTC + 1)
-//		//System.println("Time zone offset = " + System.getClockTime().timeZoneOffset);
-//
-//		// Running this in May (summer time) at 20:48
-//		// gregorian.info displays this time as 20:48
-//		// gregorian.utcInfo displays this time as 19:48
-//		//var testMoment = Time.now();
-//		
-//		// Running this in May (summer time)
-//		// gregorian.info displays this time as 00:00
-//		// gregorian.utcInfo displays this time as 23:00 on previous date
-//		//var testMoment = Time.today();
-//
-////var testDate = gregorian.info(testMoment, Time.FORMAT_SHORT);
-////System.println(Lang.format("$1$-$2$-$3$ T$4$:$5$:$6$", [ testDate.year.format("%4d"), testDate.month.format("%02d"), testDate.day.format("%02d"), testDate.hour.format("%02d"), testDate.min.format("%02d"), testDate.sec.format("%02d") ]));
-////testDate = gregorian.utcInfo(testMoment, Time.FORMAT_SHORT);
-////System.println(Lang.format("UTC $1$-$2$-$3$ T$4$:$5$:$6$", [ testDate.year.format("%4d"), testDate.month.format("%02d"), testDate.day.format("%02d"), testDate.hour.format("%02d"), testDate.min.format("%02d"), testDate.sec.format("%02d") ]));
-//
-//		var jan1st2000NoonUTC = gregorian.moment({:year => 2000, :month => 1, :day => 1, :hour => 12, :minute => 0, :second => 0 });
-//		var secondsToNoonUTC = 12*60*60 + System.getClockTime().timeZoneOffset;
-//		var todayNoonUTC = Time.today().add(gregorian.duration({:seconds => secondsToNoonUTC}));
-//		var durationSinceJan1st2000 = todayNoonUTC.subtract(jan1st2000NoonUTC);
-//		//var secs = duration.value();
-//		//var mins = secs / 60.0;
-//		//var hours = mins / 60.0;
-//		//var days = Math.round(hours / 24.0) + 1;
-////		var daysSinceJan1st2000 = Math.round(durationSinceJan1st2000.value() / 86400.0).toNumber() + 0.0008d;
-////		var daysSinceJan1st2000_2 = durationSinceJan1st2000.value() / 86400.0d + 0.0008d;		// dont round!!
-////System.println("daysSinceJan1st2000=" + daysSinceJan1st2000 + " or " + daysSinceJan1st2000_2);	// 7081 and 7081.0000
-//		var daysSinceJan1st2000 = Math.round(durationSinceJan1st2000.value() / 86400.0).toNumber();
-//		//var days2 = durationSinceJan1st2000.value() / 86400.0;
-//		//System.println("daysSinceJan1st2000=" + daysSinceJan1st2000 + " days2=" + days2);
-//		//var n = daysSinceJan1st2000 + 0.0008d; 	// double for accuracy
-//		var n = daysSinceJan1st2000;
-//		//System.println("n=" + n);
-//		
-//		// Windermere lat=54.380810, long=-2.907530
-//		//var lat = 54.380810d;
-//		//var long = -2.907530d;
-//		
-//		// Windermere
-//		var lat = 54.3787142d;
-//		var long = -2.9044238d;
-//		var altitude = 140.0d;	// m
-//		
-//		// Trondheim, Trøndelag, 7011, Norway
-//		//var lat = 63.4305658d;
-//		//var long = 10.3951929d;
-//		
-//		//var lat = 68.0d;
-//		//var long = 0.0d;
-//
-//		//var lat = -70.5d;
-//		//var long = 0.0d;
-//		
-//		// Longyearbyen, Svalbard, 9170, Norway
-//		//var lat = 78.2231558d;
-//		//var long = 15.6463656d;
-//		
-//		var jStar = n - long/360;
-//		var m = 357.5291d + 0.98560028d * jStar;
-//		//System.println("m=" + m);
-//		var m360 = Math.floor(m/360).toNumber();
-//		m -= m360*360;		// modulo 360
-//		//System.println("m2=" + m + " m360=" + m360);
-//		
-//		var c = 1.9148*Math.sin(Math.toRadians(m)) + 0.0200*Math.sin(Math.toRadians(m)*2) + 0.0003*Math.sin(Math.toRadians(m)*3);
-//		//System.println("c=" + c);
-//		
-//		var lambda = m + c + 180 + 102.9372;
-//		//var lambda = m + c + 180 + 102.984378d;
-//		var lambda360 = Math.floor(lambda/360).toNumber();
-//		lambda -= lambda360*360;		// modulo 360
-//		
-//		var jTransit = /*2451545.0 +*/ jStar + 0.0053*Math.sin(Math.toRadians(m)) - 0.0069*Math.sin(Math.toRadians(lambda)*2);
-//		
-//		var sinDeclination = Math.sin(Math.toRadians(lambda)) * Math.sin(Math.toRadians(23.44));
-//		var cosDeclination = Math.sqrt(1 - sinDeclination*sinDeclination);
-//		
-//		var w1 = Math.sin(Math.toRadians(-0.83)) - Math.sin(Math.toRadians(lat))*sinDeclination;
-//		//var w1 = Math.sin(Math.toRadians(-0.83 - (2.076d/60.0d)*Math.sqrt(altitude))) - Math.sin(Math.toRadians(lat))*sinDeclination;
-//		//var w1 = Math.sin(Math.toRadians(-1.13)) - Math.sin(Math.toRadians(lat))*sinDeclination;		height adjust
-//		var w2 = Math.cos(Math.toRadians(lat))*cosDeclination;
-//		var cosW = w1/w2;
-//		
-//		if (cosW < -1.0)
-//		{
-//			// permanent day
-//		}
-//		else if (cosW > 1.0)
-//		{
-//			// permanent night
-//		}
-//		
-//		var w = Math.acos(cosW);
-//		//System.println("w=" + w + " cosW=" + cosW + " w1=" + w1 + " w2=" + w2);
-//		
-//		// days since jan1st2000NoonUTC
-//		var jRise = jTransit - Math.toDegrees(w) / 360;		// up to -0.5 day
-//		var jSet = jTransit + Math.toDegrees(w) / 360;		// up to +0.5 day
-//		//var jRise = jTransit - Math.toDegrees(w) / 360 + 0.0008d;
-//		//var jSet = jTransit + Math.toDegrees(w) / 360 + 0.0008d;
-////System.println("0.0008=" + (0.0008d*24*60*60) + "seconds");		// 69 seconds
-//		
-//		var durationTransit = gregorian.duration({:seconds => jTransit*24*60*60});
-//		var momentTransit = jan1st2000NoonUTC.add(durationTransit);		
-//
-////var testDate = gregorian.info(momentTransit, Time.FORMAT_SHORT);
-////System.println(Lang.format("Transit $1$-$2$-$3$ T$4$:$5$:$6$", [ testDate.year.format("%4d"), testDate.month.format("%02d"), testDate.day.format("%02d"), testDate.hour.format("%02d"), testDate.min.format("%02d"), testDate.sec.format("%02d") ]));		
-//
-//		var durationRise = gregorian.duration({:seconds => jRise*24*60*60});
-//		var momentRise = jan1st2000NoonUTC.add(durationRise);		
-//
-////testDate = gregorian.info(momentRise, Time.FORMAT_SHORT);
-////System.println(Lang.format("Rise $1$-$2$-$3$ T$4$:$5$:$6$", [ testDate.year.format("%4d"), testDate.month.format("%02d"), testDate.day.format("%02d"), testDate.hour.format("%02d"), testDate.min.format("%02d"), testDate.sec.format("%02d") ]));		
-//
-//		var durationSet = gregorian.duration({:seconds => jSet*24*60*60});
-//		var momentSet = jan1st2000NoonUTC.add(durationSet);
-//		
-////testDate = gregorian.info(momentSet, Time.FORMAT_SHORT);
-////System.println(Lang.format("Set $1$-$2$-$3$ T$4$:$5$:$6$", [ testDate.year.format("%4d"), testDate.month.format("%02d"), testDate.day.format("%02d"), testDate.hour.format("%02d"), testDate.min.format("%02d"), testDate.sec.format("%02d") ]));		
-//	}
+	var positionGot = false;
+	var positionLatitude = 0.0d;
+	var positionLongitude = 0.0d;
+	var positionAltitude = 0.0;
+
+	// 350 code bytes
+	function calculatePosition()
+	{
+		// if not got a position yet - keep checking every frame
+		// if have a position and not using position - check every so often for new position
+		// if using position - check every update for latest value 
+		//
+		// get altitude either from Activity.getActivityInfo() at same time as location
+		// or from SensorHistory on demand
+
+		var info = Activity.getActivityInfo();
+		if (info!=null)
+		{
+			var curLoc = info.currentLocation;
+			if (curLoc != null)
+			{
+				var l = curLoc.toDegrees();
+				
+				positionGot = true;
+				positionLatitude = l[0];
+				positionLongitude = l[1];
+			}
+		}
+
+		if (info!=null && info.altitude!=null)
+		{
+			positionAltitude = info.altitude; 
+			//System.println("alt activity=" + info.altitude);
+		}
+		else if (hasElevationHistory)
+		{
+			var elevationSample = SensorHistory.getElevationHistory({:period => 1}).next();
+			if (elevationSample!=null && elevationSample.data!=null)
+			{ 
+				positionAltitude = elevationSample.data.toFloat();
+				//System.println("alt history=" + altitude);
+			}
+		}
+	}
+
+	// day, latitude, longitude, altitude
+	var sunCalculatedDay = -1;
+	var sunCalculatedLatitude;
+	var sunCalculatedLongitude;
+	var sunCalculatedAltitude;
+
+	// 0==sunrise today, 1==sunset today, 2==sun rises at all today?
+	// 3==sunrise tomorrow, 4==sunset tomorrow, 5==sun rises at all tomorrow?
+	var sunTimes = new[6];		// hour*60 + minute
+
+	(:exclude)
+	function calculateSun()
+	{
+	}
+	
+	// 1600 code bytes
+	function calculateSun(nowDayOfWeek)
+	{
+		calculatePosition();
+		
+		if (!positionGot)
+		{
+			return;
+		}
+
+		var useAltitude = (propSunAdjustAltitude ? positionAltitude : 0.0);
+
+		// Windermere lat=54.380810, long=-2.907530
+		//positionLatitude = 54.380810;
+		//positionLongitude = -2.907530;
+		
+		// Windermere
+		positionLatitude = 54.3787142d;	// 54 22 43
+		positionLongitude = -2.9044238d;	// -2 54 16
+		//useAltitude = 140.0;	// m
+		//useAltitude = 0.0;	// m
+		
+		//positionLongitude += 0.01;				// 3 secs change
+		//positionLongitude += 0.1;				// 30 secs change in sunrise
+		//useAltitude = 1.0;	// m		// 15 seconds change
+		//useAltitude = 100.0;	// m		// 3 minutes change
+		//useAltitude = 1000.0;	// m	// 10 minutes change
+		
+		// Trondheim, Trøndelag, 7011, Norway
+		//positionLatitude = 63.4305658d;
+		//positionLongitude = 10.3951929d;
+		
+		//positionLatitude = 68.0;
+		//positionLongitude = 0.0;
+
+		//positionLatitude = -70.5;
+		//positionLongitude = 0.0;
+		
+		// Longyearbyen, Svalbard, 9170, Norway
+		//positionLatitude = 78.2231558d;
+		//positionLongitude = 15.6463656d;
+		
+		var todayValue = Time.today().value();
+		if (sunCalculatedDay==todayValue &&
+			sunCalculatedLatitude==positionLatitude.toFloat() &&
+			sunCalculatedLongitude==positionLongitude.toFloat() &&
+			sunCalculatedAltitude==useAltitude)
+		{
+			return;
+		}
+
+		// remember when & where we did this calculation
+		sunCalculatedDay = todayValue;		
+		sunCalculatedLatitude = positionLatitude.toFloat();
+		sunCalculatedLongitude = positionLongitude.toFloat();
+		sunCalculatedAltitude = useAltitude;
+
+		// this is in local time at that date
+		// gregorian.info displays this time as 13:00
+		// gregorian.utcInfo displays this time as 12:00
+
+		// whereas this time in March before summer time
+		// gregorian.info displays this time as 12:00
+		// gregorian.utcInfo displays this time as 12:00
+
+		// Running this in May (summer time) then timeZoneOffset is 3600 (UTC + 1)
+
+		// Running this in May (summer time) at 20:48
+		// gregorian.info displays this time as 20:48
+		// gregorian.utcInfo displays this time as 19:48
+		
+		// Running this in May (summer time)
+		// gregorian.info displays this time as 00:00
+		// gregorian.utcInfo displays this time as 23:00 on previous date
+
+		calculateSunDay(0, nowDayOfWeek);		// today
+		calculateSunDay(1, nowDayOfWeek);		// tomorrow
+	}
+	
+	function calculateSunDay(dayOffset, nowDayOfWeek)
+	{
+		var gregorian = Time.Gregorian;
+		var toRadians = (Math.PI/180);
+
+		// start of today + 12 hours + time zone
+		var todayNoonUTC = Time.today().add(gregorian.duration({:seconds => 12*60*60 + System.getClockTime().timeZoneOffset + dayOffset*86400}));	// UTC time for local noon today (or tomorrow)
+		var todayNoonValue = todayNoonUTC.value();
+
+		//var jan1st2000NoonUTC = gregorian.moment({:year => 2000, :month => 1, :day => 1, :hour => 12, :minute => 0, :second => 0 });		// value prints out as 946728000
+		var jan1st2000NoonUTC = new Time.Moment(946728000);		// from http://www.onlineconversion.com/unix_time.htm - this one seems correct
+		//var jan1st2000NoonUTC = new Time.Moment(946731600);	from https://www.omnicalculator.com/conversion/unix-time - seems out by 1 hour?!
+		
+		var durationSinceJan1st2000 = todayNoonUTC.subtract(jan1st2000NoonUTC);
+		var daysSinceJan1st2000 = Math.round(durationSinceJan1st2000.value() / 86400.0);
+		
+		// Terrestrial Time is 32 seconds ahead of TAI (International Atomic Time)
+		// And TAI is 37 seconds ahead of UTC
+		var UTC2TT = (37+32)/86400.0;		// 0.0008
+
+		var n = daysSinceJan1st2000 + UTC2TT;
+		
+		var jStar = n - positionLongitude/360;			// correct by up to + or - half a day depending on longitude
+		var m = 357.5291 + 0.98560028d * jStar;
+		m -= Math.floor(m/360)*360;			// modulo 360
+		
+		var mRadians = m*toRadians; 
+		var c = 1.9148*Math.sin(mRadians) + 0.0200*Math.sin(mRadians*2) + 0.0003*Math.sin(mRadians*3);
+		
+		//var lambda = m + c + 180 + 102.9372;
+		var lambda = m + c + 180 + 102.984378;
+		lambda -= Math.floor(lambda/360)*360;		// modulo 360
+		
+		var sinDeclination = Math.sin(lambda*toRadians) * Math.sin(23.44*toRadians);	// this varies between +-23.44 degrees
+		var cosDeclination = Math.sqrt(1 - sinDeclination*sinDeclination);				// so cos of declination will be positive
+		
+		var latRadians = positionLatitude*toRadians;
+		//var w1 = Math.sin(-0.83*toRadians) - Math.sin(latRadians)*sinDeclination;
+		var altAdjust = ((sunCalculatedAltitude>0.0) ? ((2.076/60.0)*Math.sqrt(sunCalculatedAltitude)) : 0.0);
+		var w1 = Math.sin((-0.83 - altAdjust)*toRadians) - Math.sin(latRadians)*sinDeclination;		// with height adjust
+		var w2 = Math.cos(latRadians)*cosDeclination;
+
+		var cosW;
+		// w2 will always be tending to positive - since lat is either 90-delta or -90+delta
+		if (w2>0.0)
+		{
+			cosW = w1/w2;
+		}
+		else
+		{
+			// either permanent day or permanent night
+			// sign of w1 determines sign of cosW
+			cosW = ((w1<0.0) ? -2.0 : 2.0);
+		}
+		
+		var dayOffset3 = dayOffset*3;
+		if (cosW < -1.0 /*permanent day*/ || cosW > 1.0 /*permanent night*/)
+		{
+			sunTimes[dayOffset3] = null;
+			sunTimes[dayOffset3 + 1] = null;
+			sunTimes[dayOffset3 + 2] = (cosW < -1.0);
+		}
+		else
+		{		
+			// days since jan1st2000NoonUTC
+			var jTransit = jStar + 0.0053*Math.sin(mRadians) - 0.0069*Math.sin(lambda*toRadians*2);
+			jTransit -= UTC2TT;		// convert back to UTC time
+				
+			//var durationTransit = gregorian.duration({:seconds => jTransit*24*60*60});
+			//var momentTransit = jan1st2000NoonUTC.add(durationTransit);
+			//printMoment(momentTransit, "momentTransit");
+	
+			//var w = Math.acos(cosW);
+			//System.println("w=" + w + " cosW=" + cosW + " w1=" + w1 + " w2=" + w2);
+			var offsetFromTransit = Math.acos(cosW) / (toRadians*360);	// convert to degrees, then divide by 360 to get in range +-1
+
+			//printMoment(jan1st2000NoonUTC.add(gregorian.duration({:seconds => (jTransit - offsetFromTransit)*24*60*60})), "momentRise");
+			//printMoment(jan1st2000NoonUTC.add(gregorian.duration({:seconds => (jTransit + offsetFromTransit)*24*60*60})), "momentSet");
+
+			sunTimes[dayOffset3] = jTimeToHourMinute(jan1st2000NoonUTC, jTransit - offsetFromTransit, nowDayOfWeek);		// up to -0.5 day
+			sunTimes[dayOffset3 + 1] = jTimeToHourMinute(jan1st2000NoonUTC, jTransit + offsetFromTransit, nowDayOfWeek);		// up to +0.5 day
+			sunTimes[dayOffset3 + 2] = true;
+		}
+	}
+
+	function jTimeToHourMinute(jan1st2000NoonUTC, jTime, nowDayOfWeek)
+	{
+		// round to nearest minute
+		var sunInfo = Time.Gregorian.info(jan1st2000NoonUTC.add(Time.Gregorian.duration({:minutes => Math.round(jTime*24*60)})), Time.FORMAT_SHORT);		
+		var t = sunInfo.hour*60 + sunInfo.min;
+		if (sunInfo.day_of_week==(nowDayOfWeek+1)%7)	// tomorrow
+		{
+			t += 24*60;
+		}
+		else if (sunInfo.day_of_week==(nowDayOfWeek+6)%7)	// yesterday
+		{
+			t -= 24*60;
+		}
+		return t;
+	}
 }
 
 //class TestDelegate extends WatchUi.WatchFaceDelegate

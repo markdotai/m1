@@ -50,8 +50,7 @@
 	<font id="id_seconds_circular_in" filename="circularin_240x240.fnt" antialias="true"></font>
 	<font id="id_seconds_circularthin_in" filename="circularthinin_240x240.fnt" antialias="true"></font>
 
-	<font id="id_outer" filename="outer_240x240.fnt" antialias="true"></font>
-	<font id="id_outer_big" filename="outerbig_240x240.fnt" antialias="true"></font>
+	<font id="id_outer" filename="outer60_240x240.fnt" antialias="true"></font>
 
 <!-- 
 	<font id="id_circle" filename="circle_240x240.fnt" antialias="true"></font>

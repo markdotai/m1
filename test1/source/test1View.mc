@@ -532,15 +532,14 @@ class test1View extends WatchUi.WatchFace
 	var bufferY;
 	
 	var outerFontResource;
+	//const SCREEN_CENTRE_X = 120;
+	//const SCREEN_CENTRE_Y = 120;
 	//const OUTER_FIRST_CHAR_ID = 12;
-	//const OUTER_SIZE_HALF = 5;
-	//!const OUTER_CENTRE_OFFSET = 117;
-	var outerBigFontResource;
+	//const OUTER_SIZE_HALF = 8;
+	//const OUTER_CENTRE_OFFSET = 117;
+	//var outerBigFontResource;
 
-	//var outerX = [123, 129, 135, 141, 147, 153, 159, 165, 170, 176, 181, 186, 191, 196, 201, 205, 209, 213, 216, 220, 223, 226, 228, 230, 232, 234, 235, 236, 237, 237, 237, 237, 236, 235, 234, 232, 230, 228, 226, 223, 220, 216, 213, 209, 205, 201, 196, 191, 186, 181, 176, 170, 165, 159, 153, 147, 141, 135, 129, 123, 117, 111, 105, 99, 93, 87, 81, 75, 70, 64, 59, 54, 49, 44, 39, 35, 31, 27, 24, 20, 17, 14, 12, 10, 8, 6, 5, 4, 3, 3, 3, 3, 4, 5, 6, 8, 10, 12, 14, 17, 20, 24, 27, 31, 35, 39, 44, 49, 54, 59, 64, 70, 75, 81, 87, 93, 99, 105, 111, 117]b;
-	//var outerY = [2, 2, 3, 4, 5, 7, 9, 11, 13, 16, 19, 23, 26, 30, 34, 38, 43, 48, 53, 58, 63, 69, 74, 80, 86, 92, 98, 104, 110, 116, 122, 128, 134, 140, 146, 152, 158, 164, 169, 175, 180, 185, 190, 195, 200, 204, 208, 212, 215, 219, 222, 225, 227, 229, 231, 233, 234, 235, 236, 236, 236, 236, 235, 234, 233, 231, 229, 227, 225, 222, 219, 215, 212, 208, 204, 200, 195, 190, 185, 180, 175, 169, 164, 158, 152, 146, 140, 134, 128, 122, 116, 110, 104, 98, 92, 86, 80, 74, 69, 63, 58, 53, 48, 43, 38, 34, 30, 26, 23, 19, 16, 13, 11, 9, 7, 5, 4, 3, 2, 2]b;
-	var outerX = new[120]b;
-	var outerY = new[120]b;
+	var outerXY = new[120]b;
 	
 	//var characterString;
 
@@ -607,8 +606,8 @@ class test1View extends WatchUi.WatchFace
 		}
 	}	
 
-	var backgroundOuterFillStart;	// first segment of outer ring to draw as filled (-1 to 119)
-	var backgroundOuterFillEnd;		// last segment of outer ring to draw as filled (-1 to 119)
+	var backgroundOuterFillStart;	// first segment of outer ring to draw as filled (-1 to 59)
+	var backgroundOuterFillEnd;		// last segment of outer ring to draw as filled (-1 to 59)
 
 	//enum
 	//{
@@ -1090,7 +1089,6 @@ class test1View extends WatchUi.WatchFace
         iconsFontResource = watchUi.loadResource(fonts.id_icons);
 
 		outerFontResource = watchUi.loadResource(fonts.id_outer);
-		outerBigFontResource = watchUi.loadResource(fonts.id_outer_big);
 
         //circleFont = WatchUi.loadResource(fonts.id_circle);
         //ringFont = WatchUi.loadResource(fonts.id_ring);
@@ -1144,26 +1142,25 @@ class test1View extends WatchUi.WatchFace
 			{
 				secondsX[i] = tempResource[0][i];
 				secondsY[i] = tempResource[1][i];
-				outerX[i] = tempResource[2][i];
-				outerY[i] = tempResource[3][i];
+				outerXY[i] = tempResource[2][i];
 
 				// table for characters with diacritics
 				if (i<78)
 				{
-					myChars[i] = tempResource[4][i];
+					myChars[i] = tempResource[3][i];
 
 					if (i<64)
 					{
-						colorArray[i] = tempResource[5][i];
+						colorArray[i] = tempResource[4][i];
 
-						if (i<40)
+						if (i<36)
 						{
-							outerValues[i] = tempResource[6][i];
+							bufferValues[i] = tempResource[6][i];
 
-							if (i<36)
+							if (i<24)
 							{
-    							bufferValues[i] = tempResource[7][i];
-    						}
+								outerValues[i] = tempResource[5][i];
+							}
 						}
 					}
 				}
@@ -1340,26 +1337,28 @@ class test1View extends WatchUi.WatchFace
 			//storage.setValue("secondsX", secondsX);
 			//storage.setValue("secondsY", secondsY);
 	    }
-
+		*/
+		
+		/*
 		// calculate outer ring positions & character string
 		{
 			//var outerX = new[120];
 			//var outerY = new[120];
 
-			for (var i=0; i<120; i++)
+			for (var i=0; i<60; i++)
 			{
-		        var r = Math.toRadians((i*3) + 1.5);	// to centre of arc
+		        var r = Math.toRadians((i*6) + 3.0);	// to centre of arc
 	        	// top left of char
 		    	var x = Math.floor(SCREEN_CENTRE_X - OUTER_SIZE_HALF + 0.5 + OUTER_CENTRE_OFFSET * Math.sin(r));
 		    	var y = Math.floor(SCREEN_CENTRE_Y - OUTER_SIZE_HALF + 0.5 - OUTER_CENTRE_OFFSET * Math.cos(r)) - 1;
-		    	outerX[i] = x.toNumber() + OUTER_SIZE_HALF;	// make sure in range 0 to 255
-		    	outerY[i] = y.toNumber() + OUTER_SIZE_HALF;	// make sure in range 0 to 255
+		    	outerXY[i*2] = x.toNumber() + OUTER_SIZE_HALF;	// make sure in range 0 to 255
+		    	outerXY[i*2+1] = y.toNumber() + OUTER_SIZE_HALF;	// make sure in range 0 to 255
 			}
 
-			//storage.setValue("outerX", outerX);
+			applicationStorage.setValue("outerXY", outerXY);
 			//storage.setValue("outerY", outerY);
 	    }
-		*/
+	    */
 		
 		/*
 		// debug code for calculating font character positions of second indicator
@@ -1525,144 +1524,84 @@ class test1View extends WatchUi.WatchFace
 		
 		/*
 		// debug code for calculating font character positions of outer circle
-        for (var i = 0; i < 120; i++)
+        for (var i = 0; i < 60; i++)
         {
        		var id = OUTER_FIRST_CHAR_ID + i;
 
 			var page = (i % 2);		// even or odd pages
         
-        	var r = Math.toRadians((i*3) + 1.5);
+        	//var r = Math.toRadians((i*6) + 3.0);
 
         	// top left of char
         	//var x = Math.floor(SCREEN_CENTRE_X - OUTER_SIZE_HALF + 0.5 + OUTER_CENTRE_OFFSET * Math.sin(r));
         	//var y = Math.floor(SCREEN_CENTRE_Y - OUTER_SIZE_HALF + 0.5 - OUTER_CENTRE_OFFSET * Math.cos(r));
-        	var x = outerX[i];
-        	var y = outerY[i] + 1;
+        	var x = outerXY[i*2].toNumber() - OUTER_SIZE_HALF;
+        	var y = outerXY[i*2+1].toNumber() - OUTER_SIZE_HALF + 1;
 
-        	var s = Lang.format("char id=$1$ x=$2$ y=$3$ width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=$4$ chnl=15", [id, x.format("%d"), y.format("%d"), page]);
+        	var s = Lang.format("char id=$1$ x=$2$ y=$3$ width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=$4$ chnl=15", [id, x.format("%d"), y.format("%d"), page]);
         	System.println(s);
 		}
 		
-		char id=1 x=118 y=-2 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=2 x=124 y=-2 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=3 x=130 y=-1 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=4 x=136 y=0 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=5 x=142 y=1 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=6 x=148 y=3 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=7 x=154 y=5 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=8 x=160 y=7 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=9 x=165 y=9 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=11 x=171 y=12 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=12 x=176 y=15 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=13 x=181 y=19 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=14 x=186 y=22 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=15 x=191 y=26 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=16 x=196 y=30 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=17 x=200 y=34 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=18 x=204 y=39 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=19 x=208 y=44 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=20 x=211 y=49 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=21 x=215 y=54 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=22 x=218 y=59 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=23 x=221 y=65 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=24 x=223 y=70 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=25 x=225 y=76 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=26 x=227 y=82 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=27 x=229 y=88 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=28 x=230 y=94 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=29 x=231 y=100 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=30 x=232 y=106 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=31 x=232 y=112 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=32 x=232 y=118 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=33 x=232 y=124 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=34 x=231 y=130 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=35 x=230 y=136 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=36 x=229 y=142 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=37 x=227 y=148 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=38 x=225 y=154 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=39 x=223 y=160 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=40 x=221 y=165 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=41 x=218 y=171 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=42 x=215 y=176 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=43 x=211 y=181 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=44 x=208 y=186 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=45 x=204 y=191 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=46 x=200 y=196 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=47 x=196 y=200 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=48 x=191 y=204 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=49 x=186 y=208 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=50 x=181 y=211 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=51 x=176 y=215 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=52 x=171 y=218 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=53 x=165 y=221 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=54 x=160 y=223 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=55 x=154 y=225 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=56 x=148 y=227 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=57 x=142 y=229 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=58 x=136 y=230 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=59 x=130 y=231 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=60 x=124 y=232 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=61 x=118 y=232 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=62 x=112 y=232 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=63 x=106 y=232 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=64 x=100 y=231 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=65 x=94 y=230 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=66 x=88 y=229 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=67 x=82 y=227 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=68 x=76 y=225 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=69 x=70 y=223 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=70 x=65 y=221 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=71 x=59 y=218 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=72 x=54 y=215 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=73 x=49 y=211 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=74 x=44 y=208 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=75 x=39 y=204 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=76 x=34 y=200 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=77 x=30 y=196 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=78 x=26 y=191 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=79 x=22 y=186 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=80 x=19 y=181 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=81 x=15 y=176 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=82 x=12 y=171 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=83 x=9 y=165 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=84 x=7 y=160 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=85 x=5 y=154 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=86 x=3 y=148 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=87 x=1 y=142 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=88 x=0 y=136 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=89 x=-1 y=130 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=90 x=-2 y=124 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=91 x=-2 y=118 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=92 x=-2 y=112 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=93 x=-2 y=106 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=94 x=-1 y=100 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=95 x=0 y=94 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=96 x=1 y=88 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=97 x=3 y=82 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=98 x=5 y=76 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=99 x=7 y=70 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=100 x=9 y=65 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=101 x=12 y=59 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=102 x=15 y=54 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=103 x=19 y=49 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=104 x=22 y=44 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=105 x=26 y=39 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=106 x=30 y=34 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=107 x=34 y=30 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=108 x=39 y=26 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=109 x=44 y=22 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=110 x=49 y=19 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=111 x=54 y=15 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=112 x=59 y=12 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=113 x=65 y=9 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=114 x=70 y=7 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=115 x=76 y=5 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=116 x=82 y=3 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=117 x=88 y=1 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=118 x=94 y=0 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=119 x=100 y=-1 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
-		char id=120 x=106 y=-2 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
-		char id=121 x=112 y=-2 width=10 height=10 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=12 x=118 y=-5 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=13 x=130 y=-4 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=14 x=142 y=-1 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=15 x=154 y=3 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=16 x=165 y=8 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=17 x=176 y=14 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=18 x=186 y=21 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=19 x=195 y=29 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=20 x=203 y=38 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=21 x=210 y=48 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=22 x=216 y=59 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=23 x=221 y=70 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=24 x=225 y=82 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=25 x=228 y=94 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=26 x=229 y=106 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=27 x=229 y=118 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=28 x=228 y=130 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=29 x=225 y=142 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=30 x=221 y=154 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=31 x=216 y=165 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=32 x=210 y=176 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=33 x=203 y=186 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=34 x=195 y=195 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=35 x=186 y=203 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=36 x=176 y=210 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=37 x=165 y=216 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=38 x=154 y=221 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=39 x=142 y=225 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=40 x=130 y=228 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=41 x=118 y=229 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=42 x=106 y=229 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=43 x=94 y=228 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=44 x=82 y=225 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=45 x=70 y=221 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=46 x=59 y=216 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=47 x=48 y=210 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=48 x=38 y=203 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=49 x=29 y=195 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=50 x=21 y=186 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=51 x=14 y=176 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=52 x=8 y=165 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=53 x=3 y=154 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=54 x=-1 y=142 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=55 x=-4 y=130 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=56 x=-5 y=118 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=57 x=-5 y=106 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=58 x=-4 y=94 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=59 x=-1 y=82 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=60 x=3 y=70 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=61 x=8 y=59 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=62 x=14 y=48 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=63 x=21 y=38 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=64 x=29 y=29 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=65 x=38 y=21 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=66 x=48 y=14 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=67 x=59 y=8 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=68 x=70 y=3 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=69 x=82 y=-1 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
+		char id=70 x=94 y=-4 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=0 chnl=15
+		char id=71 x=106 y=-5 width=16 height=16 xoffset=0 yoffset=0 xadvance=16 page=1 chnl=15
 		*/
     }
 
@@ -2956,40 +2895,40 @@ class test1View extends WatchUi.WatchFace
 				var steps = activityMonitorInfo.steps;
 				var stepGoal = activityMonitorInfo.stepGoal;
 				
-				backgroundOuterFillEnd = (120 * steps) / stepGoal - 1;
-				if (backgroundOuterFillEnd>=120)
+				backgroundOuterFillEnd = (60 * steps) / stepGoal - 1;
+				if (backgroundOuterFillEnd>=60)
 				{
 					backgroundOuterFillEnd++;	// add that 1 back on again so multiples of stepGoal correctly align at start 
 					
 					// once past steps goal then use a different style - draw just two unfilled blocks moving around
 					var multiple = steps / stepGoal;
-					backgroundOuterFillStart = (backgroundOuterFillEnd+2*multiple)%120;
-					backgroundOuterFillEnd = (backgroundOuterFillEnd+119)%120;	// same as -1
+					backgroundOuterFillStart = (backgroundOuterFillEnd+multiple)%60;
+					backgroundOuterFillEnd = (backgroundOuterFillEnd+59)%60;	// same as -1
 				}
 			}
 			else if (outerMode==2)			// minutes
 			{
-	    		backgroundOuterFillEnd = (minute * 2) - 1;
+	    		backgroundOuterFillEnd = minute - 1;
 			}
 			else if (outerMode==3)			// hours
 			{
 		        if (deviceSettings.is24Hour)
 		        {
 	        		//backgroundOuterFillEnd = ((hour*60 + minute) * 120) / (24 * 60);
-	        		backgroundOuterFillEnd = (hour*60 + minute) / 12 - 1;
+	        		backgroundOuterFillEnd = (hour*60 + minute) / 24 - 1;
 		        }
 		        else        	// 12 hours
 		        {
-	        		backgroundOuterFillEnd = ((hour%12)*60 + minute) / 6 - 1;
+	        		backgroundOuterFillEnd = ((hour%12)*60 + minute) / 12 - 1;
 		        }
 	   		}
 	   		else if (outerMode==4)			// battery percentage
 	   		{
-				backgroundOuterFillEnd = (systemStats.battery * 120).toNumber() / 100 - 1;
+				backgroundOuterFillEnd = (systemStats.battery * 60).toNumber() / 100 - 1;
 	   		}
 			else		// plain color
 			{
-				backgroundOuterFillEnd = 119;
+				backgroundOuterFillEnd = 59;
 			}
 		}
 		
@@ -3067,7 +3006,7 @@ class test1View extends WatchUi.WatchFace
 //	var outerBigXY;
 //	var outerOffscreenStart;
 //	var outerOffscreenEnd;
-	var outerValues = new[40]b;
+	var outerValues = new[24]b;
 
 	function drawBackgroundToDc(useDc)
 	{ 
@@ -3281,7 +3220,7 @@ class test1View extends WatchUi.WatchFace
 			if (!toBuffer)		// main display
 			{
 				jStart = 0;
-				jEnd = 119;		// all segments
+				jEnd = 59;		// all segments
 			}
 			else				// offscreen buffer
 			{
@@ -3290,8 +3229,8 @@ class test1View extends WatchUi.WatchFace
 				//var outerOffscreenStart = 	[  -2,   7,  19,  28,  37,  49,  58,  67,  79,  88,  97, 109 ];
 				//var outerOffscreenEnd = 	[   9,  22,  30,  39,  52,  59,  69,  82,  89,  99, 112, 120 ];
 			
-    			jStart = outerValues[bufferIndex + 16] - 10;
-    			jEnd = outerValues[bufferIndex + 28];
+    			jStart = outerValues[bufferIndex] - 10;
+    			jEnd = outerValues[bufferIndex + 12];
 			}
 	
 			//jStart = 0;	// test draw all
@@ -3305,61 +3244,35 @@ class test1View extends WatchUi.WatchFace
 			{
 				colFilled = propOuterColorUnfilled;
 				colUnfilled = propOuterColorFilled;
-				fillStart = (backgroundOuterFillEnd+1)%120;		// + 1
-				fillEnd = (backgroundOuterFillStart+119)%120;	// - 1
+				fillStart = (backgroundOuterFillEnd+1)%60;		// + 1
+				fillEnd = (backgroundOuterFillStart+59)%60;	// - 1
 			}
 
-			var xOffset = -dcX - 5/*OUTER_SIZE_HALF*/;
-			var yOffset = -dcY - 5/*OUTER_SIZE_HALF*/;
+			var xOffset = -dcX - 8/*OUTER_SIZE_HALF*/;
+			var yOffset = -dcY - 8/*OUTER_SIZE_HALF*/;
 			var curCol = COLOR_NOTSET;
 	
 			// draw the correct segments
 			for (var j=jStart; j<=jEnd; )
 			{
-				var index = (j+120)%120;	// handle segments <0 and >=120
+				var index = (j+60)%60;	// handle segments <0 and >=60
 				
 				var indexCol = ((index>=fillStart && index<=fillEnd) ? colFilled : colUnfilled); 
-
-				if (indexCol!=COLOR_NOTSET && curCol!=indexCol)
-				{
-					curCol = indexCol;
-       				useDc.setColor(curCol, graphics.COLOR_TRANSPARENT);
-       			}
-
-				// when drawing whole display in onUpdate then do an optimization using 8 large segments
-				if (!toBuffer)
-				{
-					if (index%15==0)	// start of large segment (they each cover 15 small segments)
-					{
-						// if the whole of large segment is the same color, then we can draw it
-						// Otherwise use small segments as normal
-						if ((/*index<fillStart &&*/ index+14<fillStart) ||
-							(index>=fillStart && index+14<=fillEnd) ||
-							(index>fillEnd /*&& index+14>fillEnd*/))
-						{
-							if (indexCol != COLOR_NOTSET)
-							{
-								var bigIndex = index/15;
-								var bigIndex2 = bigIndex*2;
-								//var s = characterString.substring(bigIndex, bigIndex+1);
-								//var s = StringUtil.charArrayToString([(bigIndex + OUTER_FIRST_CHAR_ID).toChar()]);
-								var s = (bigIndex + 12/*OUTER_FIRST_CHAR_ID*/).toChar().toString();
-					        	useDc.drawText(outerValues[bigIndex2] - 10 - dcX, outerValues[bigIndex2 + 1] - 10 - dcY, outerBigFontResource, s, graphics.TEXT_JUSTIFY_LEFT);
-					        }
-					        
-				        	j += 15;	// drawn a big segment so advance 15 small ones
-							continue;	// skip to next loop so don't draw small segment
-						}
-					}
-				}
 
 				// draw the segment (if a color is set)
 				if (indexCol != COLOR_NOTSET)
 				{
+					if (curCol!=indexCol)
+					{
+						curCol = indexCol;
+	       				useDc.setColor(curCol, graphics.COLOR_TRANSPARENT);
+	       			}
+
 					//var s = characterString.substring(index, index+1);
 					//var s = StringUtil.charArrayToString([(index + OUTER_FIRST_CHAR_ID).toChar()]);
 					var s = (index + 12/*OUTER_FIRST_CHAR_ID*/).toChar().toString();
-		        	useDc.drawText(xOffset + outerX[index], yOffset + outerY[index], outerFontResource, s, graphics.TEXT_JUSTIFY_LEFT);
+					var index2 = index*2;
+		        	useDc.drawText(xOffset + outerXY[index2], yOffset + outerXY[index2+1], outerFontResource, s, graphics.TEXT_JUSTIFY_LEFT);
 		        }
 			    
 			    j++;	// next segment
@@ -3527,8 +3440,8 @@ class test1View extends WatchUi.WatchFace
 				drawBackgroundToDc(null);
 	
 				// test draw the offscreen buffer to see what is in it
-		    	//dc.setClip(bufferX, bufferY, BUFFER_SIZE, BUFFER_SIZE);
-				//dc.drawBitmap(bufferX, bufferY, buffer);
+		    	//dc.setClip(bufferX, bufferY, 62/*BUFFER_SIZE*/, 62/*BUFFER_SIZE*/);
+				//dc.drawBitmap(bufferX, bufferY, bufferBitmap);
 		    	//dc.clearClip();
 			}
 		}

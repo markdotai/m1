@@ -13,11 +13,27 @@ class test1View extends WatchUi.WatchFace
 {
 	//var forceMemoryTest = new[1024*6]b;
 	//const forceTestFont = false;
+	//const forceTestLocation = false;
 	//const forceClearStorage = false;
 	//const forceDemoProfiles = false;
 	//const forceDemoFontStyles = false;
 	//const forceFieldTest = true;
 
+//	(:exclude)	// always excluded
+//	function testExcludeFunction()
+//	{
+//	}
+//	
+//	(:m1plus)	// in m1plus - excluded in m1normal
+//	function testExcludeFunction()
+//	{
+//	}
+//	
+//	(:m1normal)	// in m1normal - excluded in m1plus
+//	function testExcludeFunction()
+//	{
+//	}
+	
 	const PROFILE_VERSION = 13;			// a version number
 	const PROFILE_NUM_PRESET = 14;		// number of preset profiles (in the jsondata resource)
 
@@ -962,13 +978,25 @@ class test1View extends WatchUi.WatchFace
 
 		return t;		
 	}
-	
+
+	(:m1normal)	
 	function propertiesGetColor(p)
 	{
 		var v = propertiesGetNumber(p);
 		return getColorArray(v);
 	}
 	
+	(:m1plus)	
+	function propertiesGetColor(p)
+	{
+		var charArray = propertiesGetCharArray(p);
+		var charArraySize = charArray.size();
+		parseIndex = 0;
+		
+		var v = parseHexOrNumber(charArray, charArraySize);
+		return getColorArray(v);
+	}
+
 	function addStringToCharArray(s, toArray, toLen, toMax)
 	{
 		var charArray = s.toCharArray();
@@ -3908,36 +3936,41 @@ class test1View extends WatchUi.WatchFace
 	
 	var parseIndex;
 	
-//	function parseHexOrNumber(charArray, charArraySize)
-//	{
-//		var v = 0;
-//	
-//		if (charArraySize<6)
-//		{
-//			v = parseNumber(charArray, charArraySize);
-//		}
-//		else
-//		{
-//	    	for (; parseIndex<charArraySize; parseIndex++)
-//	    	{
-//	    		var c = charArray[parseIndex].toUpper().toNumber();
-//	    		if (c>=48/*APPCHAR_0*/ && c<=57/*APPCHAR_9*/)
-//	    		{
-//	    			v = v*16 + (c-48/*APPCHAR_0*/); 
-//	    		}
-//	    		else if (c>=65/*APPCHAR_A*/ && c<=70/*APPCHAR_F*/)
-//	    		{
-//	    			v = v*16 + 10 + (c-65/*APPCHAR_A*/); 
-//	    		}
-//	    		else
-//	    		{
-//	    			break;
-//	    		}
-//	    	}
-//		}
-//		
-//		return v;
-//	}
+	(:m1plus)
+	function parseHexOrNumber(charArray, charArraySize)
+	{
+		var v = -1;		// if string empty then return -1 (not set)
+	
+		if (charArraySize>0)
+		{
+			if (charArraySize<6)
+			{
+				v = parseNumber(charArray, charArraySize);
+			}
+			else
+			{
+				v = 0;
+		    	for (; parseIndex<charArraySize; parseIndex++)
+		    	{
+		    		var c = charArray[parseIndex].toUpper().toNumber();
+		    		if (c>=48/*APPCHAR_0*/ && c<=57/*APPCHAR_9*/)
+		    		{
+		    			v = v*16 + (c-48/*APPCHAR_0*/); 
+		    		}
+		    		else if (c>=65/*APPCHAR_A*/ && c<=70/*APPCHAR_F*/)
+		    		{
+		    			v = v*16 + 10 + (c-65/*APPCHAR_A*/); 
+		    		}
+		    		else
+		    		{
+		    			break;
+		    		}
+		    	}
+			}
+		}
+				
+		return v;
+	}
 
    	// find next comma or end of array
 	function parseToComma(charArray, charArraySize)
@@ -4589,11 +4622,6 @@ class test1View extends WatchUi.WatchFace
 	// 3==sunrise tomorrow, 4==sunset tomorrow, 5==sun rises at all tomorrow?
 	var sunTimes = new[6];		// hour*60 + minute
 
-	(:exclude)
-	function calculateSun()
-	{
-	}
-	
 	// 1600 code bytes
 	function calculateSun(nowDayOfWeek)
 	{
@@ -4606,35 +4634,38 @@ class test1View extends WatchUi.WatchFace
 
 		var useAltitude = (propSunAdjustAltitude ? positionAltitude : 0.0);
 
-		// Windermere lat=54.380810, long=-2.907530
-		//positionLatitude = 54.380810;
-		//positionLongitude = -2.907530;
-		
-		// Windermere
-		positionLatitude = 54.3787142d;	// 54 22 43
-		positionLongitude = -2.9044238d;	// -2 54 16
-		//useAltitude = 140.0;	// m
-		//useAltitude = 0.0;	// m
-		
-		//positionLongitude += 0.01;				// 3 secs change
-		//positionLongitude += 0.1;				// 30 secs change in sunrise
-		//useAltitude = 1.0;	// m		// 15 seconds change
-		//useAltitude = 100.0;	// m		// 3 minutes change
-		//useAltitude = 1000.0;	// m	// 10 minutes change
-		
-		// Trondheim, Trøndelag, 7011, Norway
-		//positionLatitude = 63.4305658d;
-		//positionLongitude = 10.3951929d;
-		
-		//positionLatitude = 68.0;
-		//positionLongitude = 0.0;
-
-		//positionLatitude = -70.5;
-		//positionLongitude = 0.0;
-		
-		// Longyearbyen, Svalbard, 9170, Norway
-		//positionLatitude = 78.2231558d;
-		//positionLongitude = 15.6463656d;
+//		if (forceTestLocation)
+//		{
+//			// Windermere lat=54.380810, long=-2.907530
+//			//positionLatitude = 54.380810;
+//			//positionLongitude = -2.907530;
+//			
+//			// Windermere
+//			positionLatitude = 54.3787142d;	// 54 22 43
+//			positionLongitude = -2.9044238d;	// -2 54 16
+//			//useAltitude = 140.0;	// m
+//			//useAltitude = 0.0;	// m
+//			
+//			//positionLongitude += 0.01;				// 3 secs change
+//			//positionLongitude += 0.1;				// 30 secs change in sunrise
+//			//useAltitude = 1.0;	// m		// 15 seconds change
+//			//useAltitude = 100.0;	// m		// 3 minutes change
+//			//useAltitude = 1000.0;	// m	// 10 minutes change
+//			
+//			// Trondheim, Trøndelag, 7011, Norway
+//			//positionLatitude = 63.4305658d;
+//			//positionLongitude = 10.3951929d;
+//			
+//			//positionLatitude = 68.0;
+//			//positionLongitude = 0.0;
+//	
+//			//positionLatitude = -70.5;
+//			//positionLongitude = 0.0;
+//			
+//			// Longyearbyen, Svalbard, 9170, Norway
+//			//positionLatitude = 78.2231558d;
+//			//positionLongitude = 15.6463656d;
+//		}
 		
 		var todayValue = Time.today().value();
 		if (sunCalculatedDay==todayValue &&

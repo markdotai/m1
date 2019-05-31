@@ -1,6 +1,6 @@
 <properties>
 
-    <property id="1" type="number">0x000000</property>		<!-- background color -->
+    <property id="1" type="number">0</property>				<!-- background color -->
     
     <property id="2" type="number">1</property>				<!-- time on -->
     <property id="3" type="boolean">false</property>		<!-- time military -->

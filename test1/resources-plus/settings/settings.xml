@@ -239,6 +239,10 @@
         <settingConfig type="numeric" />
     </setting>
 
+    <setting propertyKey="@Properties.37" title="@Strings.Field2ndOffsetTitle">
+        <settingConfig type="numeric" />
+    </setting>
+
     <setting propertyKey="@Properties.FM" title="@Strings.FieldManagementTitle">
         <settingConfig type="list">
             <listEntry value="0x00">@Strings.ItemOff</listEntry>
@@ -297,6 +301,13 @@
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
             <listEntry value="19">@Strings.FieldAM</listEntry>
             <listEntry value="20">@Strings.FieldPM</listEntry>
+            <listEntry value="88">@Strings.Field2ndHour</listEntry>
+            <listEntry value="82">@Strings.FieldSunriseHour</listEntry>
+            <listEntry value="83">@Strings.FieldSunriseMinute</listEntry>
+            <listEntry value="84">@Strings.FieldSunsetHour</listEntry>
+            <listEntry value="85">@Strings.FieldSunsetMinute</listEntry>
+            <listEntry value="86">@Strings.FieldSunEventHour</listEntry>
+            <listEntry value="87">@Strings.FieldSunEventMinute</listEntry>
 
             <listEntry value="-5">@Strings.MenuBlank</listEntry>
             <listEntry value="-6">@Strings.MenuLine</listEntry>
@@ -324,6 +335,21 @@
             <listEntry value="36">@Strings.ItemBatteryPercentage</listEntry>
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
+            <listEntry value="78">@Strings.FieldHeartMin</listEntry>
+            <listEntry value="79">@Strings.FieldHeartMax</listEntry>
+            <listEntry value="80">@Strings.FieldHeartAverage</listEntry>
+            <listEntry value="81">@Strings.FieldHeartChart</listEntry>
+            <listEntry value="94">@Strings.FieldDistance</listEntry>
+            <listEntry value="95">@Strings.FieldDistanceUnits</listEntry>
+            <listEntry value="89">@Strings.FieldCalories</listEntry>
+            <listEntry value="90">@Strings.FieldActiveCalories</listEntry>
+            <listEntry value="91">@Strings.FieldIntensity</listEntry>
+            <listEntry value="92">@Strings.FieldIntensityGoal</listEntry>
+            <listEntry value="93">@Strings.FieldSmartGoal</listEntry>
+            <listEntry value="96">@Strings.FieldPressure</listEntry>
+            <listEntry value="97">@Strings.FieldPressureUnits</listEntry>
+            <listEntry value="98">@Strings.FieldAltitude</listEntry>
+            <listEntry value="99">@Strings.FieldAltitudeUnits</listEntry>
 
             <listEntry value="-13">@Strings.MenuBlank</listEntry>
             <listEntry value="-14">@Strings.MenuLine</listEntry>
@@ -363,6 +389,9 @@
     <setting propertyKey="@Properties.F4" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
             <listEntry value="0">@Strings.ItemOn</listEntry>
+
+            <listEntry value="-1">@Strings.MenuBlank</listEntry>
+
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -379,8 +408,15 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+
+            <listEntry value="-2">@Strings.MenuBlank</listEntry>
+
             <listEntry value="17">@Strings.FieldAM</listEntry>
             <listEntry value="18">@Strings.FieldPM</listEntry>
+            <listEntry value="19">@Strings.Field2ndAM</listEntry>
+            <listEntry value="20">@Strings.Field2ndPM</listEntry>
+            <listEntry value="21">@Strings.FieldSunEventRise</listEntry>
+            <listEntry value="22">@Strings.FieldSunEventSet</listEntry>
         </settingConfig>
     </setting>
 
@@ -417,6 +453,13 @@
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
             <listEntry value="19">@Strings.FieldAM</listEntry>
             <listEntry value="20">@Strings.FieldPM</listEntry>
+            <listEntry value="88">@Strings.Field2ndHour</listEntry>
+            <listEntry value="82">@Strings.FieldSunriseHour</listEntry>
+            <listEntry value="83">@Strings.FieldSunriseMinute</listEntry>
+            <listEntry value="84">@Strings.FieldSunsetHour</listEntry>
+            <listEntry value="85">@Strings.FieldSunsetMinute</listEntry>
+            <listEntry value="86">@Strings.FieldSunEventHour</listEntry>
+            <listEntry value="87">@Strings.FieldSunEventMinute</listEntry>
 
             <listEntry value="-5">@Strings.MenuBlank</listEntry>
             <listEntry value="-6">@Strings.MenuLine</listEntry>
@@ -444,6 +487,21 @@
             <listEntry value="36">@Strings.ItemBatteryPercentage</listEntry>
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
+            <listEntry value="78">@Strings.FieldHeartMin</listEntry>
+            <listEntry value="79">@Strings.FieldHeartMax</listEntry>
+            <listEntry value="80">@Strings.FieldHeartAverage</listEntry>
+            <listEntry value="81">@Strings.FieldHeartChart</listEntry>
+            <listEntry value="94">@Strings.FieldDistance</listEntry>
+            <listEntry value="95">@Strings.FieldDistanceUnits</listEntry>
+            <listEntry value="89">@Strings.FieldCalories</listEntry>
+            <listEntry value="90">@Strings.FieldActiveCalories</listEntry>
+            <listEntry value="91">@Strings.FieldIntensity</listEntry>
+            <listEntry value="92">@Strings.FieldIntensityGoal</listEntry>
+            <listEntry value="93">@Strings.FieldSmartGoal</listEntry>
+            <listEntry value="96">@Strings.FieldPressure</listEntry>
+            <listEntry value="97">@Strings.FieldPressureUnits</listEntry>
+            <listEntry value="98">@Strings.FieldAltitude</listEntry>
+            <listEntry value="99">@Strings.FieldAltitudeUnits</listEntry>
 
             <listEntry value="-13">@Strings.MenuBlank</listEntry>
             <listEntry value="-14">@Strings.MenuLine</listEntry>
@@ -483,6 +541,9 @@
     <setting propertyKey="@Properties.F7" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
             <listEntry value="0">@Strings.ItemOn</listEntry>
+
+            <listEntry value="-1">@Strings.MenuBlank</listEntry>
+
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -499,8 +560,15 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+
+            <listEntry value="-2">@Strings.MenuBlank</listEntry>
+
             <listEntry value="17">@Strings.FieldAM</listEntry>
             <listEntry value="18">@Strings.FieldPM</listEntry>
+            <listEntry value="19">@Strings.Field2ndAM</listEntry>
+            <listEntry value="20">@Strings.Field2ndPM</listEntry>
+            <listEntry value="21">@Strings.FieldSunEventRise</listEntry>
+            <listEntry value="22">@Strings.FieldSunEventSet</listEntry>
         </settingConfig>
     </setting>
 
@@ -537,6 +605,13 @@
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
             <listEntry value="19">@Strings.FieldAM</listEntry>
             <listEntry value="20">@Strings.FieldPM</listEntry>
+            <listEntry value="88">@Strings.Field2ndHour</listEntry>
+            <listEntry value="82">@Strings.FieldSunriseHour</listEntry>
+            <listEntry value="83">@Strings.FieldSunriseMinute</listEntry>
+            <listEntry value="84">@Strings.FieldSunsetHour</listEntry>
+            <listEntry value="85">@Strings.FieldSunsetMinute</listEntry>
+            <listEntry value="86">@Strings.FieldSunEventHour</listEntry>
+            <listEntry value="87">@Strings.FieldSunEventMinute</listEntry>
 
             <listEntry value="-5">@Strings.MenuBlank</listEntry>
             <listEntry value="-6">@Strings.MenuLine</listEntry>
@@ -564,6 +639,21 @@
             <listEntry value="36">@Strings.ItemBatteryPercentage</listEntry>
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
+            <listEntry value="78">@Strings.FieldHeartMin</listEntry>
+            <listEntry value="79">@Strings.FieldHeartMax</listEntry>
+            <listEntry value="80">@Strings.FieldHeartAverage</listEntry>
+            <listEntry value="81">@Strings.FieldHeartChart</listEntry>
+            <listEntry value="94">@Strings.FieldDistance</listEntry>
+            <listEntry value="95">@Strings.FieldDistanceUnits</listEntry>
+            <listEntry value="89">@Strings.FieldCalories</listEntry>
+            <listEntry value="90">@Strings.FieldActiveCalories</listEntry>
+            <listEntry value="91">@Strings.FieldIntensity</listEntry>
+            <listEntry value="92">@Strings.FieldIntensityGoal</listEntry>
+            <listEntry value="93">@Strings.FieldSmartGoal</listEntry>
+            <listEntry value="96">@Strings.FieldPressure</listEntry>
+            <listEntry value="97">@Strings.FieldPressureUnits</listEntry>
+            <listEntry value="98">@Strings.FieldAltitude</listEntry>
+            <listEntry value="99">@Strings.FieldAltitudeUnits</listEntry>
 
             <listEntry value="-13">@Strings.MenuBlank</listEntry>
             <listEntry value="-14">@Strings.MenuLine</listEntry>
@@ -603,6 +693,9 @@
     <setting propertyKey="@Properties.F10" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
             <listEntry value="0">@Strings.ItemOn</listEntry>
+
+            <listEntry value="-1">@Strings.MenuBlank</listEntry>
+
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -619,8 +712,15 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+
+            <listEntry value="-2">@Strings.MenuBlank</listEntry>
+
             <listEntry value="17">@Strings.FieldAM</listEntry>
             <listEntry value="18">@Strings.FieldPM</listEntry>
+            <listEntry value="19">@Strings.Field2ndAM</listEntry>
+            <listEntry value="20">@Strings.Field2ndPM</listEntry>
+            <listEntry value="21">@Strings.FieldSunEventRise</listEntry>
+            <listEntry value="22">@Strings.FieldSunEventSet</listEntry>
         </settingConfig>
     </setting>
 
@@ -657,6 +757,13 @@
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
             <listEntry value="19">@Strings.FieldAM</listEntry>
             <listEntry value="20">@Strings.FieldPM</listEntry>
+            <listEntry value="88">@Strings.Field2ndHour</listEntry>
+            <listEntry value="82">@Strings.FieldSunriseHour</listEntry>
+            <listEntry value="83">@Strings.FieldSunriseMinute</listEntry>
+            <listEntry value="84">@Strings.FieldSunsetHour</listEntry>
+            <listEntry value="85">@Strings.FieldSunsetMinute</listEntry>
+            <listEntry value="86">@Strings.FieldSunEventHour</listEntry>
+            <listEntry value="87">@Strings.FieldSunEventMinute</listEntry>
 
             <listEntry value="-5">@Strings.MenuBlank</listEntry>
             <listEntry value="-6">@Strings.MenuLine</listEntry>
@@ -684,6 +791,21 @@
             <listEntry value="36">@Strings.ItemBatteryPercentage</listEntry>
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
+            <listEntry value="78">@Strings.FieldHeartMin</listEntry>
+            <listEntry value="79">@Strings.FieldHeartMax</listEntry>
+            <listEntry value="80">@Strings.FieldHeartAverage</listEntry>
+            <listEntry value="81">@Strings.FieldHeartChart</listEntry>
+            <listEntry value="94">@Strings.FieldDistance</listEntry>
+            <listEntry value="95">@Strings.FieldDistanceUnits</listEntry>
+            <listEntry value="89">@Strings.FieldCalories</listEntry>
+            <listEntry value="90">@Strings.FieldActiveCalories</listEntry>
+            <listEntry value="91">@Strings.FieldIntensity</listEntry>
+            <listEntry value="92">@Strings.FieldIntensityGoal</listEntry>
+            <listEntry value="93">@Strings.FieldSmartGoal</listEntry>
+            <listEntry value="96">@Strings.FieldPressure</listEntry>
+            <listEntry value="97">@Strings.FieldPressureUnits</listEntry>
+            <listEntry value="98">@Strings.FieldAltitude</listEntry>
+            <listEntry value="99">@Strings.FieldAltitudeUnits</listEntry>
 
             <listEntry value="-13">@Strings.MenuBlank</listEntry>
             <listEntry value="-14">@Strings.MenuLine</listEntry>
@@ -723,6 +845,9 @@
     <setting propertyKey="@Properties.F13" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
             <listEntry value="0">@Strings.ItemOn</listEntry>
+
+            <listEntry value="-1">@Strings.MenuBlank</listEntry>
+
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -739,8 +864,15 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+
+            <listEntry value="-2">@Strings.MenuBlank</listEntry>
+
             <listEntry value="17">@Strings.FieldAM</listEntry>
             <listEntry value="18">@Strings.FieldPM</listEntry>
+            <listEntry value="19">@Strings.Field2ndAM</listEntry>
+            <listEntry value="20">@Strings.Field2ndPM</listEntry>
+            <listEntry value="21">@Strings.FieldSunEventRise</listEntry>
+            <listEntry value="22">@Strings.FieldSunEventSet</listEntry>
         </settingConfig>
     </setting>
 
@@ -777,6 +909,13 @@
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
             <listEntry value="19">@Strings.FieldAM</listEntry>
             <listEntry value="20">@Strings.FieldPM</listEntry>
+            <listEntry value="88">@Strings.Field2ndHour</listEntry>
+            <listEntry value="82">@Strings.FieldSunriseHour</listEntry>
+            <listEntry value="83">@Strings.FieldSunriseMinute</listEntry>
+            <listEntry value="84">@Strings.FieldSunsetHour</listEntry>
+            <listEntry value="85">@Strings.FieldSunsetMinute</listEntry>
+            <listEntry value="86">@Strings.FieldSunEventHour</listEntry>
+            <listEntry value="87">@Strings.FieldSunEventMinute</listEntry>
 
             <listEntry value="-5">@Strings.MenuBlank</listEntry>
             <listEntry value="-6">@Strings.MenuLine</listEntry>
@@ -804,6 +943,21 @@
             <listEntry value="36">@Strings.ItemBatteryPercentage</listEntry>
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
+            <listEntry value="78">@Strings.FieldHeartMin</listEntry>
+            <listEntry value="79">@Strings.FieldHeartMax</listEntry>
+            <listEntry value="80">@Strings.FieldHeartAverage</listEntry>
+            <listEntry value="81">@Strings.FieldHeartChart</listEntry>
+            <listEntry value="94">@Strings.FieldDistance</listEntry>
+            <listEntry value="95">@Strings.FieldDistanceUnits</listEntry>
+            <listEntry value="89">@Strings.FieldCalories</listEntry>
+            <listEntry value="90">@Strings.FieldActiveCalories</listEntry>
+            <listEntry value="91">@Strings.FieldIntensity</listEntry>
+            <listEntry value="92">@Strings.FieldIntensityGoal</listEntry>
+            <listEntry value="93">@Strings.FieldSmartGoal</listEntry>
+            <listEntry value="96">@Strings.FieldPressure</listEntry>
+            <listEntry value="97">@Strings.FieldPressureUnits</listEntry>
+            <listEntry value="98">@Strings.FieldAltitude</listEntry>
+            <listEntry value="99">@Strings.FieldAltitudeUnits</listEntry>
 
             <listEntry value="-13">@Strings.MenuBlank</listEntry>
             <listEntry value="-14">@Strings.MenuLine</listEntry>
@@ -843,6 +997,9 @@
     <setting propertyKey="@Properties.F16" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
             <listEntry value="0">@Strings.ItemOn</listEntry>
+
+            <listEntry value="-1">@Strings.MenuBlank</listEntry>
+
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -859,8 +1016,15 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+
+            <listEntry value="-2">@Strings.MenuBlank</listEntry>
+
             <listEntry value="17">@Strings.FieldAM</listEntry>
             <listEntry value="18">@Strings.FieldPM</listEntry>
+            <listEntry value="19">@Strings.Field2ndAM</listEntry>
+            <listEntry value="20">@Strings.Field2ndPM</listEntry>
+            <listEntry value="21">@Strings.FieldSunEventRise</listEntry>
+            <listEntry value="22">@Strings.FieldSunEventSet</listEntry>
         </settingConfig>
     </setting>
 
@@ -897,6 +1061,13 @@
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
             <listEntry value="19">@Strings.FieldAM</listEntry>
             <listEntry value="20">@Strings.FieldPM</listEntry>
+            <listEntry value="88">@Strings.Field2ndHour</listEntry>
+            <listEntry value="82">@Strings.FieldSunriseHour</listEntry>
+            <listEntry value="83">@Strings.FieldSunriseMinute</listEntry>
+            <listEntry value="84">@Strings.FieldSunsetHour</listEntry>
+            <listEntry value="85">@Strings.FieldSunsetMinute</listEntry>
+            <listEntry value="86">@Strings.FieldSunEventHour</listEntry>
+            <listEntry value="87">@Strings.FieldSunEventMinute</listEntry>
 
             <listEntry value="-5">@Strings.MenuBlank</listEntry>
             <listEntry value="-6">@Strings.MenuLine</listEntry>
@@ -924,6 +1095,21 @@
             <listEntry value="36">@Strings.ItemBatteryPercentage</listEntry>
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
+            <listEntry value="78">@Strings.FieldHeartMin</listEntry>
+            <listEntry value="79">@Strings.FieldHeartMax</listEntry>
+            <listEntry value="80">@Strings.FieldHeartAverage</listEntry>
+            <listEntry value="81">@Strings.FieldHeartChart</listEntry>
+            <listEntry value="94">@Strings.FieldDistance</listEntry>
+            <listEntry value="95">@Strings.FieldDistanceUnits</listEntry>
+            <listEntry value="89">@Strings.FieldCalories</listEntry>
+            <listEntry value="90">@Strings.FieldActiveCalories</listEntry>
+            <listEntry value="91">@Strings.FieldIntensity</listEntry>
+            <listEntry value="92">@Strings.FieldIntensityGoal</listEntry>
+            <listEntry value="93">@Strings.FieldSmartGoal</listEntry>
+            <listEntry value="96">@Strings.FieldPressure</listEntry>
+            <listEntry value="97">@Strings.FieldPressureUnits</listEntry>
+            <listEntry value="98">@Strings.FieldAltitude</listEntry>
+            <listEntry value="99">@Strings.FieldAltitudeUnits</listEntry>
 
             <listEntry value="-13">@Strings.MenuBlank</listEntry>
             <listEntry value="-14">@Strings.MenuLine</listEntry>
@@ -963,6 +1149,9 @@
     <setting propertyKey="@Properties.F19" title="@Strings.ItemVisibilityTitle">
         <settingConfig type="list">
             <listEntry value="0">@Strings.ItemOn</listEntry>
+
+            <listEntry value="-1">@Strings.MenuBlank</listEntry>
+
             <listEntry value="1">@Strings.FieldDoNotDisturbOn</listEntry>
             <listEntry value="2">@Strings.FieldDoNotDisturbOff</listEntry>
             <listEntry value="3">@Strings.FieldAlarmOn</listEntry>
@@ -979,8 +1168,15 @@
             <listEntry value="14">@Strings.FieldBatteryLow</listEntry>
             <listEntry value="15">@Strings.FieldMoveBarAlertTriggered</listEntry>
             <listEntry value="16">@Strings.FieldMoveBarAlertNot</listEntry>
+
+            <listEntry value="-2">@Strings.MenuBlank</listEntry>
+
             <listEntry value="17">@Strings.FieldAM</listEntry>
             <listEntry value="18">@Strings.FieldPM</listEntry>
+            <listEntry value="19">@Strings.Field2ndAM</listEntry>
+            <listEntry value="20">@Strings.Field2ndPM</listEntry>
+            <listEntry value="21">@Strings.FieldSunEventRise</listEntry>
+            <listEntry value="22">@Strings.FieldSunEventSet</listEntry>
         </settingConfig>
     </setting>
 

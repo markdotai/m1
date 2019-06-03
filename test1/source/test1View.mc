@@ -17,7 +17,6 @@ class test1View extends WatchUi.WatchFace
 	//const forceClearStorage = false;
 	//const forceDemoProfiles = false;
 	//const forceDemoFontStyles = false;
-	//const forceFieldTest = true;
 
 //	(:exclude)	// always excluded
 //	function testExcludeFunction()
@@ -98,6 +97,8 @@ class test1View extends WatchUi.WatchFace
 	var propOuterColorFilled;
 	var propOuterColorUnfilled;
 	
+	var propMoveBarOffColor;
+	
 	var propDemoDisplayOn;
 	
 	var propSunAdjustAltitude = false;
@@ -146,14 +147,16 @@ class test1View extends WatchUi.WatchFace
 	var hasLTE;
 	var hasElevationHistory;
 	var hasPressureHistory;
+	var hasHeartRateHistory;
 
 	var fieldActivePhoneStatus = null;
 	var fieldActiveNotificationsStatus = null;
 	var fieldActiveNotificationsCount = null;
 	var fieldActiveLTEStatus = null;
 
-    const PROFILE_NUM_PROPERTIES = 37;
+    const PROFILE_NUM_PROPERTIES = 38;
     //const PROFILE_PROPERTY_COLON = 36;
+    //const PROFILE_PROPERTY_2ND_OFFSET = 37;
 	
 	const PROFILE_PRIVATE_INDEX = -1;			// only used for temporary storage while app is running
 
@@ -280,8 +283,12 @@ class test1View extends WatchUi.WatchFace
 	//	STATUS_MOVEBARALERT_NOT = 16,
 	//	STATUS_AM = 17,
 	//	STATUS_PM = 18,
+	//	STATUS_2ND_AM = 19,
+	//	STATUS_2ND_PM = 20,
+	//	STATUS_SUNEVENT_RISE = 21,
+	//	STATUS_SUNEVENT_SET = 22,
 	//
-	//	STATUS_NUM = 19
+	//	STATUS_NUM = 23
 	//}
 	
 	//enum
@@ -351,6 +358,10 @@ class test1View extends WatchUi.WatchFace
 	//	//!FIELD_SHAPE_NETWORK = 63,
 	//	FIELD_SHAPE_STAIRS = 64,
 	//
+	//	FIELD_HEART_MIN = 78
+	//	FIELD_HEART_MAX = 79
+	//	FIELD_HEART_AVERAGE = 80
+	//	FIELD_HEART_CHART = 81
 	//	FIELD_SUNRISE_HOUR = 82,
 	//	FIELD_SUNRISE_MINUTE = 83,
 	//	FIELD_SUNSET_HOUR = 84,
@@ -481,11 +492,17 @@ class test1View extends WatchUi.WatchFace
 		return col;
 	}
 
+	(:m1plus)
 	function colorHexToIndex(col)
 	{
-		var r = ((col>>20) & 0x0F) / 5;	// 0-3
-		var g = ((col>>12) & 0x0F) / 5;	// 0-3
-		var b = ((col>>4) & 0x0F) / 5;	// 0-3
+		//var r = ((col>>20) & 0x0F) / 5;	// 0-3
+		//var g = ((col>>12) & 0x0F) / 5;	// 0-3
+		//var b = ((col>>4) & 0x0F) / 5;	// 0-3
+		
+		// 0x2A is half of 0x55 - we're basically rounding to nearest multiple of 0x55
+		var r = (((col>>16) & 0xFF) + 0x2A) / 0x55;	// 0-3
+		var g = (((col>>8) & 0xFF) + 0x2A) / 0x55;	// 0-3
+		var b = ((col & 0xFF) + 0x2A) / 0x55;	// 0-3
 		
 		var shortTest = (r<<4) | (g<<2) | b;
 		
@@ -979,22 +996,171 @@ class test1View extends WatchUi.WatchFace
 		return t;		
 	}
 
-	(:m1normal)	
-	function propertiesGetColor(p)
+	(:m1normal)
+	function propertiesGetColor(p, minV)
 	{
-		var v = propertiesGetNumber(p);
-		return getColorArray(v);
+		return getColorArray(getMinMax(propertiesGetNumber(p), minV, 63));
 	}
 	
-	(:m1plus)	
-	function propertiesGetColor(p)
+	(:m1plus)
+	function propertiesGetColor(p, minV)
+	{				
+		return getColorArray(propertiesGetColorIndex(p, minV));
+	}
+
+	(:m1plus)
+	function propertiesGetColorIndex(p, minV)
 	{
 		var charArray = propertiesGetCharArray(p);
 		var charArraySize = charArray.size();
 		parseIndex = 0;
 		
-		var v = parseHexOrNumber(charArray, charArraySize);
-		return getColorArray(v);
+		var v;
+	
+		if (charArraySize==0)
+		{
+			v = minV;		// if string empty then return -1 (not set)
+		}
+		else if (charArraySize<6)
+		{
+			v = getMinMax(parseNumber(charArray, charArraySize), minV, 63);
+		}
+		else
+		{
+			v = 0;
+	    	for (; parseIndex<charArraySize; parseIndex++)
+	    	{
+	    		var c = charArray[parseIndex].toUpper().toNumber();
+	    		if (c>=48/*APPCHAR_0*/ && c<=57/*APPCHAR_9*/)
+	    		{
+	    			v = v*16 + (c-48/*APPCHAR_0*/); 
+	    		}
+	    		else if (c>=65/*APPCHAR_A*/ && c<=70/*APPCHAR_F*/)
+	    		{
+	    			v = v*16 + (c-65/*APPCHAR_A*/+10); 
+	    		}
+	    		else
+	    		{
+	    			break;
+	    		}
+	    	}
+
+			v = colorHexToIndex(v);
+		}
+				
+		return v;
+	}
+
+	(:m1normal)
+	function propertiesSetColor(p, v)
+	{
+		applicationProperties.setValue(p, v);
+	}
+
+	(:m1plus)
+	function propertiesSetColor(p, v)
+	{
+		applicationProperties.setValue(p, (v>=0) ? v.toString() : "");
+	}
+
+	(:m1normal)
+	function propertiesGetNumberForField(i)
+	{
+		return propertiesGetNumber("F" + i);	// All of the field properties are numbers
+	}
+
+	(:m1plus)
+	function propertiesGetNumberForField(i)
+	{
+		var v;
+
+		if (i>=3/*FIELD_INDEX_ELEMENTS*/ && (i-3)%3==2)		// 0==display, 1==visible if, 2==color
+		{
+			v = propertiesGetColorIndex("F" + i, 0);		// Colors come from strings
+		}
+		else
+		{
+			v = propertiesGetNumber("F" + i);		// Other field properties are numbers
+		}
+
+		return v;
+	}
+
+	(:m1normal)
+	function propertiesSetNumberForField(i, v)
+	{
+		applicationProperties.setValue("F" + i, v);
+	}
+
+	(:m1plus)
+	function propertiesSetNumberForField(i, v)
+	{
+		if (i>=3/*FIELD_INDEX_ELEMENTS*/ && (i-3)%3==2)		// 0==display, 1==visible if, 2==color
+		{
+			v = v.toString();		// Color settings are strings
+		}
+
+		applicationProperties.setValue("F" + i, v);
+	}
+
+	(:m1normal)
+	function propertiesGetValueForProfile(i)
+	{
+		return applicationProperties.getValue("" + i);
+	}
+
+	(:m1plus)
+	function propertiesGetValueForProfile(i)
+	{
+		// "1" background color - min==0
+		// "5" time hour color - min==0
+		// "7" time minute color - min==0
+		// "13" second color - min==0
+		// "14" second color 5 - min==-1
+		// "15" second color 10 - min==-1
+		// "16" second color 15 - min==-1
+		// "17" second color 0 - min==-1
+		// "22" outer color filled - min==-1
+		// "23" outer color unfilled - min==-1
+		// "28" move bar off color - min==-1
+		// "36" colon separator - min==-1
+		if ((((0x1l<<1) | (0x1l<<5) | (0x1l<<7) | (0x1l<<13) | (0x1l<<14) | (0x1l<<15) | (0x1l<<16) | (0x1l<<17) | (0x1l<<22) | (0x1l<<23) | (0x1l<<28) | (0x1l<<36)) & (0x1l<<i)) != 0)
+		{
+			return propertiesGetColorIndex("" + i, (i<=13) ? 0 : -1);
+		}
+		else
+		{
+			return applicationProperties.getValue("" + i);
+		}
+	}
+
+	(:m1normal)
+	function propertiesSetValueForProfile(i, v)
+	{
+		applicationProperties.setValue("" + i, v);
+	}
+
+	(:m1plus)
+	function propertiesSetValueForProfile(i, v)
+	{
+		// "1" background color
+		// "5" time hour color
+		// "7" time minute color
+		// "13" second color
+		// "14" second color 5
+		// "15" second color 10
+		// "16" second color 15
+		// "17" second color 0
+		// "22" outer color filled
+		// "23" outer color unfilled
+		// "28" move bar off color
+		// "36" colon separator
+		if ((((0x1l<<1) | (0x1l<<5) | (0x1l<<7) | (0x1l<<13) | (0x1l<<14) | (0x1l<<15) | (0x1l<<16) | (0x1l<<17) | (0x1l<<22) | (0x1l<<23) | (0x1l<<28) | (0x1l<<36)) & (0x1l<<i)) != 0)
+		{
+			v = ((v>=0) ? v.toString() : "");
+		}
+		
+		applicationProperties.setValue("" + i, v);
 	}
 
 	function addStringToCharArray(s, toArray, toLen, toMax)
@@ -1108,6 +1274,7 @@ class test1View extends WatchUi.WatchFace
 		hasLTE = (deviceSettings.connectionInfo[:lte]!=null);
 		hasElevationHistory = SensorHistory has :getElevationHistory;
 		hasPressureHistory = SensorHistory has :getPressureHistory;
+		hasHeartRateHistory = SensorHistory has :getHeartRateHistory;
 
 		// need to seed the random number generator?
 		//var clockTime = System.getClockTime();
@@ -1210,14 +1377,7 @@ class test1View extends WatchUi.WatchFace
 				else
 				{
 					var n = (i%FIELD_NUM_PROPERTIES);
-	    			if (n==0/*FIELD_INDEX_YOFFSET*/ || n==1/*FIELD_INDEX_XOFFSET*/)
-	    			{
-	    				propFieldData[i] = 120;
-	    			}
-	    			else
-	    			{
-						propFieldData[i] = 0;
-					}
+    				propFieldData[i] = ((n==0/*FIELD_INDEX_YOFFSET*/ || n==1/*FIELD_INDEX_XOFFSET*/) ? 120 : 0);
 				}
 			}
 			
@@ -1716,7 +1876,7 @@ class test1View extends WatchUi.WatchFace
 			else if (profileManagement == 7)		// copy profile to watch settings
 			{
 				loadProfile(profileNumber);			// will set profileActive
-				saveProfile(PROFILE_PRIVATE_INDEX);	// will set profileActive = PROFILE_PRIVATE_INDEX
+				saveProfile(PROFILE_PRIVATE_INDEX);	// will set profileActive==PROFILE_PRIVATE_INDEX
 				//setProfileDelay = true;
 			}
 			else if (profileManagement == 4)
@@ -1749,20 +1909,17 @@ class test1View extends WatchUi.WatchFace
 		}
 		else	// making changes to watch settings
 		{
-			var fManagement = propertiesGetNumber("FM");
-		
-			getOrSetPropFieldDataProperties();
-	
 			// if user is retrieving field settings, or turning on/off demo profiles, then don't accept any settings changes
 			// - instead load the currently active profile to override any changes
-			if (fManagement==ITEM_RETRIEVE || demoProfilesOn!=demoProfilesOnPrev)
+			if (propertiesGetNumber("FM")==ITEM_RETRIEVE || demoProfilesOn!=demoProfilesOnPrev)
 			{
 				loadProfile(profileActive);			// sets field management property to retrieve
+				getOrSetPropFieldDataProperties();
 			}
 			else
 			{
-				// do this after getOrSetPropFieldDataProperties
-				saveProfile(PROFILE_PRIVATE_INDEX);		// will set profileActive = PROFILE_PRIVATE_INDEX
+				getOrSetPropFieldDataProperties();
+				saveProfile(PROFILE_PRIVATE_INDEX);		// do this after getOrSetPropFieldDataProperties - will set profileActive==PROFILE_PRIVATE_INDEX
 			}
 		}
 		
@@ -1862,6 +2019,7 @@ class test1View extends WatchUi.WatchFace
     		for (var i=0; i<FIELD_NUM_PROPERTIES; i++)
     		{
     			var v = propFieldData[fIndex + i].toNumber();
+    			
     			if (i==0/*FIELD_INDEX_YOFFSET*/)
     			{
     				v = 120 - v;
@@ -1877,7 +2035,8 @@ class test1View extends WatchUi.WatchFace
 
     				v = (v/FIELD_MANAGEMENT_MODULO);
     			}
-				applicationProperties.setValue("F" + i, v);
+    			
+    			propertiesSetNumberForField(i, v);
     		}
     	}
     	else
@@ -1889,22 +2048,22 @@ class test1View extends WatchUi.WatchFace
 	    		// store all current field properties to memory
 	    		for (var i=0; i<FIELD_NUM_PROPERTIES; i++)
 	    		{
-					var v = propertiesGetNumber("F" + i);	// All of the field properties are numbers
+					var v = propertiesGetNumberForField(i);		// All of the field properties are numbers
 
-	    			if (i==0/*FIELD_INDEX_YOFFSET*/)
-	    			{
-	    				v = 120 - v;
-	    			}
-	    			else if (i==1/*FIELD_INDEX_XOFFSET*/)
-	    			{
-	    				v += 120;
-	    			}
-	    			else if (i==2/*FIELD_INDEX_JUSTIFICATION*/)
-	    			{
-	    				v = (fManagement%FIELD_MANAGEMENT_MODULO) + (v*FIELD_MANAGEMENT_MODULO);
-	    			}
-
-					propFieldData[fIndex + i] = getMinMax(v, 0, 255);
+					if (i==0/*FIELD_INDEX_YOFFSET*/)
+					{
+						v = 120 - v;
+					}
+					else if (i==1/*FIELD_INDEX_XOFFSET*/)
+					{
+						v += 120;
+					}
+					else if (i==2/*FIELD_INDEX_JUSTIFICATION*/)
+					{
+						v = (fManagement%FIELD_MANAGEMENT_MODULO) + (v*FIELD_MANAGEMENT_MODULO);
+					}
+					
+					propFieldData[fIndex + i] = getMinMax(v, 0, 255);	// 0 to 255 for byte array
 	    		}
 
 				// store the current field data to storage - used only when watchface next loaded
@@ -1918,7 +2077,7 @@ class test1View extends WatchUi.WatchFace
     // Get values for all our settings
     function getGlobalProperties()
     {
-		propBackgroundColor = propertiesGetColor("1");
+		propBackgroundColor = propertiesGetColor("1", 0);
 
     	propTimeOn = propertiesGetNumber("2");
    		propTimeHourFont = propertiesGetNumber("4");
@@ -1926,14 +2085,14 @@ class test1View extends WatchUi.WatchFace
 	 	{
 	 		propTimeHourFont = 3/*APPFONT_REGULAR*/;
 	 	}
-		propTimeHourColor = propertiesGetColor("5");
+		propTimeHourColor = propertiesGetColor("5", 0);
    		propTimeMinuteFont = propertiesGetNumber("6");
 		if (propTimeMinuteFont<0 || propTimeMinuteFont>=33/*APPFONT_NUMBER_OF_FONTS*/)
 		{
 	 		propTimeMinuteFont = 3/*APPFONT_REGULAR*/;
 		}
-		propTimeMinuteColor = propertiesGetColor("7");
-		propTimeColon = propertiesGetColor("36");
+		propTimeMinuteColor = propertiesGetColor("7", 0);
+		propTimeColon = propertiesGetColor("36", -1);
     	propTimeItalic = (propertiesGetBoolean("8") && (propTimeHourFont<=5/*APPFONT_HEAVY*/) && (propTimeMinuteFont<=5/*APPFONT_HEAVY*/));
 		propTimeYOffset = propertiesGetNumber("9");
     	
@@ -1950,11 +2109,11 @@ class test1View extends WatchUi.WatchFace
 		if ((propSecondIndicatorOn&(ITEM_ON|ITEM_ONGLANCE))!=0)
 		{
 			// calculate the seconds color array
-	    	var secondColor = propertiesGetColor("13");		// second color
-	    	var secondColor5 = propertiesGetColor("14");
-	    	var secondColor10 = propertiesGetColor("15");
-	    	var secondColor15 = propertiesGetColor("16");
-	    	var secondColor0 = propertiesGetColor("17");
+	    	var secondColor = propertiesGetColor("13", 0);		// second color
+	    	var secondColor5 = propertiesGetColor("14", -1);
+	    	var secondColor10 = propertiesGetColor("15", -1);
+	    	var secondColor15 = propertiesGetColor("16", -1);
+	    	var secondColor0 = propertiesGetColor("17", -1);
 	    	var secondColorDemo = propertiesGetBoolean("18");		// second color demo
 	    	for (var i=0; i<60; i++)
 	    	{
@@ -1999,8 +2158,10 @@ class test1View extends WatchUi.WatchFace
     	propFieldFontUnsupported = propertiesGetNumber("27");
 		
 		propOuterOn = propertiesGetNumber("20");		// outer ring on
-		propOuterColorFilled = propertiesGetColor("22");
-		propOuterColorUnfilled = propertiesGetColor("23");
+		propOuterColorFilled = propertiesGetColor("22", -1);
+		propOuterColorUnfilled = propertiesGetColor("23", -1);
+
+		propMoveBarOffColor = propertiesGetColor("28", -1);
 
 		propDemoDisplayOn = propertiesGetBoolean("34");
 	}
@@ -2130,6 +2291,29 @@ class test1View extends WatchUi.WatchFace
 		fontFieldUnsupportedResource = ((propFieldFontUnsupported>=24/*APPFONT_SYSTEM_XTINY*/ && propFieldFontUnsupported<=28/*APPFONT_SYSTEM_LARGE*/) ? fontSystem[propFieldFontUnsupported-24/*APPFONT_SYSTEM_XTINY*/] : fontSystem[25/*APPFONT_SYSTEM_TINY*/-24/*APPFONT_SYSTEM_XTINY*/]); 
     }
     
+    function formatHourForDisplayString(h, is24Hour, addLeadingZero)
+    {
+        // 12 or 24 hour, and check for adding a leading zero
+        return (is24Hour ? h : (((h+11)%12) + 1)).format(addLeadingZero ? "%02d" : "%d"); 
+    }
+    
+    function getVisibilityStatus(visibilityStatus, eVisible)
+    {
+    	if (visibilityStatus[eVisible]==null)
+    	{
+	    	if (eVisible==21/*STATUS_SUNEVENT_RISE*/ || eVisible==22/*STATUS_SUNEVENT_SET*/)
+	    	{
+    			calculateSun();
+				if (sunTimes[7]!=null)
+				{
+    				visibilityStatus[eVisible] = ((eVisible==21/*STATUS_SUNEVENT_RISE*/) ? sunTimes[7] : !sunTimes[7]);
+    			}
+	    	}
+    	}
+    	
+    	return (visibilityStatus[eVisible]!=null && visibilityStatus[eVisible]);
+    }
+    
     //function printMem(s)
     //{
     //	var stats = System.getSystemStats();
@@ -2238,8 +2422,16 @@ class test1View extends WatchUi.WatchFace
 		var dateInfoShort = gregorian.info(timeNow, Time.FORMAT_SHORT);
 		var dateInfoMedium = gregorian.info(timeNow, Time.FORMAT_MEDIUM);
 		var dayNumberOfWeek = (((dateInfoShort.day_of_week - firstDayOfWeek + 7) % 7) + 1);		// 1-7
+		
+		var hour2nd = (hour - clockTime.timeZoneOffset/3600 + propertiesGetNumber("37") + 24)%24;		// 2nd time zone
 
-		//calculateSun(dateInfoShort.day_of_week);
+		sampleHeartRate(second);	// sample the heart rate every time
+
+		// check for position every onUpdate - this is so we can get and store a position from the latest activity
+		// (even if that position isn't currently being used by anything)
+		calculatePosition();
+
+		//calculateSun();
 
 		//System.println("hour=" + gregorian.info(timeNow, Time.FORMAT_SHORT).hour + " utc=" + gregorian.utcInfo(timeNow, Time.FORMAT_SHORT).hour);
 		// does not change with time simulation in simulator:
@@ -2247,9 +2439,8 @@ class test1View extends WatchUi.WatchFace
         
         // Get the current time and format it correctly
         var addLeadingZero = propertiesGetBoolean("3");
-        var hourDisplay = (deviceSettings.is24Hour ? hour : (((hour+11)%12) + 1));			// 12 or 24 hour
+    	var hourString = formatHourForDisplayString(hour, deviceSettings.is24Hour, addLeadingZero);
         var minuteString = minute.format("%02d");
-        var hourString = hourDisplay.format(addLeadingZero ? "%02d" : "%d");		// check for adding a leading zero
 
 		// calculate main time display
 		if ((propTimeOn & onOrGlanceActive)!=0 && !propDemoDisplayOn)
@@ -2309,7 +2500,7 @@ class test1View extends WatchUi.WatchFace
 		}
 
 		// calculate fields to display
-		var visibilityStatus = new[19/*STATUS_NUM*/];
+		var visibilityStatus = new[23/*STATUS_NUM*/];
 		visibilityStatus[0/*STATUS_ALWAYSON*/] = true;
 	    visibilityStatus[1/*STATUS_DONOTDISTURB_ON*/] = (hasDoNotDisturb && deviceSettings.doNotDisturb);
 	    visibilityStatus[2/*STATUS_DONOTDISTURB_OFF*/] = (hasDoNotDisturb && !deviceSettings.doNotDisturb);
@@ -2341,6 +2532,10 @@ class test1View extends WatchUi.WatchFace
 	    visibilityStatus[16/*STATUS_MOVEBARALERT_NOT*/] = (activityTrackingOn && !moveBarAlertTriggered);
 	    visibilityStatus[17/*STATUS_AM*/] = (hour < 12);
 	    visibilityStatus[18/*STATUS_PM*/] = (hour >= 12);
+	    visibilityStatus[19/*STATUS_2ND_AM*/] = (hour2nd < 12);
+	    visibilityStatus[20/*STATUS_2ND_PM*/] = (hour2nd >= 12);
+	    visibilityStatus[21/*STATUS_SUNEVENT_RISE*/] = null;	// calculated on demand
+	    visibilityStatus[22/*STATUS_SUNEVENT_SET*/] = null;		// calculated on demand
 
 		fieldActivePhoneStatus = null;
 		fieldActiveNotificationsStatus = null;
@@ -2364,88 +2559,6 @@ class test1View extends WatchUi.WatchFace
 
 				var moveBarNum = 0;
 
-//				if (forceFieldTest)
-//				{
-//					if (f==1)
-//					{
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 0] = 82/*FIELD_SUNRISE_HOUR*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 1] = 0/*STATUS_ALWAYSON*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 2] = 3;
-////
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 3] = 83/*FIELD_SUNRISE_MINUTE*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 4] = 0/*STATUS_ALWAYSON*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 5] = 3;
-////
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 6] = 21/*FIELD_SEPARATOR_SPACE*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 7] = 0/*STATUS_ALWAYSON*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 8] = 3;
-////
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 9] = 84/*FIELD_SUNSET_HOUR*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 10] = 0/*STATUS_ALWAYSON*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 11] = 3;
-////
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 12] = 85/*FIELD_SUNSET_MINUTE*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 13] = 0/*STATUS_ALWAYSON*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 14] = 3;
-//
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 0] = 86/*FIELD_SUNEVENT_HOUR*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 1] = 0/*STATUS_ALWAYSON*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 2] = 3;
-////
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 3] = 87/*FIELD_SUNEVENT_MINUTE*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 4] = 0/*STATUS_ALWAYSON*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 5] = 3;
-//
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 0] = 89/*FIELD_CALORIES*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 1] = 0/*STATUS_ALWAYSON*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 2] = 3;
-////
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 3] = 21/*FIELD_SEPARATOR_SPACE*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 4] = 0/*STATUS_ALWAYSON*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 5] = 3;
-////
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 6] = 91/*FIELD_INTENSITY*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 7] = 0/*STATUS_ALWAYSON*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 8] = 3;
-//
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 0] = 92/*FIELD_INTENSITY_GOAL*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 1] = 0/*STATUS_ALWAYSON*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 2] = 3;
-////
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 3] = 21/*FIELD_SEPARATOR_SPACE*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 4] = 0/*STATUS_ALWAYSON*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 5] = 3;
-////
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 6] = 93/*FIELD_SMART_GOAL*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 7] = 0/*STATUS_ALWAYSON*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 8] = 3;
-//
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 0] = 94/*FIELD_DISTANCE*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 1] = 0/*STATUS_ALWAYSON*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 2] = 3;
-////
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 3] = 95/*FIELD_DISTANCE_UNITS*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 4] = 0/*STATUS_ALWAYSON*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 5] = 3;
-//
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 0] = 96/*FIELD_PRESSURE*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 1] = 0/*STATUS_ALWAYSON*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 2] = 3;
-////
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 3] = 97/*FIELD_PRESSURE_UNITS*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 4] = 0/*STATUS_ALWAYSON*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 5] = 3;
-//
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 0] = 98/*FIELD_ALTITUDE*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 1] = 0/*STATUS_ALWAYSON*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 2] = 3;
-////
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 3] = 99/*FIELD_ALTITUDE_UNITS*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 4] = 0/*STATUS_ALWAYSON*/;
-////						propFieldData[dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + 5] = 3;
-//					}
-//				}
-				
 				for (var i=0; i<FIELD_NUM_ELEMENTS; i++)
 				{
 					var elementStart = dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + i*3;
@@ -2453,7 +2566,7 @@ class test1View extends WatchUi.WatchFace
 					var eVisible = propFieldData[elementStart + 1];
 
 					// don't need to test >=0 as it's a byte array
-					if (eDisplay!=0/*FIELD_EMPTY*/ && /*eVisible>=0 &&*/ eVisible<19/*STATUS_NUM*/)
+					if (eDisplay!=0/*FIELD_EMPTY*/ && /*eVisible>=0 &&*/ eVisible<23/*STATUS_NUM*/)
 					{
 						if (eVisible==5/*STATUS_NOTIFICATIONS_PENDING*/ || eVisible==6/*STATUS_NOTIFICATIONS_NONE*/)
 						{
@@ -2468,7 +2581,7 @@ class test1View extends WatchUi.WatchFace
 							fieldActiveLTEStatus = lteState;
 						} 
 
- 						if (visibilityStatus[eVisible])		// only test this after calculating the fieldActiveXXXStatus flags
+ 						if (getVisibilityStatus(visibilityStatus, eVisible))		// only test this after calculating the fieldActiveXXXStatus flags
 						{ 
 							var eColor = getColorArray(propFieldData[elementStart + 2]);
 
@@ -2699,7 +2812,7 @@ class test1View extends WatchUi.WatchFace
 											var jDisplay = propFieldData[jStart];
 											var jVisible = propFieldData[jStart + 1];
 											// don't need to test >=0 as it's a byte array
-											if (jDisplay!=0/*FIELD_EMPTY*/ && /*jVisible>=0 &&*/ jVisible<19/*STATUS_NUM*/ && visibilityStatus[jVisible])
+											if (jDisplay!=0/*FIELD_EMPTY*/ && /*jVisible>=0 &&*/ jVisible<23/*STATUS_NUM*/ && getVisibilityStatus(visibilityStatus, jVisible))
 											{
 												if (jDisplay==37/*FIELD_MOVEBAR*/)
 												{
@@ -2725,11 +2838,7 @@ class test1View extends WatchUi.WatchFace
 											numToAdd = 1;
 										}
 										
-				    					var offColor = propertiesGetColor("28");
-				    					if (offColor==COLOR_NOTSET)
-				    					{
-				    						offColor = eColor;
-				    					}
+				    					var offColor = ((propMoveBarOffColor==COLOR_NOTSET) ? eColor : propMoveBarOffColor);
 										
 										for (var j=0; j<numToAdd; j++)
 										{
@@ -2749,6 +2858,35 @@ class test1View extends WatchUi.WatchFace
 										break;
 									}
 									
+									case 78/*FIELD_HEART_MIN*/:
+									{
+										calculateHeartRate(timeNow);
+										eStr = (heartMin!=null) ? heartMin.format("%d") : "--";
+										break;
+									}
+									
+									case 79/*FIELD_HEART_MAX*/:
+									{
+										calculateHeartRate(timeNow);
+										eStr = (heartMax!=null) ? heartMax.format("%d") : "--";
+										break;
+									}
+									
+									case 80/*FIELD_HEART_AVERAGE*/:
+									{
+										calculateHeartRate(timeNow);
+										eStr = (heartAverage!=null) ? heartAverage.format("%d") : "--";
+										break;
+									}
+									
+									case 81/*FIELD_HEART_CHART*/:
+									{
+										calculateHeartRate(timeNow);
+										//eStr = (255).toChar().toString();
+								    	//eIsIcon = true;
+										break;
+									}
+
 									case 82/*FIELD_SUNRISE_HOUR*/:
 									case 83/*FIELD_SUNRISE_MINUTE*/:
 									case 84/*FIELD_SUNSET_HOUR*/:
@@ -2756,27 +2894,12 @@ class test1View extends WatchUi.WatchFace
 									case 86/*FIELD_SUNEVENT_HOUR*/:
 									case 87/*FIELD_SUNEVENT_MINUTE*/:
 									{
-										calculateSun(dateInfoShort.day_of_week);
+										calculateSun();
 
 										var t = null;
 										if (eDisplay>=86/*FIELD_SUNEVENT_HOUR*/)	// next sun event?
 										{
-											var tNow = hour*60 + minute;
-											if (sunTimes[0]!=null && tNow<sunTimes[0])	// before sunrise?
-											{
-												t = sunTimes[0];
-											}
-											else if (sunTimes[1]!=null)		// sunset occurs today
-											{
-												if (tNow<sunTimes[1])		// before sunset?
-												{
-													t = sunTimes[1];
-												}
-												else if (sunTimes[3]!=null && tNow<sunTimes[3])		// before sunrise tomorrow?
-												{
-													t = sunTimes[3];
-												}
-											}
+											t = sunTimes[6];	// null or time of next sun event
 										}
 										else
 										{
@@ -2793,12 +2916,7 @@ class test1View extends WatchUi.WatchFace
 											}
 											else
 											{
-												var h = (t/60)%24;					// hours
-		        								if (!deviceSettings.is24Hour)
-		        								{
-		        									h = ((h+11)%12) + 1;			// 12 or 24 hour
-		        								}
-		        								eStr = h.format(addLeadingZero ? "%02d" : "%d");		// check for adding a leading zero
+    											eStr = formatHourForDisplayString((t/60)%24, deviceSettings.is24Hour, addLeadingZero);	// hours
 											}
 	        							}
 	        							else
@@ -2811,6 +2929,7 @@ class test1View extends WatchUi.WatchFace
 
 									case 88/*FIELD_2ND_HOUR*/:
 									{
+										eStr = formatHourForDisplayString(hour2nd, deviceSettings.is24Hour, addLeadingZero);	// hours
 										break;
 									}
 
@@ -2860,13 +2979,16 @@ class test1View extends WatchUi.WatchFace
 
 									case 96/*FIELD_PRESSURE*/:
 									{
-										eStr = "---";
 										if (hasPressureHistory)
 										{
 											var pressureSample = SensorHistory.getPressureHistory({:period => 1}).next();
 											if (pressureSample!=null && pressureSample.data!=null)
 											{ 
 												eStr = (pressureSample.data / 100.0).format("%.1f");	// convert Pa to mbar
+											}
+											else
+											{
+												eStr = "---";
 											}
 										}
 										break;
@@ -2881,7 +3003,6 @@ class test1View extends WatchUi.WatchFace
 
 									case 98/*FIELD_ALTITUDE*/:
 									{
-										calculatePosition();
 										// convert m to feet or m
 										eStr = ((deviceSettings.distanceUnits==System.UNIT_STATUTE) ? (positionAltitude*3.2808399) : positionAltitude).format("%d");
 										break;
@@ -3405,15 +3526,62 @@ class test1View extends WatchUi.WatchFace
 // only 6000ms for 1xsetColor + 60xdrawRectangle
 // 6000ms for drawLine
 // 6000ms for drawPoint
-//		{
-//			useDc.setColor(graphics.COLOR_RED, graphics.COLOR_TRANSPARENT);
-//			for (var i=0; i<60; i++)
+		{
+			useDc.setColor(graphics.COLOR_RED, graphics.COLOR_TRANSPARENT);
+//			for (var i=0; i<chartNumSamples; i++)
 //			{
-//				//useDc.drawRectangle(i, 0, 1, 30);
-//				//useDc.drawLine(i, 0, i, 30);
-//				//useDc.drawPoint(i, i/2);
+//				if (chartSamples[i]<255)
+//				{
+//					var h = (chartSamples[i]+4)/8;
+//					useDc.drawRectangle(50+i, 150-h, 1, h);
+//					//useDc.drawLine(i, 0, i, 30);
+//					//useDc.drawPoint(i, i/2);
+//				}
 //			}
-//		}
+
+			var x = 0;
+			var n = 0;
+			var h = 0;
+			//var w = 3;
+			var w = 4;	// => this is 15 bins of 4 bytes each? for variable time range. Save these bins to storage when exit watchface?
+			//var w = 5;
+			for (var i=0; i<chartNumSamples; i++)
+			{
+				if (chartSamples[i]<255)
+				{
+					h += (chartSamples[i]+5)/10;
+					n++;
+
+					if (n==w)
+					{
+						h/=w;		
+						useDc.fillRectangle(100+x - dcX, 220-h - dcY, w-1, h);
+						//useDc.drawPoint(100+x - dcX, 220-h - dcY);
+
+						x+=w;
+						n = 0;
+						h = 0;
+					}
+										
+//					if (n==1)
+//					{					
+//						useDc.fillRectangle(100+x - dcX, 220-h - dcY, 2, h);
+//						//useDc.drawPoint(100+x - dcX, 220-h - dcY);
+//
+//						x++;
+//						n = 0;
+//						h = 0;
+//					}
+										
+					//useDc.drawLine(i, 0, i, 30);
+				}
+			}
+
+			useDc.setColor(graphics.COLOR_WHITE, graphics.COLOR_TRANSPARENT);
+			useDc.fillRectangle(100-2 - dcX, 220-20 - dcY, 1, 20);
+			useDc.fillRectangle(100+x - dcX, 220-20 - dcY, 1, 20);
+			useDc.fillRectangle(100-2 - dcX, 220 - dcY, x+3, 1);
+		}
 	}
 
 //	<!-- seconds buffer values (bufferSeconds, bufferPosX, bufferPosY) -->
@@ -3529,6 +3697,12 @@ class test1View extends WatchUi.WatchFace
     // Handle the partial update event - not called during high power mode (glance active)
     function onPartialUpdate(dc)
     {
+    	var clockTime = System.getClockTime();
+    	var minute = clockTime.min;
+    	var second = clockTime.sec;
+
+    	sampleHeartRate(second);
+    
     	// check for some status icons changing dynamically
     	{
  			var deviceSettings = System.getDeviceSettings();	// 960 bytes, but uses less code memory
@@ -3547,10 +3721,6 @@ class test1View extends WatchUi.WatchFace
     
 		if ((propSecondIndicatorOn&ITEM_ON)!=0)
 		{ 
-        	var clockTime = System.getClockTime();
-        	var minute = clockTime.min;
-        	var second = clockTime.sec;
-
 	 		// it seems as though occasionally onPartialUpdate can skip a second
 	 		// so check whether that has happened, and within the same minute since last full update
 	 		// - but only for certain refresh styles
@@ -3793,7 +3963,7 @@ class test1View extends WatchUi.WatchFace
 					// see if the start or end time uses sunrise/sunset					
 					if ((t1&(PROFILE_START_SUNRISE|PROFILE_START_SUNSET|PROFILE_END_SUNRISE|PROFILE_END_SUNSET))!=0)
 					{
-						calculateSun(dateInfoShort.day_of_week);
+						calculateSun();
 						
 						startTime = getProfileSunTime(startTime, t1, 0);
 						endTime = getProfileSunTime(endTime, t1, 2);
@@ -3936,42 +4106,6 @@ class test1View extends WatchUi.WatchFace
 	
 	var parseIndex;
 	
-	(:m1plus)
-	function parseHexOrNumber(charArray, charArraySize)
-	{
-		var v = -1;		// if string empty then return -1 (not set)
-	
-		if (charArraySize>0)
-		{
-			if (charArraySize<6)
-			{
-				v = parseNumber(charArray, charArraySize);
-			}
-			else
-			{
-				v = 0;
-		    	for (; parseIndex<charArraySize; parseIndex++)
-		    	{
-		    		var c = charArray[parseIndex].toUpper().toNumber();
-		    		if (c>=48/*APPCHAR_0*/ && c<=57/*APPCHAR_9*/)
-		    		{
-		    			v = v*16 + (c-48/*APPCHAR_0*/); 
-		    		}
-		    		else if (c>=65/*APPCHAR_A*/ && c<=70/*APPCHAR_F*/)
-		    		{
-		    			v = v*16 + 10 + (c-65/*APPCHAR_A*/); 
-		    		}
-		    		else
-		    		{
-		    			break;
-		    		}
-		    	}
-			}
-		}
-				
-		return v;
-	}
-
    	// find next comma or end of array
 	function parseToComma(charArray, charArraySize)
 	{	
@@ -4115,7 +4249,7 @@ class test1View extends WatchUi.WatchFace
 			var pArray = new[PROFILE_NUM_PROPERTIES];
 			for (var i=0; i<PROFILE_NUM_PROPERTIES; i++)
 			{
-				pArray[i] = applicationProperties.getValue("" + i);	// these values are only copied from & to properties, never used directly
+				pArray[i] = propertiesGetValueForProfile(i);	// these values are only copied from & to properties, never used directly
 			}
 			storage.setValue("P" + profileIndex, pArray);
 			pArray = null;
@@ -4177,7 +4311,7 @@ class test1View extends WatchUi.WatchFace
 			{
 				if (propertiesOrFields)
 				{
-					applicationProperties.setValue("" + i, pArray[i]);
+					propertiesSetValueForProfile(i, pArray[i]);
 				}
 				else
 				{
@@ -4189,7 +4323,7 @@ class test1View extends WatchUi.WatchFace
 			// special code to turn off colon separator for older (shorter) profiles
 			if (propertiesOrFields && size==36/*PROFILE_PROPERTY_COLON*/)
 			{
-				applicationProperties.setValue("36", -1);
+				propertiesSetColor("36", -1);
 			}
 		}
 	}
@@ -4347,14 +4481,15 @@ class test1View extends WatchUi.WatchFace
 			{
 				pArray[pNum] = parseStringComma(charArray, charArraySize);
 			}
-			else if (pNum==3 ||	// "3" time military
-					pNum==8 || 	// "8" time italic font
-					pNum==18 || 	// "18" seconds color demo
-					pNum==19 || 	// "19" seconds move in a bit
-					pNum==32 || 	// "32" demo font styles
-					pNum==33 || 	// "33" demo second styles
-					pNum==34)		// "34" demo display
+			else if ((((0x1l<<3) | (0x1l<<8) | (0x1l<<18) | (0x1l<<19) | (0x1l<<32) | (0x1l<<33) | (0x1l<<34)) & (0x1l<<pNum)) != 0)
 			{
+				// "3" time military
+				// "8" time italic font
+				// "18" seconds color demo
+				// "19" seconds move in a bit
+				// "32" demo font styles
+				// "33" demo second styles
+				// "34" demo display
 				pArray[pNum] = parseBooleanComma(charArray, charArraySize);
 			}
 			else
@@ -4566,7 +4701,97 @@ class test1View extends WatchUi.WatchFace
 			CalendarYear = year;
 		}
 	}
+
+	var heartSamples = new[60]b;
+	var heartNumSamples = 0;
+	var heartMin;
+	var heartMax;
+	var heartAverage;
+	var heartCalculated = -1;
+	var chartSamples = new[60]b;
+	var chartNumSamples = 0;
+		
+	function sampleHeartRate(second)
+	{
+		var info = Activity.getActivityInfo();
+		if (info!=null && info.currentHeartRate!=null && heartNumSamples<60)
+		{
+			for (var i=heartNumSamples; i<second; i++)
+			{
+				heartSamples[i] = 255;	// means unset
+			}
+		
+			heartSamples[second] = getMinMax(info.currentHeartRate, 0, 254);
+			heartNumSamples = second + 1;
+		}
+	}
 	
+	function calculateHeartRate(timeNow)
+	{
+		var timeNowValue = timeNow.value();
+		if (heartCalculated != timeNowValue)
+		{
+			heartCalculated = timeNowValue;
+
+			heartMin = null;
+			heartMax = null;
+			heartAverage = null;
+	
+			if (heartNumSamples > 0)
+			{
+				var sum = 0;
+				var n = 0;
+				
+				chartNumSamples = heartNumSamples;
+
+				for (var i=0; i<heartNumSamples; i++)
+				{
+					var r = heartSamples[i];
+
+					chartSamples[i] = r;
+
+					if (r<255)
+					{
+						if (heartMin==null || r<heartMin)
+						{
+							heartMin = r;
+						}
+						
+						if (heartMax==null || r>heartMax)
+						{
+							heartMax = r;
+						}
+						
+						sum += r;
+						n++;
+					}
+				}
+	
+				heartAverage = (sum + n/2)/n;
+				
+				heartNumSamples = 0;
+			}
+			else
+			{
+				chartNumSamples = 0;
+			
+				if (hasHeartRateHistory)
+				{
+					var heartSample = SensorHistory.getHeartRateHistory({:period => 1}).next();
+					if (heartSample!=null && heartSample.data!=null)
+					{
+						heartAverage = getMinMax(heartSample.data.toNumber(), 0, 254);
+						heartMin = heartAverage;
+						heartMax = heartAverage;
+
+						chartNumSamples = 1;
+						chartSamples[0] = heartAverage;
+					}
+				}
+			}
+		}
+	}
+
 	var positionGot = false;
 	var positionLatitude = 0.0d;
 	var positionLongitude = 0.0d;
@@ -4575,7 +4800,8 @@ class test1View extends WatchUi.WatchFace
 	// 350 code bytes
 	function calculatePosition()
 	{
-		// if not got a position yet - keep checking every frame
+		// ideas on when to call:
+		// if not got a position yet - keep checking every onUpdate
 		// if have a position and not using position - check every so often for new position
 		// if using position - check every update for latest value 
 		//
@@ -4620,13 +4846,15 @@ class test1View extends WatchUi.WatchFace
 
 	// 0==sunrise today, 1==sunset today, 2==sun rises at all today?
 	// 3==sunrise tomorrow, 4==sunset tomorrow, 5==sun rises at all tomorrow?
-	var sunTimes = new[6];		// hour*60 + minute
+	// 6==next sunevent, 7==next sunevent is rise?
+	var sunTimes = new[8];		// hour*60 + minute
 
 	// 1600 code bytes
-	function calculateSun(nowDayOfWeek)
+	function calculateSun()
 	{
-		calculatePosition();
-		
+		var dateInfoShort = Time.Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+		var timeTodayInMinutes = dateInfoShort.hour*60 + dateInfoShort.minute;
+
 		if (!positionGot)
 		{
 			return;
@@ -4700,8 +4928,32 @@ class test1View extends WatchUi.WatchFace
 		// gregorian.info displays this time as 00:00
 		// gregorian.utcInfo displays this time as 23:00 on previous date
 
+		var nowDayOfWeek = dateInfoShort.day_of_week;
 		calculateSunDay(0, nowDayOfWeek);		// today
 		calculateSunDay(1, nowDayOfWeek);		// tomorrow
+	
+		// calculate next sun event
+		sunTimes[6] = null;				// assume don't know time of next sun event
+		sunTimes[7] = !sunTimes[3];		// and if the sun rises today then next event is sunset (or if it doesn't rise then sunset)
+		
+		if (sunTimes[0]!=null && timeTodayInMinutes<sunTimes[0])	// before sunrise?
+		{
+			sunTimes[6] = sunTimes[0];
+			sunTimes[7] = true;			// sunrise
+		}
+		else if (sunTimes[1]!=null)		// sunset occurs today
+		{
+			if (timeTodayInMinutes<sunTimes[1])		// before sunset?
+			{
+				sunTimes[6] = sunTimes[1];
+				sunTimes[7] = false;	// sunset
+			}
+			else if (sunTimes[3]!=null && timeTodayInMinutes<sunTimes[3])		// before sunrise tomorrow?
+			{
+				sunTimes[6] = sunTimes[3];
+				sunTimes[7] = true;		// sunrise
+			}
+		}
 	}
 	
 	function calculateSunDay(dayOffset, nowDayOfWeek)

@@ -5,13 +5,14 @@
     
 	intensity minutes day
 	intensity goal (day = weekly/7)
-	metres climbed
-	metres descended
-	m
+	ascent
+	descent
+	ascent/descent units (m/ft)
 	
    steps percentage
    intensity percentage
    
+   ring distance? 10km or 6mi?
    ring 2nd time zone hours
    ring intensity minutes (weekly)
    ring smart intensity minutes
@@ -23,7 +24,6 @@
  <!--
  Feature from M1+
                 
-    <string id="Unused1">Active Calories</string>
 setting M1+    <string id="Unused1">BMR Calorie Value Override</string>
     
 ?    <string id="Unused1">Intensity Goal Reached (weekly goal)</string>
@@ -37,9 +37,7 @@ setting M1+    <string id="Unused1">BMR Calorie Value Override</string>
 
 setting    <string id="Unused1">Icon Font Size</string>
 
-
  -->
-<!-- 54 -->
 
     <string id="Unused1">X</string>
     <string id="Unused2">X</string>
@@ -63,13 +61,6 @@ setting    <string id="Unused1">Icon Font Size</string>
     <string id="Unused20">X</string>
     <string id="Unused21">X</string>
     <string id="Unused22">X</string>
-    <string id="Unused23">X</string>
-    <string id="Unused24">X</string>
-
-    <string id="Unused25">Heart Rate Minimum (last minute)</string>
-    <string id="Unused26">Heart Rate Maximum (last minute)</string>
-    <string id="Unused27">Heart Rate Average (last minute)</string>
-    <string id="Unused28">Heart Rate Chart (last minute)</string>
     
     <string id="Unused29">Heart Rate Increasing</string>
     <string id="Unused30">Heart Rate Decreasing</string>
@@ -77,15 +68,7 @@ setting    <string id="Unused1">Icon Font Size</string>
     <string id="Unused32">heart rate zone 2 or above</string>
     <string id="Unused33">heart rate zone 1 or below</string>
     
-    <string id="Unused34">Second Time Zone Is AM</string>
-    <string id="Unused35">Second Time Zone Is PM</string>
-    <string id="Unused36">Next Sun Event Is Rise</string>
-    <string id="Unused37">Next Sun Event Is Set</string>
-
 	<string id="Unused38">Sunrise/Sunset Altitude Adjustment</string>
-
-	<string id="Unused39">Second Time Zone Offset (+-hours from UTC)</string>
-    <string id="Unused40">Second Time Zone Hours</string>
 
     <string id="Unused41">Sunrise Icon</string>
     <string id="Unused42">Sunset Icon</string>
@@ -93,6 +76,7 @@ setting    <string id="Unused1">Icon Font Size</string>
     <string id="Unused44">Pressure Icon</string>
     <string id="Unused45">Moving Clock Icon</string>
     <string id="Unused46">Fire Icon</string>
+    <string id="Unused24">Lightning Icon</string>
     <string id="Unused47">Moon Icon</string>
     <string id="Unused48">Sun Icon</string>
     <string id="Unused49">Phone Icon (handset)</string>
@@ -103,28 +87,6 @@ setting    <string id="Unused1">Icon Font Size</string>
     <string id="Unused54">Arrow Up</string>
     <string id="Unused55">Arrow Down</string>
     <string id="Unused56">Clock Icon</string>
-
-    <string id="Unused57">Intensity Minutes (weekly)</string>
-    <string id="Unused58">Intensity Goal (weekly)</string>
-    <string id="Unused59">Smart Intensity Goal (increasing daily)</string>
-
-    <string id="Unused60">Calories</string>
-
-    <string id="Unused61">Air Pressure</string>
-    <string id="Unused62">mb</string>
-
-    <string id="Unused63">Altitude</string>
-    <string id="Unused64">Altitude Units (m/ft)</string>
-
-    <string id="Unused65">Distance</string>
-    <string id="Unused66">Distance Units (km/mi)</string>
-
-    <string id="Unused67">Sunrise Hours</string>
-    <string id="Unused68">Sunrise Minutes</string>
-    <string id="Unused69">Sunset Hours</string>
-    <string id="Unused70">Sunset Minutes</string>
-    <string id="Unused71">Next Sun Event Hours</string>
-    <string id="Unused72">Next Sun Event Minutes</string>
 
     <string id="AppName">M1+</string>
 <!-- 
@@ -166,6 +128,7 @@ setting    <string id="Unused1">Icon Font Size</string>
 	<string id="FieldMoveBarAlertTriggerLevelTitle">Status Move Bar Alert Trigger Level (1-5)</string>
     <string id="FieldBatteryHighPercentageTitle">Status Battery High Percentage</string>
     <string id="FieldBatteryLowPercentageTitle">Status Battery Low Percentage</string>
+	<string id="Field2ndOffsetTitle">Second Time Zone Offset (+-hours from UTC)</string>
 
     <string id="FieldManagementTitle">Field Management (turn off/on or retrieve the field settings below)</string>
     <string id="FieldNumberTitle">Field Number To Manage (1-8, each field has 6 elements below)</string>
@@ -200,6 +163,10 @@ setting    <string id="Unused1">Icon Font Size</string>
     <string id="FieldMoveBarAlertNot">Move Bar Alert Not Triggered</string>
     <string id="FieldAM">AM (morning)</string>
     <string id="FieldPM">PM (afternoon)</string>
+    <string id="Field2ndAM">Second Time Zone Is AM</string>
+    <string id="Field2ndPM">Second Time Zone Is PM</string>
+    <string id="FieldSunEventRise">Next Sun Event Is Rise</string>
+    <string id="FieldSunEventSet">Next Sun Event Is Set</string>
 
     <string id="DemoFontStylesTitle">Demo Font Styles (cycle through custom font styles)</string>
     <string id="DemoSecondStylesTitle">Demo Second Styles (cycle through second indicator styles)</string>
@@ -316,12 +283,34 @@ setting    <string id="Unused1">Icon Font Size</string>
     <string id="FieldYearISOWeekXXXX">Year (ISO week year XXXX)</string>
     <string id="FieldWeekCalendarXX">Week Number (calendar XX)</string>
     <string id="FieldYearCalendarWeekXXXX">Year (calendar week year XXXX)</string>
+    <string id="Field2ndHour">Second Time Zone Hours</string>
+    <string id="FieldSunriseHour">Sunrise Hours</string>
+    <string id="FieldSunriseMinute">Sunrise Minutes</string>
+    <string id="FieldSunsetHour">Sunset Hours</string>
+    <string id="FieldSunsetMinute">Sunset Minutes</string>
+    <string id="FieldSunEventHour">Next Sun Event Hours</string>
+    <string id="FieldSunEventMinute">Next Sun Event Minutes</string>
 
     <string id="FieldStepsGoal">Steps Goal</string>
     <string id="FieldFloors">Floors</string>
     <string id="FieldFloorsGoal">Floors Goal</string>
     <string id="FieldNotificationsCount">Notifications Count</string>
     <string id="FieldMoveBar">Move Bar</string>
+    <string id="FieldHeartMin">Heart Rate Minimum (last minute)</string>
+    <string id="FieldHeartMax">Heart Rate Maximum (last minute)</string>
+    <string id="FieldHeartAverage">Heart Rate Average (last minute)</string>
+    <string id="FieldHeartChart">Heart Rate Chart (last minute)</string>
+    <string id="FieldDistance">Distance</string>
+    <string id="FieldDistanceUnits">Distance Units (km/mi)</string>
+    <string id="FieldCalories">Calories</string>
+    <string id="FieldActiveCalories">Active Calories</string>
+    <string id="FieldIntensity">Intensity Minutes (weekly)</string>
+    <string id="FieldIntensityGoal">Intensity Goal (weekly)</string>
+    <string id="FieldSmartGoal">Smart Intensity Goal (increasing daily)</string>
+    <string id="FieldPressure">Air Pressure</string>
+    <string id="FieldPressureUnits">Air Pressure Units (mb)</string>
+    <string id="FieldAltitude">Altitude</string>
+    <string id="FieldAltitudeUnits">Altitude Units (m/ft)</string>
 
     <string id="OuterModeColor">Plain Color</string>
 

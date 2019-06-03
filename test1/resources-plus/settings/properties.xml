@@ -36,6 +36,7 @@
     <property id="29" type="number">1</property>			<!-- field move bar alert trigger level -->
     <property id="30" type="number">75</property>			<!-- field battery high percentage -->
     <property id="31" type="number">25</property>			<!-- field battery low percentage -->
+    <property id="37" type="number">0</property>			<!-- second time zone offset -->
 
     <property id="FM" type="number">1</property>			<!-- field management -->
     <property id="FN" type="number">1</property>			<!-- field number -->

@@ -60,7 +60,6 @@ setting    <string id="Unused1">Icon Font Size</string>
     <string id="Unused19">X</string>
     <string id="Unused20">X</string>
     <string id="Unused21">X</string>
-    <string id="Unused22">X</string>
     
     <string id="Unused29">Heart Rate Increasing</string>
     <string id="Unused30">Heart Rate Decreasing</string>
@@ -299,7 +298,8 @@ setting    <string id="Unused1">Icon Font Size</string>
     <string id="FieldHeartMin">Heart Rate Minimum (last minute)</string>
     <string id="FieldHeartMax">Heart Rate Maximum (last minute)</string>
     <string id="FieldHeartAverage">Heart Rate Average (last minute)</string>
-    <string id="FieldHeartChart">Heart Rate Chart (last minute)</string>
+    <string id="FieldHeartChart">Heart Rate Bars (last minute)</string>
+    <string id="FieldHeartAxes">Heart Rate Axes</string>
     <string id="FieldDistance">Distance</string>
     <string id="FieldDistanceUnits">Distance Units (km/mi)</string>
     <string id="FieldCalories">Calories</string>

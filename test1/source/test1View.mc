@@ -32,7 +32,7 @@ class test1View extends WatchUi.WatchFace
 //	function testExcludeFunction()
 //	{
 //	}
-	
+		
 	const PROFILE_VERSION = 13;			// a version number
 	const PROFILE_NUM_PRESET = 14;		// number of preset profiles (in the jsondata resource)
 
@@ -358,10 +358,11 @@ class test1View extends WatchUi.WatchFace
 	//	//!FIELD_SHAPE_NETWORK = 63,
 	//	FIELD_SHAPE_STAIRS = 64,
 	//
-	//	FIELD_HEART_MIN = 78
-	//	FIELD_HEART_MAX = 79
-	//	FIELD_HEART_AVERAGE = 80
-	//	FIELD_HEART_CHART = 81
+	//	FIELD_HEART_MIN = 77
+	//	FIELD_HEART_MAX = 78
+	//	FIELD_HEART_AVERAGE = 79
+	//	FIELD_HEART_CHART = 80
+	//	FIELD_HEART_AXES = 81
 	//	FIELD_SUNRISE_HOUR = 82,
 	//	FIELD_SUNRISE_MINUTE = 83,
 	//	FIELD_SUNSET_HOUR = 84,
@@ -1459,6 +1460,8 @@ class test1View extends WatchUi.WatchFace
 		}
 
 		initProfiles();			// load profile times and save out a first version of the private profile to storage if it doesn't exist
+		
+		initHeartSamples();
     }
 
 	function saveDataForStop()
@@ -2425,13 +2428,14 @@ class test1View extends WatchUi.WatchFace
 		
 		var hour2nd = (hour - clockTime.timeZoneOffset/3600 + propertiesGetNumber("37") + 24)%24;		// 2nd time zone
 
-		sampleHeartRate(second);	// sample the heart rate every time
-
 		// check for position every onUpdate - this is so we can get and store a position from the latest activity
 		// (even if that position isn't currently being used by anything)
 		calculatePosition();
 
 		//calculateSun();
+
+		// sample the heart rate every time
+		sampleHeartRate(second);
 
 		//System.println("hour=" + gregorian.info(timeNow, Time.FORMAT_SHORT).hour + " utc=" + gregorian.utcInfo(timeNow, Time.FORMAT_SHORT).hour);
 		// does not change with time simulation in simulator:
@@ -2586,9 +2590,8 @@ class test1View extends WatchUi.WatchFace
 							var eColor = getColorArray(propFieldData[elementStart + 2]);
 
 	 						var eStr = null;		// null means empty if nothing below sets it
-							var eIsIcon = false;
-							var eUseUnsupportedFont = false;
-							var eDiacritics = -1;
+							var eKern = 0;
+							var eFlags = 0;
 							var makeUpperCase = false;
 		
 							//if (e==FIELD_EMPTY)			// empty
@@ -2609,7 +2612,7 @@ class test1View extends WatchUi.WatchFace
 								//eStr = StringUtil.charArrayToString(charArray);
 								//var charArray = [(e - FIELD_SHAPE_CIRCLE + ICONS_FIRST_CHAR_ID).toChar()];
 								eStr = (eDisplay - 41/*FIELD_SHAPE_CIRCLE*/ + 65/*ICONS_FIRST_CHAR_ID*/).toChar().toString();
-						    	eIsIcon = true;
+						    	eFlags |= 0x1000/*eIsIcon*/;
 						    }
 							else
 							{
@@ -2638,9 +2641,10 @@ class test1View extends WatchUi.WatchFace
 										if (fieldFontIsCustom)		// custom font
 										{ 
 											var tempStr = eStr.toUpper();				// custom fonts always upper case
-											eUseUnsupportedFont = useUnsupportedFieldFont(tempStr);
-											if (eUseUnsupportedFont)
+											if (useUnsupportedFieldFont(tempStr))
 											{
+												eFlags |= 0x2000/*eUseUnsupportedFont*/;
+											
 												// will be using system font - so use case for that as specified by user
 												if (fontSystemCase==1)	// APPCASE_UPPER = 1
 												{
@@ -2658,7 +2662,7 @@ class test1View extends WatchUi.WatchFace
 											else
 											{
 												eStr = tempStr;		// ok to use
-												eDiacritics = ((eDisplay==3/*FIELD_DAY_NAME*/) ? 0 : 1);
+												eFlags |= ((eDisplay==3/*FIELD_DAY_NAME*/) ? 0x4000/*eDiacritics*/ : 0x8000/*eDiacritics*/);
 											}
 										}
 										else
@@ -2804,39 +2808,9 @@ class test1View extends WatchUi.WatchFace
 									{
 										// check how many in rest of field
 										// and if next element is a movebar for kerning
-										var numToAdd = 5;
-										var nextIsMoveBar = -1;
-										for (var j=i+1; j<FIELD_NUM_ELEMENTS; j++)
-										{
-											var jStart = dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + j*3;
-											var jDisplay = propFieldData[jStart];
-											var jVisible = propFieldData[jStart + 1];
-											// don't need to test >=0 as it's a byte array
-											if (jDisplay!=0/*FIELD_EMPTY*/ && /*jVisible>=0 &&*/ jVisible<23/*STATUS_NUM*/ && getVisibilityStatus(visibilityStatus, jVisible))
-											{
-												if (jDisplay==37/*FIELD_MOVEBAR*/)
-												{
-													numToAdd--;
-													
-													if (nextIsMoveBar<0)	// not set yet
-													{
-														nextIsMoveBar = 1;		// true
-													}
-												}
-												else
-												{
-													if (nextIsMoveBar<0)	// not set yet
-													{
-														nextIsMoveBar = 0;		// false
-													}
-												}
-											}
-										}
-										
-										if (moveBarNum!=0)	// first in this field so need to add some extra ones
-										{
-											numToAdd = 1;
-										}
+										var checkNextMoveBar = checkNextElementType(dataStart, i, visibilityStatus, 37/*FIELD_MOVEBAR*/);
+										var nextIsMoveBar = checkNextMoveBar[0];
+										var numToAdd = ((moveBarNum!=0) ? 1 : (5 - checkNextMoveBar[1]));	// if first in this field check for adding extra ones
 										
 				    					var offColor = ((propMoveBarOffColor==COLOR_NOTSET) ? eColor : propMoveBarOffColor);
 										
@@ -2848,8 +2822,8 @@ class test1View extends WatchUi.WatchFace
 											// moveBarLevel has range 1 to 5
 											// moveBarNum goes from 1 to 5
 											var barIsOn = (moveBarNum <= activityMonitorInfo.moveBarLevel);
-											var eKern = ((j<numToAdd-1 || nextIsMoveBar==1) ? -5 : 0);
-											addBackgroundField(dc, f, fieldInfoIndexEnd, (barIsOn ? "Z" : "Y"), true, false, (barIsOn ? eColor : offColor), eKern, -1);
+											var tempKern = ((j<numToAdd-1 || nextIsMoveBar) ? -5 : 0);
+											addBackgroundField(dc, f, fieldInfoIndexEnd, (barIsOn ? "Z" : "Y"), (barIsOn ? eColor : offColor), tempKern, 0x1000/*eIsIcon*/);
 										}
 										
 										// leave eStr as null so doesn't get added again below
@@ -2858,32 +2832,28 @@ class test1View extends WatchUi.WatchFace
 										break;
 									}
 									
-									case 78/*FIELD_HEART_MIN*/:
+									case 77/*FIELD_HEART_MIN*/:
+									case 78/*FIELD_HEART_MAX*/:
+									case 79/*FIELD_HEART_AVERAGE*/:
+									case 80/*FIELD_HEART_CHART*/:
+									case 81/*FIELD_HEART_AXES*/:
 									{
-										calculateHeartRate(timeNow);
-										eStr = (heartMin!=null) ? heartMin.format("%d") : "--";
-										break;
-									}
-									
-									case 79/*FIELD_HEART_MAX*/:
-									{
-										calculateHeartRate(timeNow);
-										eStr = (heartMax!=null) ? heartMax.format("%d") : "--";
-										break;
-									}
-									
-									case 80/*FIELD_HEART_AVERAGE*/:
-									{
-										calculateHeartRate(timeNow);
-										eStr = (heartAverage!=null) ? heartAverage.format("%d") : "--";
-										break;
-									}
-									
-									case 81/*FIELD_HEART_CHART*/:
-									{
-										calculateHeartRate(timeNow);
-										//eStr = (255).toChar().toString();
-								    	//eIsIcon = true;
+										calculateHeartRate(minute, second);
+
+										if (eDisplay==80/*FIELD_HEART_CHART*/ || eDisplay==81/*FIELD_HEART_AXES*/)
+										{
+											eStr = "0";		// just a placeholder in the field array
+											eFlags |= ((eDisplay==80/*FIELD_HEART_CHART*/) ? 0x0400/*eHeartChart*/ : 0x0800/*eHeartAxes*/);
+
+											var checkNextHeart = checkNextElementType(dataStart, i, visibilityStatus, 80/*FIELD_HEART_CHART*/+81/*FIELD_HEART_AXES*/-eDisplay);	// check for other type
+											eKern = (checkNextHeart[0] ? 0 : (15*4 + 10));
+										}
+										else
+										{
+											var heartVal = (eDisplay==77/*FIELD_HEART_MIN*/) ? heartDisplayMin : ((eDisplay==78/*FIELD_HEART_MAX*/) ? heartDisplayMax : heartDisplayAverage);
+											eStr = (heartVal!=null) ? heartVal.format("%d") : "--";
+										}
+										
 										break;
 									}
 
@@ -3024,7 +2994,7 @@ class test1View extends WatchUi.WatchFace
 									eStr = eStr.toUpper();
 								}
 							
-								addBackgroundField(dc, f, fieldInfoIndexEnd, eStr, eIsIcon, eUseUnsupportedFont, eColor, 0, eDiacritics);
+								addBackgroundField(dc, f, fieldInfoIndexEnd, eStr, eColor, eKern, eFlags);
 							}
 						}
 					}
@@ -3112,7 +3082,15 @@ class test1View extends WatchUi.WatchFace
 		}
     }
 
-	function addBackgroundField(dc, f, fieldInfoIndexEnd, eStr, eIsIcon, eUseUnsupportedFont, eColor, eKern, eDiacritics)
+	// eFlags:
+	// eUnused1 = 0x0100
+	// eUnused2 = 0x0200
+	// eHeartChart = 0x0400
+	// eHeartAxes = 0x0800
+	// eIsIcon = 0x1000
+	// eUseUnsupportedFont = 0x2000
+	// eDiacritics = 0x4000 and 0x8000
+	function addBackgroundField(dc, f, fieldInfoIndexEnd, eStr, eColor, eKern, eFlags)
 	{
 		// add the background field info (precalculate stuff so don't need to do it for the offscreen buffer)
 		var fieldInfoIndex = backgroundFieldInfoIndex[f];
@@ -3124,19 +3102,23 @@ class test1View extends WatchUi.WatchFace
 			{
 				backgroundFieldInfoCharArrayLength[f] = eLen;
 	
-				var infoData = (sLen << 24) | (eLen << 16) | (eIsIcon?0x1000:0x0000) | (eUseUnsupportedFont?0x2000:0x0000);
+				var infoData = (sLen << 24) | (eLen << 16) | eFlags;
 								
 				var width = eKern;
-				var fontResource = (eIsIcon ? iconsFontResource : (eUseUnsupportedFont ? fontFieldUnsupportedResource : fontFieldResource));
-				if (eDiacritics>=0)
+				if ((eFlags&(0x0400/*eHeartChart*/|0x0800/*eHeartAxes*/))==0)
 				{
-					width += addBackgroundFieldDiacritics(dc, fontResource, sLen, eLen, eDiacritics);
-					infoData |= ((eDiacritics==0)?0x4000:0x8000);
+					var fontResource = ((eFlags&0x1000/*eIsIcon*/)!=0 ? iconsFontResource : ((eFlags&0x2000/*eUseUnsupportedFont*/)!=0 ? fontFieldUnsupportedResource : fontFieldResource));
+					var eDiacritics = (eFlags&(0x4000|0x8000/*eDiacritics*/))/0x4000; 
+					if (eDiacritics>0)
+					{
+						width += addBackgroundFieldDiacritics(dc, fontResource, sLen, eLen, eDiacritics-1);
+					}
+					else
+					{
+						width += dc.getTextWidthInPixels(eStr, fontResource);
+					}
 				}
-				else
-				{
-					width += dc.getTextWidthInPixels(eStr, fontResource);
-				}
+				width = getMinMax(width, 0, 255);		// max width of 255 pixels per element
 				
 				backgroundFieldInfoData[fieldInfoIndex] = (width | infoData);
 	
@@ -3146,6 +3128,41 @@ class test1View extends WatchUi.WatchFace
 				backgroundFieldInfoIndex[f] += 1;		// increase the counter
 			}
 		}
+	}
+
+	function checkNextElementType(dataStart, i, visibilityStatus, testType)
+	{
+		var count = 0;
+		var nextIsType = -1;
+
+		for (var j=i+1; j<FIELD_NUM_ELEMENTS; j++)
+		{
+			var jStart = dataStart + 3/*FIELD_INDEX_ELEMENTS*/ + j*3;
+			var jDisplay = propFieldData[jStart];
+			var jVisible = propFieldData[jStart + 1];
+			// don't need to test >=0 as it's a byte array
+			if (jDisplay!=0/*FIELD_EMPTY*/ && /*jVisible>=0 &&*/ jVisible<23/*STATUS_NUM*/ && getVisibilityStatus(visibilityStatus, jVisible))
+			{
+				if (jDisplay==testType)
+				{
+					count++;
+					
+					if (nextIsType<0)	// not set yet
+					{
+						nextIsType = 1;		// true
+					}
+				}
+				else
+				{
+					if (nextIsType<0)	// not set yet
+					{
+						nextIsType = 0;		// false
+					}
+				}
+			}
+		}
+		
+		return [nextIsType==1, count];
 	}
 
 //	<!-- outer ring values (outerBigXY, outerOffscreenStart, outerOffscreenEnd) -->
@@ -3237,18 +3254,25 @@ class test1View extends WatchUi.WatchFace
 					for (var i=fieldInfoIndexStart; i<fieldInfoIndexEnd; i++)
 					{
 						var w = backgroundFieldInfoData[i];
-						var eWidth = (w & 0x0FFF);
+						var eWidth = (w & 0x00FF);
 						
 						if (dateX<=dcWidth && (dateX+eWidth)>=0)	// check element x overlaps buffer
 						{ 
+							var sLen = ((w>>24) & 0xFF);
+							var eLen = ((w>>16) & 0xFF);
 							var curFont;
 							var dateY = dateYOffset;
-							if ((w&0x1000)!=0)		// isIcon
+							if ((w&(0x0400/*eHeartChart*/|0x0800/*eHeartAxes*/))!=0)
+							{
+								curFont = null;
+								drawHeartChart(useDc, dateX+(10/2), dateY+6, backgroundFieldInfoColor[i], (w&0x0400/*eHeartChart*/)!=0);		// draw heart rate chart
+							}
+							else if ((w&0x1000/*eIsIcon*/)!=0)		// isIcon
 							{
 								curFont = iconsFontResource;
 								dateY -= 10;
 							}
-							else if ((w&0x2000)!=0)	// use the system font for unsupported languages
+							else if ((w&0x2000/*eUseUnsupportedFont*/)!=0)	// use the system font for unsupported languages
 							{
 								curFont = fontFieldUnsupportedResource;
 								//const fieldYAdjustFontSystem = 6;
@@ -3282,15 +3306,12 @@ class test1View extends WatchUi.WatchFace
 							{
 						        useDc.setColor(backgroundFieldInfoColor[i], graphics.COLOR_TRANSPARENT);
 	
-								var sLen = ((w>>24) & 0xFF);
-								var eLen = ((w>>16) & 0xFF);
-
 								var s = StringUtil.charArrayToString(backgroundFieldInfoCharArray.slice(sLen, eLen));
 				        		useDc.drawText(dateX, dateY, curFont, s, graphics.TEXT_JUSTIFY_LEFT);
 				        		
 				        		if ((w&(0x4000|0x8000))!=0)
 				        		{
-				        			drawBackgroundFieldDiacritics(useDc, curFont, eLen-sLen, (((w&0x4000)!=0)?0:1), dateX, dateY);
+				        			drawBackgroundFieldDiacritics(useDc, curFont, eLen-sLen, ((w&(0x4000|0x8000/*eDiacritics*/))/0x4000)-1, dateX, dateY);
 				        		}
 				        	}
 						}
@@ -3521,67 +3542,6 @@ class test1View extends WatchUi.WatchFace
 			}
 		/**/
 		}
-		
-// execution time approx 12000ms for 60x(setColor+drawRectangle) (outer ring is approx 7000ms)
-// only 6000ms for 1xsetColor + 60xdrawRectangle
-// 6000ms for drawLine
-// 6000ms for drawPoint
-		{
-			useDc.setColor(graphics.COLOR_RED, graphics.COLOR_TRANSPARENT);
-//			for (var i=0; i<chartNumSamples; i++)
-//			{
-//				if (chartSamples[i]<255)
-//				{
-//					var h = (chartSamples[i]+4)/8;
-//					useDc.drawRectangle(50+i, 150-h, 1, h);
-//					//useDc.drawLine(i, 0, i, 30);
-//					//useDc.drawPoint(i, i/2);
-//				}
-//			}
-
-			var x = 0;
-			var n = 0;
-			var h = 0;
-			//var w = 3;
-			var w = 4;	// => this is 15 bins of 4 bytes each? for variable time range. Save these bins to storage when exit watchface?
-			//var w = 5;
-			for (var i=0; i<chartNumSamples; i++)
-			{
-				if (chartSamples[i]<255)
-				{
-					h += (chartSamples[i]+5)/10;
-					n++;
-
-					if (n==w)
-					{
-						h/=w;		
-						useDc.fillRectangle(100+x - dcX, 220-h - dcY, w-1, h);
-						//useDc.drawPoint(100+x - dcX, 220-h - dcY);
-
-						x+=w;
-						n = 0;
-						h = 0;
-					}
-										
-//					if (n==1)
-//					{					
-//						useDc.fillRectangle(100+x - dcX, 220-h - dcY, 2, h);
-//						//useDc.drawPoint(100+x - dcX, 220-h - dcY);
-//
-//						x++;
-//						n = 0;
-//						h = 0;
-//					}
-										
-					//useDc.drawLine(i, 0, i, 30);
-				}
-			}
-
-			useDc.setColor(graphics.COLOR_WHITE, graphics.COLOR_TRANSPARENT);
-			useDc.fillRectangle(100-2 - dcX, 220-20 - dcY, 1, 20);
-			useDc.fillRectangle(100+x - dcX, 220-20 - dcY, 1, 20);
-			useDc.fillRectangle(100-2 - dcX, 220 - dcY, x+3, 1);
-		}
 	}
 
 //	<!-- seconds buffer values (bufferSeconds, bufferPosX, bufferPosY) -->
@@ -3724,10 +3684,12 @@ class test1View extends WatchUi.WatchFace
 	 		// it seems as though occasionally onPartialUpdate can skip a second
 	 		// so check whether that has happened, and within the same minute since last full update
 	 		// - but only for certain refresh styles
+	 		//
+	 		// But there is also a strange case when exiting high power mode where lastPartialUpdateSec may already be set to the current second 
     		if ((propSecondRefreshStyle==1/*REFRESH_EVERY_MINUTE*/) || (propSecondRefreshStyle==2/*REFRESH_ALTERNATE_MINUTES*/))
     		{
 		 		var prevSec = ((second+59)%60);
-		 		if (prevSec<second && prevSec!=lastPartialUpdateSec)	// check earlier second in same minute
+		 		if (prevSec<second && second!=lastPartialUpdateSec)		// check earlier second in same minute
 		 		{
 		 			doPartialUpdateSec(dc, prevSec, minute);
 		 		}
@@ -3741,7 +3703,7 @@ class test1View extends WatchUi.WatchFace
 
     function doPartialUpdateSec(dc, secondsIndex, minuteIndex)
     {
-    	if (secondsIndex>0)		// when secondsIndex is 0 then everything is up to date already (from doUpdate)
+    	if (secondsIndex!=lastPartialUpdateSec)		// check whether everything is up to date already (from doUpdate)
     	{		
  			var clearIndex;
 	    	if (propSecondRefreshStyle==0/*REFRESH_EVERY_SECOND*/)
@@ -4702,93 +4664,142 @@ class test1View extends WatchUi.WatchFace
 		}
 	}
 
+	var heartCalculatedTime = -1;
+	var heartDisplayMin;
+	var heartDisplayMax;
+	var heartDisplayAverage;
+	var heartDisplayValues = new[15]b;
+	
+	var heartSampledSecond = 0;
 	var heartSamples = new[60]b;
-	var heartNumSamples = 0;
-	var heartMin;
-	var heartMax;
-	var heartAverage;
-	var heartCalculated = -1;
-	var chartSamples = new[60]b;
-	var chartNumSamples = 0;
-		
-	function sampleHeartRate(second)
+
+	function initHeartSamples()
 	{
-		var info = Activity.getActivityInfo();
-		if (info!=null && info.currentHeartRate!=null && heartNumSamples<60)
+		for (var i=0; i<60; i++)
 		{
-			for (var i=heartNumSamples; i<second; i++)
-			{
-				heartSamples[i] = 255;	// means unset
-			}
-		
-			heartSamples[second] = getMinMax(info.currentHeartRate, 0, 254);
-			heartNumSamples = second + 1;
+			heartSamples[i] = 255;
+			heartDisplayValues[i/4] = 0;
 		}
 	}
-	
-	function calculateHeartRate(timeNow)
+
+	function sampleHeartRate(second)
 	{
-		var timeNowValue = timeNow.value();
-		if (heartCalculated != timeNowValue)
+		if (heartSampledSecond!=second)
 		{
-			heartCalculated = timeNowValue;
-
-			heartMin = null;
-			heartMax = null;
-			heartAverage = null;
-	
-			if (heartNumSamples > 0)
+			// clear samples between last one and now
+			for (var i=(heartSampledSecond+1)%60; i!=second; i=(i+1)%60)
 			{
-				var sum = 0;
-				var n = 0;
-				
-				chartNumSamples = heartNumSamples;
-
-				for (var i=0; i<heartNumSamples; i++)
-				{
-					var r = heartSamples[i];
-
-					chartSamples[i] = r;
-
-					if (r<255)
-					{
-						if (heartMin==null || r<heartMin)
-						{
-							heartMin = r;
-						}
-						
-						if (heartMax==null || r>heartMax)
-						{
-							heartMax = r;
-						}
-						
-						sum += r;
-						n++;
-					}
-				}
-	
-				heartAverage = (sum + n/2)/n;
-				
-				heartNumSamples = 0;
+				heartSamples[i] = 255;
 			}
-			else
-			{
-				chartNumSamples = 0;
+
+			var info = Activity.getActivityInfo();
+			heartSamples[second] = ((info!=null && info.currentHeartRate!=null) ? getMinMax(info.currentHeartRate, 0, 254) : 255);
 			
-				if (hasHeartRateHistory)
-				{
-					var heartSample = SensorHistory.getHeartRateHistory({:period => 1}).next();
-					if (heartSample!=null && heartSample.data!=null)
-					{
-						heartAverage = getMinMax(heartSample.data.toNumber(), 0, 254);
-						heartMin = heartAverage;
-						heartMax = heartAverage;
+			heartSampledSecond = second;
+		}			
+	}
+	
+	function calculateHeartRate(minute, second)
+	{
+		var t = minute*60 + second;
+		if (heartCalculatedTime!=t)
+		{
+			heartCalculatedTime = t;
 
-						chartNumSamples = 1;
-						chartSamples[0] = heartAverage;
+			heartDisplayMin = null;
+			heartDisplayMax = null;
+			heartDisplayAverage = null;
+
+			var allSum = 0;
+			var allCount = 0;
+			var bin = 0;
+			var binSum = 0;
+			var binCount = 0;
+			var isLastI = false;
+			// start from bin following this second's bin (keeps the display bars moving nicely without gaps appearing)
+			for (var i=((second/4)*4+4)%60; !isLastI; i=(i+1)%60)
+			{		
+				var r = heartSamples[i];
+				if (r != 255)
+				{
+					if (heartDisplayMin==null || r<heartDisplayMin)
+					{
+						heartDisplayMin = r;
 					}
+						
+					if (heartDisplayMax==null || r>heartDisplayMax)
+					{
+						heartDisplayMax = r;
+					}
+
+					allSum += r;
+					allCount++;
+					
+					binSum += r;
+					binCount++;					
+				}
+				
+				isLastI = (i==second);
+				if ((bin%4)==3 || isLastI)
+				{
+					heartDisplayValues[bin/4] = ((binCount>0) ? (binSum/binCount) : 0);
+					
+					binSum = 0;
+					binCount = 0;
+				}
+				bin++;
+			}
+
+			if (allCount>0)
+			{
+				heartDisplayAverage = (allSum + allCount/2)/allCount;
+			}
+
+			if (heartDisplayAverage==null && hasHeartRateHistory)
+			{
+				var heartSample = SensorHistory.getHeartRateHistory({:period => 1}).next();
+				if (heartSample!=null && heartSample.data!=null)
+				{
+					var r = heartSample.data.toNumber();
+					heartDisplayMin = r;
+					heartDisplayMax = r;
+					heartDisplayAverage = r;
 				}
 			}
+		}
+	}
+
+// execution time approx 12000ms for 60x(setColor+drawRectangle) (outer ring is approx 7000ms)
+// only 6000ms for 1xsetColor + 60xdrawRectangle
+// 6000ms for drawLine
+// 6000ms for drawPoint
+	function drawHeartChart(useDc, x, y, color, barsOrAxes)
+	{
+		// draw the bars
+		var heightScale = 10;
+		var barWidth = 4;
+		var hAxis = 200 / heightScale;
+
+		if (barsOrAxes)
+		{
+			useDc.setColor(color, Graphics.COLOR_TRANSPARENT);
+	
+			for (var i=0; i<15; i++)
+			{
+				var h = (heartDisplayValues[i]+(heightScale/2))/heightScale;
+	
+				useDc.fillRectangle(x + barWidth*i, y - h, barWidth-1, h+1);	// h+1 so it goes to same position as axes (for alignment with text when no axes drawn)
+				//useDc.drawPoint(100+x - dcX, 220-h - dcY);
+				//useDc.drawLine(i, 0, i, 30);
+			}
+		}
+		else
+		{
+			// draw the axes
+			useDc.setColor(color, Graphics.COLOR_TRANSPARENT);
+			useDc.fillRectangle(x - 2, y - hAxis, 1, hAxis);				// left
+			useDc.fillRectangle(x + barWidth*15, y - hAxis, 1, hAxis);		// right
+			useDc.fillRectangle(x - 2, y, barWidth*15 + 3, 1);				// bottom
 		}
 	}
 

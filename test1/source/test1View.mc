@@ -97,7 +97,7 @@ class test1View extends WatchUi.WatchFace
 	var propOuterColorFilled;
 	var propOuterColorUnfilled;
 	
-	var propMoveBarOffColor;
+	var propMoveBarOffColorIndex;
 	
 	var propDemoDisplayOn;
 	
@@ -489,8 +489,7 @@ class test1View extends WatchUi.WatchFace
 		var c0 = (shortCol & 0x003) * 5;			// 0x0, 0x5, 0xA, 0xF	
 		var c1 = ((shortCol<<2) & 0x030) * 5;		// 0x00, 0x50, 0xA0, 0xF0
 		var c2 = ((shortCol<<4) & 0x300) * 5;		// 0x000, 0x500, 0xA00, 0xF00
-		var col = (c0 | ((c0|c1) << 4) | ((c1|c2) << 8) | (c2 << 12)); 
-		return col;
+		return (c0 | ((c0|c1) << 4) | ((c1|c2) << 8) | (c2 << 12)); 
 	}
 
 	(:m1plus)
@@ -505,9 +504,7 @@ class test1View extends WatchUi.WatchFace
 		var g = (((col>>8) & 0xFF) + 0x2A) / 0x55;	// 0-3
 		var b = ((col & 0xFF) + 0x2A) / 0x55;	// 0-3
 		
-		var shortTest = (r<<4) | (g<<2) | b;
-		
-		var index = colorArray.indexOf(shortTest);
+		var index = colorArray.indexOf((r<<4) | (g<<2) | b);
 		if (index < 0)
 		{
 			index = 0;
@@ -557,7 +554,7 @@ class test1View extends WatchUi.WatchFace
 	//	"\u0040\u0041\u0042\u0043\u0044\u0045\u0046\u0047\u0048\u0049\u004a\u004b\u004c\u004d\u004e\u004f" +		// 59
 	//	"\u0050";																									// 60
 	
-	var secondsCol = new[60];
+	var secondsColorIndexArray = new[60]b;
 	
 	//const BUFFER_SIZE = 62;
 	var bufferBitmap = null;
@@ -590,12 +587,12 @@ class test1View extends WatchUi.WatchFace
 	var backgroundTimeTotalWidth;
 	var backgroundTimeXOffset;
 
-	const FIELD_INFO_CHAR_MAX_LEN = 20;		// 20 characters seems plenty - widest element might be step count, but normally day or month name = 3*6
+	const FIELD_INFO_CHAR_MAX_LEN = 16;		// 20 characters seems plenty - widest element might be step count, but normally day or month name = 3*6
 	var backgroundFieldInfoIndex = new[FIELD_NUM]b;		// index into backgroundFieldInfo arrays
 	var backgroundFieldInfoCharArray = new[FIELD_NUM*FIELD_INFO_CHAR_MAX_LEN];
 	var backgroundFieldInfoCharArrayLength = new[FIELD_NUM]b;
 	var backgroundFieldInfoData = new[FIELD_NUM*FIELD_NUM_ELEMENTS_DRAW];	// pixel width, string start, string end, is icon, use unsupported font
-	var backgroundFieldInfoColor = new[FIELD_NUM*FIELD_NUM_ELEMENTS_DRAW];
+	var backgroundFieldInfoColorIndex = new[FIELD_NUM*FIELD_NUM_ELEMENTS_DRAW]b;
 	var backgroundFieldTotalWidth = new[FIELD_NUM];
 
 	// index 0==day, 1==month
@@ -635,7 +632,7 @@ class test1View extends WatchUi.WatchFace
 			var c = backgroundFieldDiacriticsArray[startIndex+i];
 			if (c!=0)
 			{
-				dc.drawText(dateX + backgroundFieldDiacriticsWidth[startIndex+i], dateY, fontResource, c.toString(), Graphics.TEXT_JUSTIFY_LEFT);
+				dc.drawText(dateX + backgroundFieldDiacriticsWidth[startIndex+i], dateY, fontResource, c.toString(), 2/*TEXT_JUSTIFY_LEFT*/);
 			}
 		}
 	}	
@@ -759,44 +756,75 @@ class test1View extends WatchUi.WatchFace
 			}
 		}
 		
+//for (var i=0; i<6; i++)
+//{
+//	for (var j=0; j<2; j++)
+//	{
+//		cur = 1;		// 1 or 2
+//		next = 4;
+//		appFontCur = i;
+//		narrow = (j==0);
+//
+//var tempVal1 = val;
+	
 		// special case code for different weights
-		if (cur==1)
+		// saves 100 bytes compared to version below
+		if (next==4 && (cur==1 || cur==2))
 		{
-			if (next==4)	// 1-4
-			{
-				if (appFontCur<=1/*APPFONT_EXTRA_LIGHT*/)
-				{
-					val += (narrow?0:2);
-				}
-				else if (appFontCur==2/*APPFONT_LIGHT*/)
-				{
-					val += (narrow?0:1);
-				}
-				else if (appFontCur==4/*APPFONT_BOLD*/)
-				{
-					val -= 1;
-				}
-				else if (appFontCur==5/*APPFONT_HEAVY*/)
-				{
-					val -= 2;
-				}
-			}
+			var adjust = ((((
+			// cur==1	ultralight +2	extralight +2	light +1		regular 0		bold -1			heavy -2     
+						(0x6l<<0) | 	(0x6l<<3) | 	(0x5l<<6) | 	(0x4l<<9) | 	(0x3l<<12) | 	(0x2l<<15) | 
+			// cur==2	ultralight +1	extralight +1	light 0			regular 0		bold 0			heavy -1     
+						(0x5l<<18) | 	(0x5l<<21) | 	(0x4l<<24) | 	(0x4l<<27) | 	(0x4l<<30) | 	(0x3l<<33) 
+					) >> (appFontCur*3 + (cur-1)*18)) & 0x07) - 4).toNumber();	// make sure not still a long
+					
+			val += ((narrow && adjust>0) ? 0 : adjust);
 		}
-		else if (cur==2)
-		{
-			if (next==4)	// 2-4
-			{
-				if (appFontCur<=1/*APPFONT_EXTRA_LIGHT*/)
-				{
-					val += (narrow?0:1);
-				}
-				else if (appFontCur==5/*APPFONT_HEAVY*/)
-				{
-					val -= 1;
-				}
-			}
-		}
-		
+
+//var tempVal2 = val;
+//val = tempVal1;
+//
+		// special case code for different weights
+//		if (cur==1 && next==4)	// 1-4
+//		{
+//			if (appFontCur<=1/*APPFONT_EXTRA_LIGHT*/ && !narrow)
+//			{
+//				val += 2;
+//			}
+//			else if (appFontCur==2/*APPFONT_LIGHT*/ && !narrow)
+//			{
+//				val += 1;
+//			}
+//			else if (appFontCur==4/*APPFONT_BOLD*/)
+//			{
+//				val -= 1;
+//			}
+//			else if (appFontCur==5/*APPFONT_HEAVY*/)
+//			{
+//				val -= 2;
+//			}
+//		}
+//		else if (cur==2 && next==4)	// 2-4
+//		{
+//			if (appFontCur<=1/*APPFONT_EXTRA_LIGHT*/ && !narrow)
+//			{
+//				val += 1;
+//			}
+//			else if (appFontCur==5/*APPFONT_HEAVY*/)
+//			{
+//				val -= 1;
+//			}
+//		}
+	
+//tempVal1 = val;
+//if (tempVal1 != tempVal2)
+//{
+//	System.println("mismatch appFontCur=" + appFontCur + " narrow=" + narrow);
+//}
+//	
+//	}
+//}
+
 		return val + (narrow?3:0);
 	}
 	
@@ -862,6 +890,7 @@ class test1View extends WatchUi.WatchFace
 			//var c1 = [ 3,  6,  7,  9, 11, 14, 15, 21, 24,  26, 28, 29, 30, 31, 70, 78, 92, 127, 131, 133, 146, 154, 156, 162, 187, 191]b;		// -190
 			//var c2 = [65, 65, 65, 67, 69, 73, 73, 79, 79, 216, 85, 85, 85, 89, 65, 67, 69,  76,  76,  78,  79,  82,  83,  83,  90,  90]b;
 			//var c3 = [69, 70, 71, 72, 69, 73, 74, 69, 70,   0, 69, 75, 70, 69, 76, 77, 77,  78,  79,  69,  80,  77,  69,  77,  69,  77]b;		// -700
+			
 			for (var i=0; i<26; i++)
 			{
 				if (myChars[i] == cNum)
@@ -883,15 +912,7 @@ class test1View extends WatchUi.WatchFace
         	
 	function getMinMax(v, min, max)
 	{
-		if (v<min)
-		{
-			v = min;
-		}
-		else if (v>max)
-		{
-			v = max;
-		}
-		return v;
+		return (v<min) ? min : ((v>max) ? max : v);
 	}
 
 	function propertiesGetBoolean(p)
@@ -997,18 +1018,17 @@ class test1View extends WatchUi.WatchFace
 		return t;		
 	}
 
-	(:m1normal)
-	function propertiesGetColor(p, minV)
-	{
-		return getColorArray(getMinMax(propertiesGetNumber(p), minV, 63));
-	}
-	
-	(:m1plus)
 	function propertiesGetColor(p, minV)
 	{				
 		return getColorArray(propertiesGetColorIndex(p, minV));
 	}
 
+	(:m1normal)
+	function propertiesGetColorIndex(p, minV)
+	{
+		return getMinMax(propertiesGetNumber(p), minV, 63);
+	}
+	
 	(:m1plus)
 	function propertiesGetColorIndex(p, minV)
 	{
@@ -1976,27 +1996,31 @@ class test1View extends WatchUi.WatchFace
         {
 	        if ((index%3)==0 || forceChange)
 	        { 
-	        	var index3 = index/3;
-	        
-		    	properties.setValue("11", index3%6/*SECONDFONT_TRI_IN*/);		// second indicator style - cycles every 18
+		    	properties.setValue("11", (index/3)%6/*SECONDFONT_TRI_IN*/);		// second indicator style - cycles every 18
 		
 		    	changed = true;
 		    }
 
-        	var srs = index%11;		// prime number to be out of sync with indicator style
-        	if (srs<3)		// 0, 1, 2
-        	{
-        		srs = 1/*REFRESH_EVERY_MINUTE*/;
-        	}
-        	else if (srs<7)	// 3, 4, 5, 6
-        	{
-        		srs = 2/*REFRESH_ALTERNATE_MINUTES*/;
-        	}
-        	else			// 7, 8, 9, 10
-        	{
-        		srs = 0/*REFRESH_EVERY_SECOND*/;
-        	}
-	    	properties.setValue("12", srs);		// second refresh style
+			// 0, 1, 2, 3 -> 2/*REFRESH_ALTERNATE_MINUTES*/
+			// 4, 5, 6, 7 -> 0/*REFRESH_EVERY_SECOND*/
+			// 8, 9, 10 -> 1/*REFRESH_EVERY_MINUTE*/
+        	// prime number to be out of sync with indicator style
+			properties.setValue("12", ((index%11)/4 + 2)%3);		// second refresh style
+
+//        	var srs = index%11;		// prime number to be out of sync with indicator style
+//        	if (srs<3)		// 0, 1, 2
+//        	{
+//        		srs = 1/*REFRESH_EVERY_MINUTE*/;
+//        	}
+//        	else if (srs<7)	// 3, 4, 5, 6
+//        	{
+//        		srs = 2/*REFRESH_ALTERNATE_MINUTES*/;
+//        	}
+//        	else			// 7, 8, 9, 10
+//        	{
+//        		srs = 0/*REFRESH_EVERY_SECOND*/;
+//        	}
+//	    	properties.setValue("12", srs);		// second refresh style
 	    	//changed = true;	don't need to set changed for this
 		}
 			    
@@ -2112,11 +2136,11 @@ class test1View extends WatchUi.WatchFace
 		if ((propSecondIndicatorOn&(ITEM_ON|ITEM_ONGLANCE))!=0)
 		{
 			// calculate the seconds color array
-	    	var secondColor = propertiesGetColor("13", 0);		// second color
-	    	var secondColor5 = propertiesGetColor("14", -1);
-	    	var secondColor10 = propertiesGetColor("15", -1);
-	    	var secondColor15 = propertiesGetColor("16", -1);
-	    	var secondColor0 = propertiesGetColor("17", -1);
+	    	var secondColorIndex = propertiesGetColorIndex("13", 0);		// second color
+	    	var secondColorIndex5 = propertiesGetColorIndex("14", -1);
+	    	var secondColorIndex10 = propertiesGetColorIndex("15", -1);
+	    	var secondColorIndex15 = propertiesGetColorIndex("16", -1);
+	    	var secondColorIndex0 = propertiesGetColorIndex("17", -1);
 	    	var secondColorDemo = propertiesGetBoolean("18");		// second color demo
 	    	for (var i=0; i<60; i++)
 	    	{
@@ -2124,30 +2148,30 @@ class test1View extends WatchUi.WatchFace
 		
 		        if (secondColorDemo)		// second color demo
 		        {
-		        	col = getColorArray(4 + i);
+		        	col = 4 + i;
 		        }
-				else if (secondColor0!=COLOR_NOTSET && i==0)
+				else if (secondColorIndex0!=COLOR_NOTSET && i==0)
 				{
-					col = secondColor0;
+					col = secondColorIndex0;
 				}
-				else if (secondColor15!=COLOR_NOTSET && (i%15)==0)
+				else if (secondColorIndex15!=COLOR_NOTSET && (i%15)==0)
 				{
-					col = secondColor15;
+					col = secondColorIndex15;
 				}
-				else if (secondColor10!=COLOR_NOTSET && (i%10)==0)
+				else if (secondColorIndex10!=COLOR_NOTSET && (i%10)==0)
 				{
-					col = secondColor10;
+					col = secondColorIndex10;
 				}
-				else if (secondColor5!=COLOR_NOTSET && (i%10)==5)
+				else if (secondColorIndex5!=COLOR_NOTSET && (i%10)==5)
 				{
-					col = secondColor5;
+					col = secondColorIndex5;
 				}
 		        else
 		        {
-		        	col = secondColor;		// second color
+		        	col = secondColorIndex;		// second color
 		        }
 		        
-		        secondsCol[i] = col;
+		        secondsColorIndexArray[i] = col;
 		    }
 		}
 		
@@ -2164,7 +2188,7 @@ class test1View extends WatchUi.WatchFace
 		propOuterColorFilled = propertiesGetColor("22", -1);
 		propOuterColorUnfilled = propertiesGetColor("23", -1);
 
-		propMoveBarOffColor = propertiesGetColor("28", -1);
+		propMoveBarOffColorIndex = propertiesGetColorIndex("28", -1);
 
 		propDemoDisplayOn = propertiesGetBoolean("34");
 	}
@@ -2176,6 +2200,12 @@ class test1View extends WatchUi.WatchFace
     	fontTimeHourResource = null;
     	fontTimeMinuteResource = null;
 		propSecondFontResource = null;
+    }
+
+	function loadCustomOrSystemFont(f, fontLoad, fontSystem)
+	{    
+													// custom fonts						system fonts
+		return (f < 24/*APPFONT_SYSTEM_XTINY*/) ? WatchUi.loadResource(fontLoad[f]) : fontSystem[f - 24/*APPFONT_SYSTEM_XTINY*/];
     }
     
     function loadDynamicResources()
@@ -2260,34 +2290,37 @@ class test1View extends WatchUi.WatchFace
 		//}
 		
 		// field font	
-		if (propFieldFont < 24/*APPFONT_SYSTEM_XTINY*/)		// custom fonts
-		{
-			fontFieldResource = watchUi.loadResource(fontLoad[propFieldFont]);
-		}
-		else											// system fonts
-		{ 
-		   	fontFieldResource = fontSystem[propFieldFont - 24/*APPFONT_SYSTEM_XTINY*/];
-		}
+		fontFieldResource = loadCustomOrSystemFont(propFieldFont, fontLoad, fontSystem);
+//		if (propFieldFont < 24/*APPFONT_SYSTEM_XTINY*/)		// custom fonts
+//		{
+//			fontFieldResource = watchUi.loadResource(fontLoad[propFieldFont]);
+//		}
+//		else											// system fonts
+//		{ 
+//		   	fontFieldResource = fontSystem[propFieldFont - 24/*APPFONT_SYSTEM_XTINY*/];
+//		}
 
 		// hour font		 	
-		if (propTimeHourFont < 24/*APPFONT_SYSTEM_XTINY*/)		// custom fonts
-		{
-			fontTimeHourResource = watchUi.loadResource(propTimeItalic ? fontLoadItalic[propTimeHourFont] : fontLoad[propTimeHourFont]);
-		}
-		else												// system fonts
-		{ 
-	    	fontTimeHourResource = fontSystem[propTimeHourFont - 24/*APPFONT_SYSTEM_XTINY*/];
-		}
+		fontTimeHourResource = loadCustomOrSystemFont(propTimeHourFont, propTimeItalic ? fontLoadItalic : fontLoad, fontSystem);
+//		if (propTimeHourFont < 24/*APPFONT_SYSTEM_XTINY*/)		// custom fonts
+//		{
+//			fontTimeHourResource = watchUi.loadResource(propTimeItalic ? fontLoadItalic[propTimeHourFont] : fontLoad[propTimeHourFont]);
+//		}
+//		else												// system fonts
+//		{ 
+//	    	fontTimeHourResource = fontSystem[propTimeHourFont - 24/*APPFONT_SYSTEM_XTINY*/];
+//		}
 
 		// minute font			
-		if (propTimeMinuteFont < 24/*APPFONT_SYSTEM_XTINY*/)		// custom fonts
-		{
-			fontTimeMinuteResource = watchUi.loadResource(propTimeItalic ? fontLoadItalic[propTimeMinuteFont] : fontLoad[propTimeMinuteFont]);
-		}
-		else												// system fonts
-		{ 
-		   	fontTimeMinuteResource = fontSystem[propTimeMinuteFont - 24/*APPFONT_SYSTEM_XTINY*/];
-		}
+		fontTimeMinuteResource = loadCustomOrSystemFont(propTimeMinuteFont, propTimeItalic ? fontLoadItalic : fontLoad, fontSystem);
+//		if (propTimeMinuteFont < 24/*APPFONT_SYSTEM_XTINY*/)		// custom fonts
+//		{
+//			fontTimeMinuteResource = watchUi.loadResource(propTimeItalic ? fontLoadItalic[propTimeMinuteFont] : fontLoad[propTimeMinuteFont]);
+//		}
+//		else												// system fonts
+//		{ 
+//		   	fontTimeMinuteResource = fontSystem[propTimeMinuteFont - 24/*APPFONT_SYSTEM_XTINY*/];
+//		}
 			
    		propSecondFontResource = watchUi.loadResource(secondFontLoad[propSecondIndicatorStyle]);
 			
@@ -2572,6 +2605,8 @@ class test1View extends WatchUi.WatchFace
 					// don't need to test >=0 as it's a byte array
 					if (eDisplay!=0/*FIELD_EMPTY*/ && /*eVisible>=0 &&*/ eVisible<23/*STATUS_NUM*/)
 					{
+						// these fieldActiveXXXStatus flags need setting whether or not the field element using them is visible!!
+						// So make sure to do these tests before the visibility test
 						if (eVisible==5/*STATUS_NOTIFICATIONS_PENDING*/ || eVisible==6/*STATUS_NOTIFICATIONS_NONE*/)
 						{
 							fieldActiveNotificationsStatus = (notificationCount > 0);
@@ -2583,11 +2618,11 @@ class test1View extends WatchUi.WatchFace
 						if (eVisible==9/*STATUS_LTE_CONNECTED*/ || eVisible==10/*STATUS_LTE_NOT*/)
 						{
 							fieldActiveLTEStatus = lteState;
-						} 
+						}
 
- 						if (getVisibilityStatus(visibilityStatus, eVisible))		// only test this after calculating the fieldActiveXXXStatus flags
+ 						if (getVisibilityStatus(visibilityStatus, eVisible))
 						{ 
-							var eColor = getColorArray(propFieldData[elementStart + 2]);
+							var eColorIndex = propFieldData[elementStart + 2];
 
 	 						var eStr = null;		// null means empty if nothing below sets it
 							var eKern = 0;
@@ -2812,8 +2847,6 @@ class test1View extends WatchUi.WatchFace
 										var nextIsMoveBar = checkNextMoveBar[0];
 										var numToAdd = ((moveBarNum!=0) ? 1 : (5 - checkNextMoveBar[1]));	// if first in this field check for adding extra ones
 										
-				    					var offColor = ((propMoveBarOffColor==COLOR_NOTSET) ? eColor : propMoveBarOffColor);
-										
 										for (var j=0; j<numToAdd; j++)
 										{
 											moveBarNum++;
@@ -2823,7 +2856,7 @@ class test1View extends WatchUi.WatchFace
 											// moveBarNum goes from 1 to 5
 											var barIsOn = (moveBarNum <= activityMonitorInfo.moveBarLevel);
 											var tempKern = ((j<numToAdd-1 || nextIsMoveBar) ? -5 : 0);
-											addBackgroundField(dc, f, fieldInfoIndexEnd, (barIsOn ? "Z" : "Y"), (barIsOn ? eColor : offColor), tempKern, 0x1000/*eIsIcon*/);
+											addBackgroundField(dc, f, fieldInfoIndexEnd, (barIsOn ? "Z" : "Y"), ((barIsOn || propMoveBarOffColorIndex==COLOR_NOTSET) ? eColorIndex : propMoveBarOffColorIndex), tempKern, 0x1000/*eIsIcon*/);
 										}
 										
 										// leave eStr as null so doesn't get added again below
@@ -2994,7 +3027,7 @@ class test1View extends WatchUi.WatchFace
 									eStr = eStr.toUpper();
 								}
 							
-								addBackgroundField(dc, f, fieldInfoIndexEnd, eStr, eColor, eKern, eFlags);
+								addBackgroundField(dc, f, fieldInfoIndexEnd, eStr, eColorIndex, eKern, eFlags);
 							}
 						}
 					}
@@ -3090,7 +3123,7 @@ class test1View extends WatchUi.WatchFace
 	// eIsIcon = 0x1000
 	// eUseUnsupportedFont = 0x2000
 	// eDiacritics = 0x4000 and 0x8000
-	function addBackgroundField(dc, f, fieldInfoIndexEnd, eStr, eColor, eKern, eFlags)
+	function addBackgroundField(dc, f, fieldInfoIndexEnd, eStr, eColorIndex, eKern, eFlags)
 	{
 		// add the background field info (precalculate stuff so don't need to do it for the offscreen buffer)
 		var fieldInfoIndex = backgroundFieldInfoIndex[f];
@@ -3122,7 +3155,7 @@ class test1View extends WatchUi.WatchFace
 				
 				backgroundFieldInfoData[fieldInfoIndex] = (width | infoData);
 	
-				backgroundFieldInfoColor[fieldInfoIndex] = eColor;
+				backgroundFieldInfoColorIndex[fieldInfoIndex] = eColorIndex;
 		
 				backgroundFieldTotalWidth[f] += width;
 				backgroundFieldInfoIndex[f] += 1;		// increase the counter
@@ -3204,11 +3237,11 @@ class test1View extends WatchUi.WatchFace
 
     	// reset to the background color
 		useDc.clearClip();
-	    useDc.setColor(graphics.COLOR_TRANSPARENT, propBackgroundColor);
+	    useDc.setColor(-1/*COLOR_TRANSPARENT*/, propBackgroundColor);
 		// test draw background of offscreen buffer in a different color
 		//if (toBuffer)
 		//{
-	    //	useDc.setColor(graphics.COLOR_TRANSPARENT, getColorArray(4+42+(bufferIndex*4)%12));
+	    //	useDc.setColor(-1/*COLOR_TRANSPARENT*/, getColorArray(4+42+(bufferIndex*4)%12));
 		//}
         useDc.clear();
 		
@@ -3246,7 +3279,7 @@ class test1View extends WatchUi.WatchFace
 						(dateYOffset-23)<=dcHeight && (dateYOffset-23+38)>=0)
 				{
 					// show where the text bounding box is
-				    //useDc.setColor(graphics.COLOR_DK_BLUE, graphics.COLOR_TRANSPARENT);
+				    //useDc.setColor(graphics.COLOR_DK_BLUE, -1/*COLOR_TRANSPARENT*/);
 					//useDc.fillRectangle(dateX, (dateYOffset-23), backgroundFieldTotalWidth[f], 38);
 
 					var fieldInfoIndexStart = f*FIELD_NUM_ELEMENTS_DRAW;
@@ -3265,7 +3298,7 @@ class test1View extends WatchUi.WatchFace
 							if ((w&(0x0400/*eHeartChart*/|0x0800/*eHeartAxes*/))!=0)
 							{
 								curFont = null;
-								drawHeartChart(useDc, dateX+(10/2), dateY+6, backgroundFieldInfoColor[i], (w&0x0400/*eHeartChart*/)!=0);		// draw heart rate chart
+								drawHeartChart(useDc, dateX+(10/2), dateY+6, getColorArray(backgroundFieldInfoColorIndex[i]), (w&0x0400/*eHeartChart*/)!=0);		// draw heart rate chart
 							}
 							else if ((w&0x1000/*eIsIcon*/)!=0)		// isIcon
 							{
@@ -3304,10 +3337,10 @@ class test1View extends WatchUi.WatchFace
 			
 							if (curFont!=null)
 							{
-						        useDc.setColor(backgroundFieldInfoColor[i], graphics.COLOR_TRANSPARENT);
+						        useDc.setColor(getColorArray(backgroundFieldInfoColorIndex[i]), -1/*COLOR_TRANSPARENT*/);
 	
 								var s = StringUtil.charArrayToString(backgroundFieldInfoCharArray.slice(sLen, eLen));
-				        		useDc.drawText(dateX, dateY, curFont, s, graphics.TEXT_JUSTIFY_LEFT);
+				        		useDc.drawText(dateX, dateY, curFont, s, 2/*TEXT_JUSTIFY_LEFT*/);
 				        		
 				        		if ((w&(0x4000|0x8000))!=0)
 				        		{
@@ -3340,7 +3373,7 @@ class test1View extends WatchUi.WatchFace
 				//System.println("timedraw=" + i);
 	
 				// show where the text bounding box is
-			    //useDc.setColor(graphics.COLOR_DK_BLUE, graphics.COLOR_TRANSPARENT);
+			    //useDc.setColor(graphics.COLOR_DK_BLUE, -1/*COLOR_TRANSPARENT*/);
 				//useDc.fillRectangle(timeX, (timeYOffset-32), backgroundTimeTotalWidth, 64);
 		
 		        for (var i=0; i<backgroundTimeArrayLength; i++)
@@ -3366,8 +3399,8 @@ class test1View extends WatchUi.WatchFace
 								timeY += 30 - graphics.getFontAscent(fontTimeResource);	
 							}
 			
-				       		useDc.setColor(backgroundTimeColorArray[i], graphics.COLOR_TRANSPARENT);
-			        		useDc.drawText(timeX, timeY, fontTimeResource, backgroundTimeCharArray[i].toString(), graphics.TEXT_JUSTIFY_LEFT);
+				       		useDc.setColor(backgroundTimeColorArray[i], -1/*COLOR_TRANSPARENT*/);
+			        		useDc.drawText(timeX, timeY, fontTimeResource, backgroundTimeCharArray[i].toString(), 2/*TEXT_JUSTIFY_LEFT*/);
 			        	}
 					}
 							
@@ -3435,14 +3468,14 @@ class test1View extends WatchUi.WatchFace
 					if (curCol!=indexCol)
 					{
 						curCol = indexCol;
-	       				useDc.setColor(curCol, graphics.COLOR_TRANSPARENT);
+	       				useDc.setColor(curCol, -1/*COLOR_TRANSPARENT*/);
 	       			}
 
 					//var s = characterString.substring(index, index+1);
 					//var s = StringUtil.charArrayToString([(index + OUTER_FIRST_CHAR_ID).toChar()]);
-					var s = (index + 12/*OUTER_FIRST_CHAR_ID*/).toChar().toString();
+					//var s = (index + 12/*OUTER_FIRST_CHAR_ID*/).toChar().toString();
 					var index2 = index*2;
-		        	useDc.drawText(xOffset + outerXY[index2], yOffset + outerXY[index2+1], outerFontResource, s, graphics.TEXT_JUSTIFY_LEFT);
+		        	useDc.drawText(xOffset + outerXY[index2], yOffset + outerXY[index2+1], outerFontResource, (index + 12/*OUTER_FIRST_CHAR_ID*/).toChar().toString(), 2/*TEXT_JUSTIFY_LEFT*/);
 		        }
 			    
 			    j++;	// next segment
@@ -3451,61 +3484,56 @@ class test1View extends WatchUi.WatchFace
 
 		if (propDemoDisplayOn)
 		{
-		/*
-	   		useDc.setColor(propTimeHourColor, graphics.COLOR_TRANSPARENT);
-	   		if (fontTimeHourResource!=null)		// sometimes onPartialUpdate is called between onSettingsChanged and onUpdate - so this resource could be null
-	   		{
-				useDc.drawText(120 - dcX, 120 - 105 - dcY, fontTimeHourResource, "012", graphics.TEXT_JUSTIFY_CENTER);
-				useDc.drawText(120 - dcX, 120 - 35 - dcY, fontTimeHourResource, "3456", graphics.TEXT_JUSTIFY_CENTER);
-				useDc.drawText(120 - dcX, 120 + 35 - dcY, fontTimeHourResource, "789:", graphics.TEXT_JUSTIFY_CENTER);
-			}
-		/**/
+//	   		useDc.setColor(propTimeHourColor, -1/*COLOR_TRANSPARENT*/);
+//	   		if (fontTimeHourResource!=null)		// sometimes onPartialUpdate is called between onSettingsChanged and onUpdate - so this resource could be null
+//	   		{
+//				useDc.drawText(120 - dcX, 120 - 105 - dcY, fontTimeHourResource, "012", graphics.TEXT_JUSTIFY_CENTER);
+//				useDc.drawText(120 - dcX, 120 - 35 - dcY, fontTimeHourResource, "3456", graphics.TEXT_JUSTIFY_CENTER);
+//				useDc.drawText(120 - dcX, 120 + 35 - dcY, fontTimeHourResource, "789:", graphics.TEXT_JUSTIFY_CENTER);
+//			}
 
-		/*
-	   		useDc.setColor(propTimeHourColor, graphics.COLOR_TRANSPARENT);
-	   		if (fontFieldResource!=null)		// sometimes onPartialUpdate is called between onSettingsChanged and onUpdate - so this resource could be null
-	   		{
-				//useDc.drawText(120 - dcX, 120 - 120 - dcY, fontFieldResource, " I:I1%", graphics.TEXT_JUSTIFY_CENTER);
-				//useDc.drawText(120 - dcX, 120 - 95 - dcY, fontFieldResource, "2345678", graphics.TEXT_JUSTIFY_CENTER);
-				//useDc.drawText(120 - dcX, 120 - 70 - dcY, fontFieldResource, "9-0\\/A.B,CD", graphics.TEXT_JUSTIFY_CENTER);
-				//useDc.drawText(120 - dcX, 120 - 45 - dcY, fontFieldResource, "EFGHIJKLMNO", graphics.TEXT_JUSTIFY_CENTER);
-				//useDc.drawText(120 - dcX, 120 - 20 - dcY, fontFieldResource, "PQRSTUVWXYZ", graphics.TEXT_JUSTIFY_CENTER);
-				//useDc.drawText(120 - dcX, 120 + 10 - dcY, fontFieldResource, "ÁÚÄÅÇÉÌÍÓÖØ", graphics.TEXT_JUSTIFY_CENTER);
-				//useDc.drawText(120 - dcX, 120 + 40 - dcY, fontFieldResource, "ÛÜÝĄČĚĽŁŃ", graphics.TEXT_JUSTIFY_CENTER);
-				//useDc.drawText(120 - dcX, 120 + 70 - dcY, fontFieldResource, "ŐŘŚŠŹŽ​", graphics.TEXT_JUSTIFY_CENTER);
-
-	   			var yOffsets = [-120, -95, -70, -45, -20, 10, 40, 70];
-	   			var sArray = [" I:I1%", "2345678", "9-0\\/A.B,CD", "EFGHIJKLMNO", "PQRSTUVWXYZ", "ÁÚÄÅÇÉÌÍÓÖØ", "ÛÜÝĄČĚĽŁŃ", "ŐŘŚŠŹŽ​"];
-
-				for (var i=0; i<sArray.size(); i++)
-				{
-					var charArray = sArray[i].toCharArray();
-					
-					// calculate total width first
-					var totalWidth = 0;
-					for (var j=0; j<charArray.size(); j++)
-					{
-						var c = getMyCharDiacritic(charArray[j]);
-	        			totalWidth += useDc.getTextWidthInPixels(c[0].toString(), fontFieldResource);
-					}
-					
-					// draw each character + any diacritic
-					var xOffset = 0;
-					for (var j=0; j<charArray.size(); j++)
-					{
-						var c = getMyCharDiacritic(charArray[j]);						
-						useDc.drawText(120 - dcX - totalWidth/2 + xOffset, 120 - dcY + yOffsets[i], fontFieldResource, c[0].toString(), graphics.TEXT_JUSTIFY_LEFT);
-		    			if (c[1]>700)
-		    			{
-							useDc.drawText(120 - dcX - totalWidth/2 + xOffset, 120 - dcY + yOffsets[i], fontFieldResource, c[1].toChar().toString(), graphics.TEXT_JUSTIFY_LEFT);
-		    			}
-						xOffset += useDc.getTextWidthInPixels(c[0].toString(), fontFieldResource);
-					}
-				}
-			}
-		/**/
+//	   		useDc.setColor(propTimeHourColor, -1/*COLOR_TRANSPARENT*/);
+//	   		if (fontFieldResource!=null)		// sometimes onPartialUpdate is called between onSettingsChanged and onUpdate - so this resource could be null
+//	   		{
+//				//useDc.drawText(120 - dcX, 120 - 120 - dcY, fontFieldResource, " I:I1%", graphics.TEXT_JUSTIFY_CENTER);
+//				//useDc.drawText(120 - dcX, 120 - 95 - dcY, fontFieldResource, "2345678", graphics.TEXT_JUSTIFY_CENTER);
+//				//useDc.drawText(120 - dcX, 120 - 70 - dcY, fontFieldResource, "9-0\\/A.B,CD", graphics.TEXT_JUSTIFY_CENTER);
+//				//useDc.drawText(120 - dcX, 120 - 45 - dcY, fontFieldResource, "EFGHIJKLMNO", graphics.TEXT_JUSTIFY_CENTER);
+//				//useDc.drawText(120 - dcX, 120 - 20 - dcY, fontFieldResource, "PQRSTUVWXYZ", graphics.TEXT_JUSTIFY_CENTER);
+//				//useDc.drawText(120 - dcX, 120 + 10 - dcY, fontFieldResource, "ÁÚÄÅÇÉÌÍÓÖØ", graphics.TEXT_JUSTIFY_CENTER);
+//				//useDc.drawText(120 - dcX, 120 + 40 - dcY, fontFieldResource, "ÛÜÝĄČĚĽŁŃ", graphics.TEXT_JUSTIFY_CENTER);
+//				//useDc.drawText(120 - dcX, 120 + 70 - dcY, fontFieldResource, "ŐŘŚŠŹŽ​", graphics.TEXT_JUSTIFY_CENTER);
+//
+//	   			var yOffsets = [-120, -95, -70, -45, -20, 10, 40, 70];
+//	   			var sArray = [" I:I1%", "2345678", "9-0\\/A.B,CD", "EFGHIJKLMNO", "PQRSTUVWXYZ", "ÁÚÄÅÇÉÌÍÓÖØ", "ÛÜÝĄČĚĽŁŃ", "ŐŘŚŠŹŽ​"];
+//
+//				for (var i=0; i<sArray.size(); i++)
+//				{
+//					var charArray = sArray[i].toCharArray();
+//					
+//					// calculate total width first
+//					var totalWidth = 0;
+//					for (var j=0; j<charArray.size(); j++)
+//					{
+//						var c = getMyCharDiacritic(charArray[j]);
+//	        			totalWidth += useDc.getTextWidthInPixels(c[0].toString(), fontFieldResource);
+//					}
+//					
+//					// draw each character + any diacritic
+//					var xOffset = 0;
+//					for (var j=0; j<charArray.size(); j++)
+//					{
+//						var c = getMyCharDiacritic(charArray[j]);						
+//						useDc.drawText(120 - dcX - totalWidth/2 + xOffset, 120 - dcY + yOffsets[i], fontFieldResource, c[0].toString(), 2/*TEXT_JUSTIFY_LEFT*/);
+//		    			if (c[1]>700)
+//		    			{
+//							useDc.drawText(120 - dcX - totalWidth/2 + xOffset, 120 - dcY + yOffsets[i], fontFieldResource, c[1].toChar().toString(), 2/*TEXT_JUSTIFY_LEFT*/);
+//		    			}
+//						xOffset += useDc.getTextWidthInPixels(c[0].toString(), fontFieldResource);
+//					}
+//				}
+//			}
  
- 		/**/
  			// draw demo grid of all colors
 			for (var i=-3; i<3; i++)
 			{
@@ -3517,15 +3545,15 @@ class test1View extends WatchUi.WatchFace
 						var x = 120 + j * 20 - dcX;
 						if (x<=dcWidth && (x+20)>=0)
 						{
-				   			useDc.setColor(getColorArray(4 + (i+3) + (j+5)*6), graphics.COLOR_TRANSPARENT);
-							useDc.drawText(x, y, iconsFontResource, "F", graphics.TEXT_JUSTIFY_LEFT);	// solid squares
+				   			useDc.setColor(getColorArray(4 + (i+3) + (j+5)*6), -1/*COLOR_TRANSPARENT*/);
+							useDc.drawText(x, y, iconsFontResource, "F", 2/*TEXT_JUSTIFY_LEFT*/);	// solid squares
 						}
 					}
 				}
 			}
 
 			// draw demo grid of all shapes & icons
-	   		useDc.setColor(propTimeHourColor, graphics.COLOR_TRANSPARENT);
+	   		useDc.setColor(propTimeHourColor, -1/*COLOR_TRANSPARENT*/);
 
 			var x = 120 - dcX;
 			var y;
@@ -3537,10 +3565,9 @@ class test1View extends WatchUi.WatchFace
 				y = 120 + iconOffsets[i] - dcY;
 				if (y<=dcHeight && (y+20)>=0)
 				{
-					useDc.drawText(x, y, iconsFontResource, iconStrings[i], graphics.TEXT_JUSTIFY_CENTER);
+					useDc.drawText(x, y, iconsFontResource, iconStrings[i], 1/*TEXT_JUSTIFY_CENTER*/);
 				}
 			}
-		/**/
 		}
 	}
 
@@ -3667,13 +3694,10 @@ class test1View extends WatchUi.WatchFace
     	{
  			var deviceSettings = System.getDeviceSettings();	// 960 bytes, but uses less code memory
 	
-	    	var wouldLikeAnUpdate = false;
-			wouldLikeAnUpdate = (wouldLikeAnUpdate || (fieldActivePhoneStatus!=null && (fieldActivePhoneStatus != deviceSettings.phoneConnected)));
-			wouldLikeAnUpdate = (wouldLikeAnUpdate || (fieldActiveNotificationsStatus!=null && (fieldActiveNotificationsStatus != (deviceSettings.notificationCount > 0))));
-			wouldLikeAnUpdate = (wouldLikeAnUpdate || (fieldActiveNotificationsCount!=null && (fieldActiveNotificationsCount != deviceSettings.notificationCount)));
-			wouldLikeAnUpdate = (wouldLikeAnUpdate || (fieldActiveLTEStatus!=null && (fieldActiveLTEStatus != lteConnected())));
-			
-	    	if (wouldLikeAnUpdate)
+	    	if ((fieldActivePhoneStatus!=null && (fieldActivePhoneStatus != deviceSettings.phoneConnected)) ||
+	    		(fieldActiveNotificationsStatus!=null && (fieldActiveNotificationsStatus != (deviceSettings.notificationCount > 0))) ||
+	    		(fieldActiveNotificationsCount!=null && (fieldActiveNotificationsCount != deviceSettings.notificationCount)) ||
+	    		(fieldActiveLTEStatus!=null && (fieldActiveLTEStatus != lteConnected())) )
 	    	{
 	        	WatchUi.requestUpdate();
 	    	}
@@ -3727,12 +3751,12 @@ class test1View extends WatchUi.WatchFace
 				// copy from the offscreen buffer over the second indicator
     			setSecondClip(dc, clearIndex);
 	    		
-	    		//dc.setColor(Graphics.COLOR_TRANSPARENT, Graphics.COLOR_GREEN);	// check the buffer is clearing the whole of clip region
+	    		//dc.setColor(-1/*COLOR_TRANSPARENT*/, Graphics.COLOR_GREEN);	// check the buffer is clearing the whole of clip region
         		//dc.clear();
 				
 				//if (bufferBitmap==null)
 				//{
-	    		//	dc.setColor(Graphics.COLOR_TRANSPARENT, propBackgroundColor);
+	    		//	dc.setColor(-1/*COLOR_TRANSPARENT*/, propBackgroundColor);
 	        	//	dc.clear();
 				//}
 				//else
@@ -3743,20 +3767,17 @@ class test1View extends WatchUi.WatchFace
 
 			if (propSecondRefreshStyle==2/*REFRESH_ALTERNATE_MINUTES*/ && (minuteIndex%2)==1)
 			{
-		        if (clearIndex>=0)
-		        {
-					// redraw the indicator following the one we just cleared
-					// as some of it might have been erased
-					// - but need to keep using the clip region we used for the erase above
-					var nextIndex = (clearIndex+1)%60; 
-					drawSecond(dc, nextIndex, nextIndex);
-		
-					// in this mode we also always draw the indicator at 0
-					// - so check if that needs redrawing too after erasing the indicator at 1
-					if (clearIndex==1)
-					{
-						drawSecond(dc, 0, 0);
-					}
+				// redraw the indicator following the one we just cleared
+				// as some of it might have been erased
+				// - but need to keep using the clip region we used for the erase above
+				var nextIndex = (clearIndex+1)%60; 
+				drawSecond(dc, nextIndex, nextIndex);
+	
+				// in this mode we also always draw the indicator at 0
+				// - so check if that needs redrawing too after erasing the indicator at 1
+				if (clearIndex==1)
+				{
+					drawSecond(dc, 0, 0);
 				}
 			}
 			else
@@ -3777,26 +3798,24 @@ class test1View extends WatchUi.WatchFace
     {
 		if (propSecondFontResource!=null)		// sometimes onPartialUpdate is called between onSettingsChanged and onUpdate - so this resource could be null
 		{
-	    	var graphics = Graphics;
-	    	
 	    	var curCol = COLOR_NOTSET;
 	   		var xyIndex = startIndex + (propSecondMoveInABit ? 60 : 0);
 	    	for (var index=startIndex; index<=endIndex; index++, xyIndex++)
 	    	{
-				var col = secondsCol[index];
+				var col = getColorArray(secondsColorIndexArray[index]);
 		
 		        if (curCol != col)
 		        {
 		        	curCol = col;
-		       		dc.setColor(curCol, graphics.COLOR_TRANSPARENT);	// seconds color
+		       		dc.setColor(curCol, -1/*COLOR_TRANSPARENT*/);	// seconds color
 		       	}
 		       	//dc.setColor(col, graphics.COLOR_GREEN);
-		       	//dc.setColor(getColorArray(4+42+(index*4)%12), graphics.COLOR_TRANSPARENT);
+		       	//dc.setColor(getColorArray(4+42+(index*4)%12), -1/*COLOR_TRANSPARENT*/);
 		       	
 		       	//var s = characterString.substring(index+9, index+10);
 				//var s = StringUtil.charArrayToString([(index + SECONDS_FIRST_CHAR_ID).toChar()]);
-				var s = (index + 21/*SECONDS_FIRST_CHAR_ID*/).toChar().toString();
-	        	dc.drawText(-8/*SECONDS_SIZE_HALF*/ + secondsX[xyIndex], -8/*SECONDS_SIZE_HALF*/ + secondsY[xyIndex], propSecondFontResource, s, graphics.TEXT_JUSTIFY_LEFT);
+				//var s = (index + 21/*SECONDS_FIRST_CHAR_ID*/).toChar().toString();
+	        	dc.drawText(-8/*SECONDS_SIZE_HALF*/ + secondsX[xyIndex], -8/*SECONDS_SIZE_HALF*/ + secondsY[xyIndex], propSecondFontResource, (index + 21/*SECONDS_FIRST_CHAR_ID*/).toChar().toString(), 2/*TEXT_JUSTIFY_LEFT*/);
 			}
 		}
     }
@@ -4782,7 +4801,7 @@ class test1View extends WatchUi.WatchFace
 
 		if (barsOrAxes)
 		{
-			useDc.setColor(color, Graphics.COLOR_TRANSPARENT);
+			useDc.setColor(color, -1/*COLOR_TRANSPARENT*/);
 	
 			for (var i=0; i<15; i++)
 			{
@@ -4796,7 +4815,7 @@ class test1View extends WatchUi.WatchFace
 		else
 		{
 			// draw the axes
-			useDc.setColor(color, Graphics.COLOR_TRANSPARENT);
+			useDc.setColor(color, -1/*COLOR_TRANSPARENT*/);
 			useDc.fillRectangle(x - 2, y - hAxis, 1, hAxis);				// left
 			useDc.fillRectangle(x + barWidth*15, y - hAxis, 1, hAxis);		// right
 			useDc.fillRectangle(x - 2, y, barWidth*15 + 3, 1);				// bottom

@@ -5,9 +5,11 @@
     
 	intensity minutes day
 	intensity goal (day = weekly/7)
+
 	ascent
 	descent
 	ascent/descent units (m/ft)
+    <string id="Unused43">Mountain Icon</string>
 	
    steps percentage
    intensity percentage
@@ -19,6 +21,19 @@
    ring heart rate min & max
    ring sunrise & sunset
    ring sunrise & sunset (bottom clockwise)
+ 
+    <string id="Unused29">Heart Rate Increasing</string>
+    <string id="Unused30">Heart Rate Decreasing</string>
+    <string id="Unused31">Heart Rate Steady</string>
+    <string id="Unused32">heart rate zone 2 or above</string>
+    <string id="Unused33">heart rate zone 1 or below</string>
+    <string id="Unused54">Arrow Up</string>
+    <string id="Unused55">Arrow Down</string>
+    
+    <string id="Unused50">Battery Horizontal Icon</string>
+    <string id="Unused51">Battery Horizontal Icon (solid)</string>
+    <string id="Unused24">Lightning Icon</string>
+    <string id="Unused44">Pressure Icon</string>
  -->
  
  <!--
@@ -36,8 +51,6 @@ setting M1+    <string id="Unused1">BMR Calorie Value Override</string>
 ?	floors goal not reached
 
 setting    <string id="Unused1">Icon Font Size</string>
-
- -->
 
     <string id="Unused1">X</string>
     <string id="Unused2">X</string>
@@ -60,33 +73,33 @@ setting    <string id="Unused1">Icon Font Size</string>
     <string id="Unused19">X</string>
     <string id="Unused20">X</string>
     <string id="Unused21">X</string>
-    
-    <string id="Unused29">Heart Rate Increasing</string>
-    <string id="Unused30">Heart Rate Decreasing</string>
-    <string id="Unused31">Heart Rate Steady</string>
-    <string id="Unused32">heart rate zone 2 or above</string>
-    <string id="Unused33">heart rate zone 1 or below</string>
-    
-	<string id="Unused38">Sunrise/Sunset Altitude Adjustment</string>
+    <string id="Unused22">X</string>
+    <string id="Unused23">X</string>
+    <string id="Unused24">X</string>
+    <string id="Unused25">X</string>
+    <string id="Unused26">X</string>
+    <string id="Unused27">X</string>
+    <string id="Unused28">X</string>
+    <string id="Unused29">X</string>
+    <string id="Unused30">X</string>
+    <string id="Unused31">X</string>
+    <string id="Unused32">X</string>
+    <string id="Unused33">X</string>
+    <string id="Unused34">X</string>
+    <string id="Unused35">X</string>
+ -->
+ 
+	<string id="Unused60">Sunrise/Sunset Altitude Adjustment</string>
 
-    <string id="Unused41">Sunrise Icon</string>
-    <string id="Unused42">Sunset Icon</string>
-    <string id="Unused43">Mountain Icon</string>
-    <string id="Unused44">Pressure Icon</string>
+    <string id="Unused49">Phone Icon (handset)</string>
     <string id="Unused45">Moving Clock Icon</string>
     <string id="Unused46">Fire Icon</string>
-    <string id="Unused24">Lightning Icon</string>
-    <string id="Unused47">Moon Icon</string>
-    <string id="Unused48">Sun Icon</string>
-    <string id="Unused49">Phone Icon (handset)</string>
-    <string id="Unused50">Battery Horizontal Icon</string>
-    <string id="Unused51">Battery Horizontal Icon (solid)</string>
     <string id="Unused52">Heart Icon</string>
-    <string id="Unused53">Heart Icon (solid)</string>
-    <string id="Unused54">Arrow Up</string>
-    <string id="Unused55">Arrow Down</string>
-    <string id="Unused56">Clock Icon</string>
-
+    <string id="Unused41">Sunrise Icon</string>
+    <string id="Unused42">Sunset Icon</string>
+    <string id="Unused48">Sun Icon</string>
+    <string id="Unused47">Moon Icon</string>
+    
     <string id="AppName">M1+</string>
 <!-- 
     <string id="AppName">M1</string>

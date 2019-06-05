@@ -102,8 +102,8 @@ setting    <string id="Unused1">Icon Font Size</string>
     
     <string id="AppName">M1+</string>
 <!-- 
-    <string id="AppName">M1</string>
-    <string id="AppName">M1beta</string>
+    <string id="AppName">M1+</string>
+    <string id="AppName">M1+beta</string>
  -->
 
     <string id="BackgroundColorTitle">Background Color</string>

@@ -13,7 +13,7 @@ class test1View extends WatchUi.WatchFace
 {
 	//var forceMemoryTest = new[1024*6]b;
 	//const forceTestFont = false;
-	//const forceTestLocation = false;
+	//const forceTestLocation = true;
 	//const forceClearStorage = false;
 	//const forceDemoProfiles = false;
 	//const forceDemoFontStyles = false;
@@ -3864,9 +3864,9 @@ class test1View extends WatchUi.WatchFace
 			// since we are doing modulo 24*60 below, doing the following would make no difference so don't need it ...
 			//else
 			//{			
-			//	//if ((riseSetIndex==0 && !sunTimes[3]) ||	// looking for sunrise but sun doesn't rise (so permanent night)
-			//	//	(riseSetIndex==1 && sunTimes[3]))		// looking for sunset but sun rises (so permanent day)
-			//	if ((riseSetIndex==0) != sunTimes[3])
+			//	//if ((riseSetIndex==0 && !sunTimes[2]) ||	// looking for sunrise but sun doesn't rise (so permanent night)
+			//	//	(riseSetIndex==1 && sunTimes[2]))		// looking for sunset but sun rises (so permanent day)
+			//	if ((riseSetIndex==0) != sunTimes[2])
 			//	{
 			//		time += 24*60;		// set time offset from end of day
 			//	}
@@ -4866,34 +4866,11 @@ class test1View extends WatchUi.WatchFace
 				//System.println("alt history=" + altitude);
 			}
 		}
-	}
-
-	// day, latitude, longitude, altitude
-	var sunCalculatedDay = -1;
-	var sunCalculatedLatitude;
-	var sunCalculatedLongitude;
-	var sunCalculatedAltitude;
-
-	// 0==sunrise today, 1==sunset today, 2==sun rises at all today?
-	// 3==sunrise tomorrow, 4==sunset tomorrow, 5==sun rises at all tomorrow?
-	// 6==next sunevent, 7==next sunevent is rise?
-	var sunTimes = new[8];		// hour*60 + minute
-
-	// 1600 code bytes
-	function calculateSun()
-	{
-		var dateInfoShort = Time.Gregorian.info(Time.now(), Time.FORMAT_SHORT);
-		var timeTodayInMinutes = dateInfoShort.hour*60 + dateInfoShort.minute;
-
-		if (!positionGot)
-		{
-			return;
-		}
-
-		var useAltitude = (propSunAdjustAltitude ? positionAltitude : 0.0);
 
 //		if (forceTestLocation)
 //		{
+//			positionGot = true;
+//
 //			// Windermere lat=54.380810, long=-2.907530
 //			//positionLatitude = 54.380810;
 //			//positionLongitude = -2.907530;
@@ -4901,8 +4878,8 @@ class test1View extends WatchUi.WatchFace
 //			// Windermere
 //			positionLatitude = 54.3787142d;	// 54 22 43
 //			positionLongitude = -2.9044238d;	// -2 54 16
-//			//useAltitude = 140.0;	// m
-//			//useAltitude = 0.0;	// m
+//			//positionAltitude = 140.0;	// m
+//			positionAltitude = 0.0;	// m
 //			
 //			//positionLongitude += 0.01;				// 3 secs change
 //			//positionLongitude += 0.1;				// 30 secs change in sunrise
@@ -4924,48 +4901,69 @@ class test1View extends WatchUi.WatchFace
 //			//positionLatitude = 78.2231558d;
 //			//positionLongitude = 15.6463656d;
 //		}
-		
-		var todayValue = Time.today().value();
-		if (sunCalculatedDay==todayValue &&
-			sunCalculatedLatitude==positionLatitude.toFloat() &&
-			sunCalculatedLongitude==positionLongitude.toFloat() &&
-			sunCalculatedAltitude==useAltitude)
+	}
+
+	// day, latitude, longitude, altitude
+	var sunCalculatedDay = -1;
+	var sunCalculatedLatitude;
+	var sunCalculatedLongitude;
+	var sunCalculatedAltitude;
+
+	// 0==sunrise today, 1==sunset today, 2==sun rises at all today?
+	// 3==sunrise tomorrow, 4==sunset tomorrow, 5==sun rises at all tomorrow?
+	// 6==next sunevent, 7==next sunevent is rise?
+	var sunTimes = new[8];		// hour*60 + minute
+
+	// 1600 code bytes
+	function calculateSun()
+	{
+		if (!positionGot)
 		{
 			return;
 		}
 
-		// remember when & where we did this calculation
-		sunCalculatedDay = todayValue;		
-		sunCalculatedLatitude = positionLatitude.toFloat();
-		sunCalculatedLongitude = positionLongitude.toFloat();
-		sunCalculatedAltitude = useAltitude;
+		var dateInfoShort = Time.Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+		var useAltitude = (propSunAdjustAltitude ? positionAltitude : 0.0);
 
-		// this is in local time at that date
-		// gregorian.info displays this time as 13:00
-		// gregorian.utcInfo displays this time as 12:00
-
-		// whereas this time in March before summer time
-		// gregorian.info displays this time as 12:00
-		// gregorian.utcInfo displays this time as 12:00
-
-		// Running this in May (summer time) then timeZoneOffset is 3600 (UTC + 1)
-
-		// Running this in May (summer time) at 20:48
-		// gregorian.info displays this time as 20:48
-		// gregorian.utcInfo displays this time as 19:48
-		
-		// Running this in May (summer time)
-		// gregorian.info displays this time as 00:00
-		// gregorian.utcInfo displays this time as 23:00 on previous date
-
-		var nowDayOfWeek = dateInfoShort.day_of_week;
-		calculateSunDay(0, nowDayOfWeek);		// today
-		calculateSunDay(1, nowDayOfWeek);		// tomorrow
+		var todayValue = Time.today().value();
+		if (sunCalculatedDay!=todayValue ||
+			sunCalculatedLatitude!=positionLatitude.toFloat() ||
+			sunCalculatedLongitude!=positionLongitude.toFloat() ||
+			sunCalculatedAltitude!=useAltitude)
+		{
+			// remember when & where we did this calculation
+			sunCalculatedDay = todayValue;		
+			sunCalculatedLatitude = positionLatitude.toFloat();
+			sunCalculatedLongitude = positionLongitude.toFloat();
+			sunCalculatedAltitude = useAltitude;
 	
-		// calculate next sun event
+			// this is in local time at that date
+			// gregorian.info displays this time as 13:00
+			// gregorian.utcInfo displays this time as 12:00
+	
+			// whereas this time in March before summer time
+			// gregorian.info displays this time as 12:00
+			// gregorian.utcInfo displays this time as 12:00
+	
+			// Running this in May (summer time) then timeZoneOffset is 3600 (UTC + 1)
+	
+			// Running this in May (summer time) at 20:48
+			// gregorian.info displays this time as 20:48
+			// gregorian.utcInfo displays this time as 19:48
+			
+			// Running this in May (summer time)
+			// gregorian.info displays this time as 00:00
+			// gregorian.utcInfo displays this time as 23:00 on previous date
+	
+			calculateSunDay(0, dateInfoShort.day_of_week);		// today
+			calculateSunDay(1, dateInfoShort.day_of_week);		// tomorrow
+		}
+			
+		// calculate next sun event (on every call)
 		sunTimes[6] = null;				// assume don't know time of next sun event
-		sunTimes[7] = !sunTimes[3];		// and if the sun rises today then next event is sunset (or if it doesn't rise then sunset)
+		sunTimes[7] = !sunTimes[2];		// and if the sun rises today then next event is sunset (or if it doesn't rise then sunset)
 		
+		var timeTodayInMinutes = dateInfoShort.hour*60 + dateInfoShort.min;
 		if (sunTimes[0]!=null && timeTodayInMinutes<sunTimes[0])	// before sunrise?
 		{
 			sunTimes[6] = sunTimes[0];
@@ -4984,6 +4982,8 @@ class test1View extends WatchUi.WatchFace
 				sunTimes[7] = true;		// sunrise
 			}
 		}
+
+		//System.println("sunTimes=" + sunTimes.toString());
 	}
 	
 	function calculateSunDay(dayOffset, nowDayOfWeek)
@@ -5076,11 +5076,14 @@ class test1View extends WatchUi.WatchFace
 		// round to nearest minute
 		var sunInfo = Time.Gregorian.info(jan1st2000NoonUTC.add(Time.Gregorian.duration({:minutes => Math.round(jTime*24*60)})), Time.FORMAT_SHORT);		
 		var t = sunInfo.hour*60 + sunInfo.min;
-		if (sunInfo.day_of_week==(nowDayOfWeek+1)%7)	// tomorrow
+		
+		// day_of_week is 1-7 (1=Sun, 2=Mon 3=Tue ...)
+		// so subtract 1 before doing modulo, then add 1 again afterwards
+		if (sunInfo.day_of_week==(nowDayOfWeek/*+1-1*/)%7+1)	// tomorrow
 		{
 			t += 24*60;
 		}
-		else if (sunInfo.day_of_week==(nowDayOfWeek+6)%7)	// yesterday
+		else if (sunInfo.day_of_week==(nowDayOfWeek+6-1)%7+1)	// yesterday
 		{
 			t -= 24*60;
 		}

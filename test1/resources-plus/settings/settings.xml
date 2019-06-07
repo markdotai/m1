@@ -335,9 +335,9 @@
             <listEntry value="36">@Strings.ItemBatteryPercentage</listEntry>
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
+            <listEntry value="79">@Strings.FieldHeartRate</listEntry>
             <listEntry value="77">@Strings.FieldHeartMin</listEntry>
             <listEntry value="78">@Strings.FieldHeartMax</listEntry>
-            <listEntry value="79">@Strings.FieldHeartAverage</listEntry>
             <listEntry value="80">@Strings.FieldHeartChart</listEntry>
             <listEntry value="81">@Strings.FieldHeartAxes</listEntry>
             <listEntry value="94">@Strings.FieldDistance</listEntry>
@@ -488,9 +488,9 @@
             <listEntry value="36">@Strings.ItemBatteryPercentage</listEntry>
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
+            <listEntry value="79">@Strings.FieldHeartRate</listEntry>
             <listEntry value="77">@Strings.FieldHeartMin</listEntry>
             <listEntry value="78">@Strings.FieldHeartMax</listEntry>
-            <listEntry value="79">@Strings.FieldHeartAverage</listEntry>
             <listEntry value="80">@Strings.FieldHeartChart</listEntry>
             <listEntry value="81">@Strings.FieldHeartAxes</listEntry>
             <listEntry value="94">@Strings.FieldDistance</listEntry>
@@ -641,9 +641,9 @@
             <listEntry value="36">@Strings.ItemBatteryPercentage</listEntry>
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
+            <listEntry value="79">@Strings.FieldHeartRate</listEntry>
             <listEntry value="77">@Strings.FieldHeartMin</listEntry>
             <listEntry value="78">@Strings.FieldHeartMax</listEntry>
-            <listEntry value="79">@Strings.FieldHeartAverage</listEntry>
             <listEntry value="80">@Strings.FieldHeartChart</listEntry>
             <listEntry value="81">@Strings.FieldHeartAxes</listEntry>
             <listEntry value="94">@Strings.FieldDistance</listEntry>
@@ -794,9 +794,9 @@
             <listEntry value="36">@Strings.ItemBatteryPercentage</listEntry>
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
+            <listEntry value="79">@Strings.FieldHeartRate</listEntry>
             <listEntry value="77">@Strings.FieldHeartMin</listEntry>
             <listEntry value="78">@Strings.FieldHeartMax</listEntry>
-            <listEntry value="79">@Strings.FieldHeartAverage</listEntry>
             <listEntry value="80">@Strings.FieldHeartChart</listEntry>
             <listEntry value="81">@Strings.FieldHeartAxes</listEntry>
             <listEntry value="94">@Strings.FieldDistance</listEntry>
@@ -947,9 +947,9 @@
             <listEntry value="36">@Strings.ItemBatteryPercentage</listEntry>
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
+            <listEntry value="79">@Strings.FieldHeartRate</listEntry>
             <listEntry value="77">@Strings.FieldHeartMin</listEntry>
             <listEntry value="78">@Strings.FieldHeartMax</listEntry>
-            <listEntry value="79">@Strings.FieldHeartAverage</listEntry>
             <listEntry value="80">@Strings.FieldHeartChart</listEntry>
             <listEntry value="81">@Strings.FieldHeartAxes</listEntry>
             <listEntry value="94">@Strings.FieldDistance</listEntry>
@@ -1100,9 +1100,9 @@
             <listEntry value="36">@Strings.ItemBatteryPercentage</listEntry>
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
+            <listEntry value="79">@Strings.FieldHeartRate</listEntry>
             <listEntry value="77">@Strings.FieldHeartMin</listEntry>
             <listEntry value="78">@Strings.FieldHeartMax</listEntry>
-            <listEntry value="79">@Strings.FieldHeartAverage</listEntry>
             <listEntry value="80">@Strings.FieldHeartChart</listEntry>
             <listEntry value="81">@Strings.FieldHeartAxes</listEntry>
             <listEntry value="94">@Strings.FieldDistance</listEntry>

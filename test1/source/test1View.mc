@@ -1285,6 +1285,8 @@ class test1View extends WatchUi.WatchFace
 		var watchUi = WatchUi;
 		var fonts = Rez.Fonts;
 
+		var timeNowValue = Time.now().value();
+
 		//if (forceClearStorage)
 		//{
 		//	storage.clearValues();		// clear all values from storage for debugging
@@ -1427,42 +1429,25 @@ class test1View extends WatchUi.WatchFace
 				// delete the saved data (in case the app decides to reset itself and all properties ...)
 				//storage.deleteValue("C");
 
-				var timeNowValue = Time.now().value();
-				
 				if (saveData[0]>=PROFILE_PRIVATE_INDEX && saveData[0]<PROFILE_NUM_USER+PROFILE_NUM_PRESET)
 				{
 					profileActive = saveData[0];
-					profileDelayEnd = saveData[1];
-					
 					// verify that profileDelayEnd is not too far in the future ... just in case (should be 2+1 minutes or less)
-					if (profileDelayEnd > (timeNowValue + (2+1)*60))
-					{
-						profileDelayEnd = 0;
-					}
+					profileDelayEnd = ((saveData[1] <= (timeNowValue + (2+1)*60)) ? saveData[1] : 0);
 				}
 				
 				if (saveData[2]>=0 && saveData[2]<PROFILE_NUM_USER)
 				{
 					profileRandom = saveData[2]; 
-					profileRandomEnd = saveData[3];
-					
 					// verify that profileRandomEnd is not too far in the future ... just in case (should be 20+1 minutes or less)
-					if (profileRandomEnd > (timeNowValue + (20+1)*60))
-					{
-						profileRandomEnd = 0;
-					}
+					profileRandomEnd = ((saveData[3] <= (timeNowValue + (20+1)*60)) ? saveData[3] : 0);
 				}
 				
 				if (saveData[4]>=0 && saveData[4]<PROFILE_NUM_USER+PROFILE_NUM_PRESET)
 				{
 					demoProfilesCurrentProfile = saveData[4]; 
-					demoProfilesCurrentEnd = saveData[5];
-					
 					// verify that demoProfilesCurrentEnd is not too far in the future ... just in case (should be 5+1 minutes or less)
-					if (demoProfilesCurrentEnd > (timeNowValue + (5+1)*60))
-					{
-						demoProfilesCurrentEnd = 0;
-					}
+					demoProfilesCurrentEnd = ((saveData[5] <= (timeNowValue + (5+1)*60)) ? saveData[5] : 0);
 				}
 				
 				demoProfilesOn = saveData[6];
@@ -1481,7 +1466,7 @@ class test1View extends WatchUi.WatchFace
 
 		initProfiles();			// load profile times and save out a first version of the private profile to storage if it doesn't exist
 		
-		initHeartSamples();
+		initHeartSamples(timeNowValue);
     }
 
 	function saveDataForStop()
@@ -1858,7 +1843,7 @@ class test1View extends WatchUi.WatchFace
 		applicationProperties.setValue("EG", "");
 	}
 	
-	function handleSettingsChanged(clockTime, timeNow)
+	function handleSettingsChanged(timeNow, second)
 	{
 		demoProfilesOnPrev = demoProfilesOn; 
 		demoProfilesOn = propertiesGetBoolean("DP");
@@ -1961,7 +1946,7 @@ class test1View extends WatchUi.WatchFace
 		
 		if (setProfileDelay)
 		{
-			profileDelayEnd = timeNow.value() + ((60-clockTime.sec)%60) + 2*60;		// delay of 2 minutes before any auto profile switching
+			profileDelayEnd = timeNow.value() + ((60-second)%60) + 2*60;		// delay of 2 minutes before any auto profile switching
 			profileRandomEnd = 0;							// clear this
 			demoProfilesCurrentEnd = 0;
 		}
@@ -2173,6 +2158,25 @@ class test1View extends WatchUi.WatchFace
 		        
 		        secondsColorIndexArray[i] = col;
 		    }
+
+// this test code now works out exactly the same size as the original above!
+//			// Initialising the array like this works out 100 bytes more expensive
+//			//var colArray = [propertiesGetColorIndex("13", 0), 4, propertiesGetColorIndex("17", -1), propertiesGetColorIndex("16", -1), propertiesGetColorIndex("15", -1), propertiesGetColorIndex("14", -1)];			
+//			var colArray = new [6];
+//			colArray[0] = propertiesGetColorIndex("13", 0);
+//			for (var i=2; i<6; i++)
+//			{
+//				colArray[i] = propertiesGetColorIndex("" + (19-i), -1);
+//			}			
+//	    	var secondColorDemo2 = propertiesGetBoolean("18");		// second color demo
+//		
+//			// this for loop is 30 bytes cheaper than original
+//	    	for (var i=0; i<60; i++)
+//	    	{
+//				colArray[1] = 4+i;
+//				var testArray = [secondColorDemo2, i==0 && colArray[2]!=-1, (i%15)==0 && colArray[3]!=-1, (i%10)==0 && colArray[4]!=-1, (i%10)==5 && colArray[5]!=-1];
+//				secondsColorIndexArray[i] = colArray[testArray.indexOf(true)+1];
+//			}		
 		}
 		
     	propFieldFont = propertiesGetNumber("24");
@@ -2362,10 +2366,10 @@ class test1View extends WatchUi.WatchFace
 		//System.println("onUpdate");
     
         var clockTime = System.getClockTime();	// get as first thing so we know it is correct and won't change later on
+		var timeNow = Time.now();
         var hour = clockTime.hour;
         var minute = clockTime.min;
         var second = clockTime.sec;
-		var timeNow = Time.now();
 		var profileToActivate;
 		var demoSettingsChanged;
 		var doGetPropertiesAndDynamicResources = false;
@@ -2388,14 +2392,14 @@ class test1View extends WatchUi.WatchFace
 		//System.println("update rest sec=" + second);
 
 		if (settingsHaveChanged || firstUpdateSinceInitialize)
-		{
+		{		
 			profileRandomLastMin = minute;	// don't do a random profile change on first minute (after initialize or settings change)
 
 			releaseDynamicResources();						// also done in onSettingsChanged()
 			doGetPropertiesAndDynamicResources = true;
 			forceDemoSettingsChange = true;
 			
-			handleSettingsChanged(clockTime, timeNow);		// save/load/export/import etc
+			handleSettingsChanged(timeNow, second);		// save/load/export/import etc
 
 			settingsHaveChanged = false;			// clear the flag now as it has been handled (do after handleSettingsChanged)
 			firstUpdateSinceInitialize = false;		// and make sure this is cleared now also
@@ -2465,10 +2469,9 @@ class test1View extends WatchUi.WatchFace
 		// (even if that position isn't currently being used by anything)
 		calculatePosition();
 
-		//calculateSun();
-
 		// sample the heart rate every time
-		sampleHeartRate(second);
+		sampleHeartRate(second, false);
+		heartChartVisible = false;		// until know otherwise
 
 		//System.println("hour=" + gregorian.info(timeNow, Time.FORMAT_SHORT).hour + " utc=" + gregorian.utcInfo(timeNow, Time.FORMAT_SHORT).hour);
 		// does not change with time simulation in simulator:
@@ -2875,11 +2878,13 @@ class test1View extends WatchUi.WatchFace
 
 										if (eDisplay==80/*FIELD_HEART_CHART*/ || eDisplay==81/*FIELD_HEART_AXES*/)
 										{
+											heartChartVisible = true;	// we know it is visible now
+										
 											eStr = "0";		// just a placeholder in the field array
 											eFlags |= ((eDisplay==80/*FIELD_HEART_CHART*/) ? 0x0400/*eHeartChart*/ : 0x0800/*eHeartAxes*/);
 
 											var checkNextHeart = checkNextElementType(dataStart, i, visibilityStatus, 80/*FIELD_HEART_CHART*/+81/*FIELD_HEART_AXES*/-eDisplay);	// check for other type
-											eKern = (checkNextHeart[0] ? 0 : (15*4 + 10));
+											eKern = (checkNextHeart[0] ? 0 : 58/*heartChartWidth*/);
 										}
 										else
 										{
@@ -3298,7 +3303,7 @@ class test1View extends WatchUi.WatchFace
 							if ((w&(0x0400/*eHeartChart*/|0x0800/*eHeartAxes*/))!=0)
 							{
 								curFont = null;
-								drawHeartChart(useDc, dateX+(10/2), dateY+6, getColorArray(backgroundFieldInfoColorIndex[i]), (w&0x0400/*eHeartChart*/)!=0);		// draw heart rate chart
+								drawHeartChart(useDc, dateX+5/*heartChartXOffset*/, dateY+6, getColorArray(backgroundFieldInfoColorIndex[i]), (w&0x0400/*eHeartChart*/)!=0);		// draw heart rate chart
 							}
 							else if ((w&0x1000/*eIsIcon*/)!=0)		// isIcon
 							{
@@ -3319,13 +3324,14 @@ class test1View extends WatchUi.WatchFace
 									// align bottom of text with bottom of icons
 									if (propFieldFont<24/*APPFONT_SYSTEM_XTINY*/)		// custom font?
 									{
-										var fieldYAdjustFontCustom = [			// 60 code bytes to initialise
-											0,		// APPFONT_ULTRA_LIGHT
-											-12,	// APPFONT_ULTRA_LIGHT_TINY
-											-16,	// APPFONT_ULTRA_LIGHT_SMALL
-											-21,	// APPFONT_ULTRA_LIGHT_MEDIUM
-										];
-										dateY += fieldYAdjustFontCustom[propFieldFont/6];
+										//var fieldYAdjustFontCustom = [			// 60 code bytes to initialise
+										//	0,	// APPFONT_ULTRA_LIGHT
+										//	12,	// APPFONT_ULTRA_LIGHT_TINY
+										//	16,	// APPFONT_ULTRA_LIGHT_SMALL
+										//	21,	// APPFONT_ULTRA_LIGHT_MEDIUM
+										//];
+										//dateY -= fieldYAdjustFontCustom[propFieldFont/6];
+										dateY -= ((((0x15<<24) | (0x10<<16) | (0x0C<<8) | 0) >> ((propFieldFont/6)*8)) & 0xFF);
 									}
 									else
 									{
@@ -3558,11 +3564,12 @@ class test1View extends WatchUi.WatchFace
 			var x = 120 - dcX;
 			var y;
 			var iconStrings = ["ACEGIK", "BDFHJL", "NMPOWRS", "QTVXU"];		// 60 code bytes to initialise
-			var iconOffsets = [60, 80, -80, -100];		// 60 code bytes to initialise
+			//var iconOffsets = [180, 200, 40, 20];		// 60 code bytes to initialise
 				
 			for (var i=0; i<4; i++)
 			{
-				y = 120 + iconOffsets[i] - dcY;
+				//y = iconOffsets[i] - dcY;
+				y = ((((0x14<<24) | (0x28<<16) | (0xC8<<8) | 0xB4)>>(i*8))&0xFF) - dcY;
 				if (y<=dcHeight && (y+20)>=0)
 				{
 					useDc.drawText(x, y, iconsFontResource, iconStrings[i], 1/*TEXT_JUSTIFY_CENTER*/);
@@ -3688,7 +3695,7 @@ class test1View extends WatchUi.WatchFace
     	var minute = clockTime.min;
     	var second = clockTime.sec;
 
-    	sampleHeartRate(second);
+    	sampleHeartRate(second, second!=lastPartialUpdateSec);
     
     	// check for some status icons changing dynamically
     	{
@@ -3925,7 +3932,7 @@ class test1View extends WatchUi.WatchFace
 			var dateInfoShort = Time.Gregorian.info(timeNow, Time.FORMAT_SHORT);
 			var nowDayNumber = (dateInfoShort.day_of_week+5)%7;		// 1=Sun, 2=Mon 3=Tue, etc so convert to 0=Mon, 1=Tue ... 6=Sun
 			var prevDayNumber = (nowDayNumber+6)%7;
-	        var nowTime = clockTime.hour*60 + clockTime.min;
+	        var timeNowInMinutes = clockTime.hour*60 + clockTime.min;
 			var randomNum = 0;
 			var randomProfiles = new[PROFILE_NUM_USER];
 			var randomEvents = new[PROFILE_NUM_USER];
@@ -3952,7 +3959,7 @@ class test1View extends WatchUi.WatchFace
 					
 					if (startTime<endTime)		// Note: if 2 times are equal then go for 24 hours (e.g. by default both times are 0)
 					{
-						if (nowTime>=startTime && nowTime<endTime && (t0&(0x01<<nowDayNumber))!=0)	// current day set?
+						if (timeNowInMinutes>=startTime && timeNowInMinutes<endTime && (t0&(0x01<<nowDayNumber))!=0)	// current day set?
 						{
 							doActivate = i;
 						}
@@ -3960,8 +3967,8 @@ class test1View extends WatchUi.WatchFace
 					else
 					{
 						// goes over midnight
-						if ((nowTime>=startTime && (t0&(0x01<<nowDayNumber))!=0) ||			// current day 
-							(nowTime<endTime && (t0&(0x01<<prevDayNumber))!=0))				// previous day
+						if ((timeNowInMinutes>=startTime && (t0&(0x01<<nowDayNumber))!=0) ||			// current day 
+							(timeNowInMinutes<endTime && (t0&(0x01<<prevDayNumber))!=0))				// previous day
 						{
 							doActivate = i;
 						}
@@ -4683,43 +4690,64 @@ class test1View extends WatchUi.WatchFace
 		}
 	}
 
+	//const heartBinSize = 5;
+	//const heartNumBins = 12;
+	var heartStarting;
+	var heartChartVisible = false;
 	var heartCalculatedTime = -1;
 	var heartDisplayMin;
 	var heartDisplayMax;
 	var heartDisplayAverage;
-	var heartDisplayValues = new[15]b;
+	var heartDisplayValues = new[12/*heartNumBins*/]b;
 	
 	var heartSampledSecond = 0;
 	var heartSamples = new[60]b;
 
-	function initHeartSamples()
+	var heartMax;
+
+	function initHeartSamples(timeNowValue)
 	{
+		heartStarting = timeNowValue;	// set start time for initial frequent heart updates
+
 		for (var i=0; i<60; i++)
 		{
-			heartSamples[i] = 255;
-			heartDisplayValues[i/4] = 0;
+			heartSamples[i] = 255;	// means not set
+			heartDisplayValues[i/5/*heartBinSize*/] = 0;
+		}
+		
+		heartMax = UserProfile.getHeartRateZones(0/*UserProfile.HR_ZONE_SPORT_GENERIC*/)[5];
+		if (heartMax<=0)	// max must be at least 1 to avoid potential zero divide
+		{
+			heartMax = 1;
 		}
 	}
 
-	function sampleHeartRate(second)
+	function sampleHeartRate(second, checkRequestUpdate)
 	{
+		//System.println("sampleHeartRate=" + second);
 		if (heartSampledSecond!=second)
 		{
 			// clear samples between last one and now
 			for (var i=(heartSampledSecond+1)%60; i!=second; i=(i+1)%60)
 			{
-				heartSamples[i] = 255;
+				heartSamples[i] = 255;	// means not set
 			}
 
 			var info = Activity.getActivityInfo();
 			heartSamples[second] = ((info!=null && info.currentHeartRate!=null) ? getMinMax(info.currentHeartRate, 0, 254) : 255);
-			
+
 			heartSampledSecond = second;
+			
+			if (heartChartVisible && checkRequestUpdate && (Time.now().value()<heartStarting+60) && ((second%5/*heartBinSize*/)==0))
+			{
+        		WatchUi.requestUpdate();
+			}
 		}			
 	}
 	
 	function calculateHeartRate(minute, second)
 	{
+		//System.println("calculateHeartRate=" + second);
 		var t = minute*60 + second;
 		if (heartCalculatedTime!=t)
 		{
@@ -4728,6 +4756,7 @@ class test1View extends WatchUi.WatchFace
 			heartDisplayMin = null;
 			heartDisplayMax = null;
 			heartDisplayAverage = null;
+			var heartDisplayLatest = null;
 
 			var allSum = 0;
 			var allCount = 0;
@@ -4736,11 +4765,13 @@ class test1View extends WatchUi.WatchFace
 			var binCount = 0;
 			var isLastI = false;
 			// start from bin following this second's bin (keeps the display bars moving nicely without gaps appearing)
-			for (var i=((second/4)*4+4)%60; !isLastI; i=(i+1)%60)
+			for (var i=((second/5/*heartBinSize*/ + 1)*5/*heartBinSize*/)%60; !isLastI; i=(i+1)%60)
 			{		
 				var r = heartSamples[i];
-				if (r != 255)
+				if (r != 255)	// value has been set
 				{
+					heartDisplayLatest = r;
+				
 					if (heartDisplayMin==null || r<heartDisplayMin)
 					{
 						heartDisplayMin = r;
@@ -4759,9 +4790,9 @@ class test1View extends WatchUi.WatchFace
 				}
 				
 				isLastI = (i==second);
-				if ((bin%4)==3 || isLastI)
+				if ((bin%5/*heartBinSize*/)==(5/*heartBinSize*/-1) || isLastI)
 				{
-					heartDisplayValues[bin/4] = ((binCount>0) ? (binSum/binCount) : 0);
+					heartDisplayValues[bin/5/*heartBinSize*/] = ((binCount>0) ? (binSum/binCount) : 0);
 					
 					binSum = 0;
 					binCount = 0;
@@ -4771,18 +4802,20 @@ class test1View extends WatchUi.WatchFace
 
 			if (allCount>0)
 			{
-				heartDisplayAverage = (allSum + allCount/2)/allCount;
+				// during glance gesture display the latest heart rate value, otherwise display average
+				heartDisplayAverage = ((onOrGlanceActive&ITEM_ONGLANCE)!=0) ? heartDisplayLatest : (allSum + allCount/2)/allCount;
 			}
 
+			// resort to sensor history if no heart rate measured in last minute
 			if (heartDisplayAverage==null && hasHeartRateHistory)
 			{
 				var heartSample = SensorHistory.getHeartRateHistory({:period => 1}).next();
 				if (heartSample!=null && heartSample.data!=null)
 				{
-					var r = heartSample.data.toNumber();
-					heartDisplayMin = r;
-					heartDisplayMax = r;
-					heartDisplayAverage = r;
+					//var r = heartSample.data.toNumber();
+					//heartDisplayMin = r;		don't set, as no value in last minute
+					//heartDisplayMax = r;		don't set, as no value in last minute
+					heartDisplayAverage = heartSample.data.toNumber();
 				}
 			}
 		}
@@ -4792,22 +4825,24 @@ class test1View extends WatchUi.WatchFace
 // only 6000ms for 1xsetColor + 60xdrawRectangle
 // 6000ms for drawLine
 // 6000ms for drawPoint
+
+	//const heartChartHeight = 20;
+	//const heartBarWidth = 4;
+	//const heartChartXOffset = 5;
+	//const heartChartWidth = 58;	(12/*heartNumBins*/*4/*heartBarWidth*/ + 2*5/*heartChartXOffset*/)
+
 	function drawHeartChart(useDc, x, y, color, barsOrAxes)
-	{
-		// draw the bars
-		var heightScale = 10;
-		var barWidth = 4;
-		var hAxis = 200 / heightScale;
+	{	
+		useDc.setColor(color, -1/*COLOR_TRANSPARENT*/);
 
 		if (barsOrAxes)
 		{
-			useDc.setColor(color, -1/*COLOR_TRANSPARENT*/);
-	
-			for (var i=0; i<15; i++)
+			// draw the bars
+			for (var i=0; i<12/*heartNumBins*/; i++)
 			{
-				var h = (heartDisplayValues[i]+(heightScale/2))/heightScale;
+				var h = getMinMax((heartDisplayValues[i]*(20/*heartChartHeight*/+1))/heartMax, 0, 20/*heartChartHeight*/);
 	
-				useDc.fillRectangle(x + barWidth*i, y - h, barWidth-1, h+1);	// h+1 so it goes to same position as axes (for alignment with text when no axes drawn)
+				useDc.fillRectangle(x + 4/*heartBarWidth*/*i, y - h, 4/*heartBarWidth*/-1, h+1);	// h+1 so it goes to same position as axes (for alignment with text when no axes drawn)
 				//useDc.drawPoint(100+x - dcX, 220-h - dcY);
 				//useDc.drawLine(i, 0, i, 30);
 			}
@@ -4815,10 +4850,9 @@ class test1View extends WatchUi.WatchFace
 		else
 		{
 			// draw the axes
-			useDc.setColor(color, -1/*COLOR_TRANSPARENT*/);
-			useDc.fillRectangle(x - 2, y - hAxis, 1, hAxis);				// left
-			useDc.fillRectangle(x + barWidth*15, y - hAxis, 1, hAxis);		// right
-			useDc.fillRectangle(x - 2, y, barWidth*15 + 3, 1);				// bottom
+			useDc.fillRectangle(x-2, y - 20/*heartChartHeight*/, 1, 20/*heartChartHeight*/);				// left
+			useDc.fillRectangle(x+(4/*heartBarWidth*/*12/*heartNumBins*/), y-20/*heartChartHeight*/, 1, 20/*heartChartHeight*/);		// right
+			useDc.fillRectangle(x-2, y, (4/*heartBarWidth*/*12/*heartNumBins*/)+3, 1);				// bottom
 		}
 	}
 

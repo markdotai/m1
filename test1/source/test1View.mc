@@ -101,7 +101,7 @@ class test1View extends WatchUi.WatchFace
 	
 	var propDemoDisplayOn;
 	
-	var propSunAdjustAltitude = false;
+	var propSunAltitudeAdjust = false;
 	
 	const FIELD_NUM = 8;		// number of fields
 	const FIELD_NUM_ELEMENTS = 6;
@@ -156,7 +156,7 @@ class test1View extends WatchUi.WatchFace
 
     const PROFILE_NUM_PROPERTIES = 38;
     //const PROFILE_PROPERTY_COLON = 36;
-    //const PROFILE_PROPERTY_2ND_OFFSET = 37;
+    //const PROFILE_PROPERTY_2ND_TIME_ZONE_OFFSET = 37;
 	
 	const PROFILE_PRIVATE_INDEX = -1;			// only used for temporary storage while app is running
 
@@ -194,8 +194,15 @@ class test1View extends WatchUi.WatchFace
 	var demoProfilesCurrentEnd = 0;
 
 	var iconsFontResource;
+	// if any of these numbers below change, then also need to modify:
+	//     	- FIELD_SHAPE_CIRCLE, as they are in the same order
+	//		- the demo display drawing mode 
 	//!const iconsString = "ABCDEFGHIJKLMNOPQRSTUVWX";
 	//const ICONS_FIRST_CHAR_ID = 65;
+	//
+	// 0 = 48 = move bar
+	// 1 = 49 = move bar solid
+	//
 	// A = 65 = circle
 	// B = 66 = circle solid
 	// C = 67 = rounded
@@ -221,46 +228,15 @@ class test1View extends WatchUi.WatchFace
 	// V = 86 = footsteps
 	// W = 87 = network
 	// X = 88 = stairs
-	//
-	// Y = 89 = move bar
-	// Z = 90 = move bar solid
-
-	//enum
-	//{
-		// if any of these numbers below change, then also need to modify:
-		//     	- FIELD_SHAPE_CIRCLE, as they are in the same order
-		//     	- the icons font resource (ICONS_FIRST_CHAR_ID)
-		//		- the demo display drawing mode 
-		//!FIELD_ICON_EMPTY = 0,
-		//!FIELD_ICON_SPACE = 1,
-
-		//!FIELD_ICON_CIRCLE = 2,				
-		//!FIELD_ICON_CIRCLE_SOLID = 3,
-		//!FIELD_ICON_ROUNDED = 4,
-		//!FIELD_ICON_ROUNDED_SOLID = 5,
-		//!FIELD_ICON_SQUARE = 6,
-		//!FIELD_ICON_SQUARE_SOLID = 7,
-		//!FIELD_ICON_TRIANGLE = 8,
-		//!FIELD_ICON_TRIANGLE_SOLID = 9,
-		//!FIELD_ICON_DIAMOND = 10,
-		//!FIELD_ICON_DIAMOND_SOLID = 11,
-		//!FIELD_ICON_STAR = 12,
-		//!FIELD_ICON_STAR_SOLID = 13,
-		//!FIELD_ICON_ALARM = 14,
-		//!FIELD_ICON_LOCK = 15,
-		//!FIELD_ICON_PHONE = 16,
-		//!FIELD_ICON_NOTIFICATION = 17,
-		//!FIELD_ICON_FIGURE = 18,
-		//!FIELD_ICON_BATTERY = 19,
-		//!FIELD_ICON_BATTERY_SOLID = 20,
-		//!FIELD_ICON_BED = 21,
-		//!FIELD_ICON_FLOWER = 22,
-		//!FIELD_ICON_FOOTSTEPS = 23,
-		//!FIELD_ICON_NETWORK = 24,
-		//!FIELD_ICON_STAIRS = 25,
-
-		//!FIELD_ICON_UNUSED = -1,		
-	//}
+	// Y = 89 = phone (handset)
+	// Z = 90 = moving clock
+	// [ = 91 = fire
+	// \ = 92 = heart
+	// ] = 93 = sunrise
+	// ^ = 94 = sunset
+	// _ = 95 = sun
+	// ' = 96 = moon
+	// a = 97 = mountain
 	
 	//enum
 	//{
@@ -356,7 +332,16 @@ class test1View extends WatchUi.WatchFace
 	//	//!FIELD_SHAPE_FLOWER = 61,
 	//	//!FIELD_SHAPE_FOOTSTEPS = 62,
 	//	//!FIELD_SHAPE_NETWORK = 63,
-	//	FIELD_SHAPE_STAIRS = 64,
+	//	//!FIELD_SHAPE_STAIRS = 64,
+	//	//!FIELD_SHAPE_PHONE_HANDSET = 65,
+	//	//!FIELD_SHAPE_STOPWATCH = 66,
+	//	//!FIELD_SHAPE_FIRE = 67,
+	//	//!FIELD_SHAPE_HEART = 68,
+	//	//!FIELD_SHAPE_SUNRISE = 69,
+	//	//!FIELD_SHAPE_SUNSET = 70,
+	//	//!FIELD_SHAPE_SUN = 71,
+	//	//!FIELD_SHAPE_MOON = 72,
+	//	//!FIELD_SHAPE_MOUNTAIN = 73,
 	//
 	//	FIELD_HEART_MIN = 77
 	//	FIELD_HEART_MAX = 78
@@ -2086,9 +2071,22 @@ class test1View extends WatchUi.WatchFace
     	}
 	}
 		
+	(:m1normal)
+    function getGlobalPropertiesPlus()
+    {
+	}
+
+	(:m1plus)
+    function getGlobalPropertiesPlus()
+    {
+		propSunAltitudeAdjust = propertiesGetBoolean("SA");
+	}
+
     // Get values for all our settings
     function getGlobalProperties()
     {
+    	getGlobalPropertiesPlus();
+    
 		propBackgroundColor = propertiesGetColor("1", 0);
 
     	propTimeOn = propertiesGetNumber("2");
@@ -2370,6 +2368,7 @@ class test1View extends WatchUi.WatchFace
         var hour = clockTime.hour;
         var minute = clockTime.min;
         var second = clockTime.sec;
+        var timeNowInMinutesToday = hour*60 + minute;
 		var profileToActivate;
 		var demoSettingsChanged;
 		var doGetPropertiesAndDynamicResources = false;
@@ -2405,7 +2404,7 @@ class test1View extends WatchUi.WatchFace
 			firstUpdateSinceInitialize = false;		// and make sure this is cleared now also
 		}
 					
-		profileToActivate = checkProfileToActivate(clockTime, timeNow);
+		profileToActivate = checkProfileToActivate(timeNow);
 		if (profileToActivate != profileActive)
 		{
 			releaseDynamicResources();
@@ -2418,7 +2417,7 @@ class test1View extends WatchUi.WatchFace
 			profileGlance = doActivateGlanceCheck;		// set this after loadProfile, so it gets remembered
 		}
 
-    	demoSettingsChanged = checkDemoSettings(hour*60 + minute, forceDemoSettingsChange);
+    	demoSettingsChanged = checkDemoSettings(timeNowInMinutesToday, forceDemoSettingsChange);
     	if (demoSettingsChanged)
     	{
 			releaseDynamicResources();
@@ -2642,7 +2641,7 @@ class test1View extends WatchUi.WatchFace
 								var separatorString = " /\\:-.,%";
 			        			eStr = separatorString.substring(eDisplay-21/*FIELD_SEPARATOR_SPACE*/, eDisplay-21/*FIELD_SEPARATOR_SPACE*/+1);
 						    }
-						    else if (eDisplay>=41/*FIELD_SHAPE_CIRCLE*/ && eDisplay<=64/*FIELD_SHAPE_STAIRS*/)
+						    else if (eDisplay>=41/*FIELD_SHAPE_CIRCLE*/ && eDisplay<=73/*FIELD_SHAPE_MOUNTAIN*/)
 						    {			    	
 								//var iconsString = "ABCDEFGHIJKLMNOPQRSTUVWX";
 								//eStr = iconsString.substring(e-FIELD_SHAPE_CIRCLE, e-FIELD_SHAPE_CIRCLE+1);
@@ -2859,7 +2858,7 @@ class test1View extends WatchUi.WatchFace
 											// moveBarNum goes from 1 to 5
 											var barIsOn = (moveBarNum <= activityMonitorInfo.moveBarLevel);
 											var tempKern = ((j<numToAdd-1 || nextIsMoveBar) ? -5 : 0);
-											addBackgroundField(dc, f, fieldInfoIndexEnd, (barIsOn ? "Z" : "Y"), ((barIsOn || propMoveBarOffColorIndex==COLOR_NOTSET) ? eColorIndex : propMoveBarOffColorIndex), tempKern, 0x1000/*eIsIcon*/);
+											addBackgroundField(dc, f, fieldInfoIndexEnd, (barIsOn ? "1" : "0"), ((barIsOn || propMoveBarOffColorIndex==COLOR_NOTSET) ? eColorIndex : propMoveBarOffColorIndex), tempKern, 0x1000/*eIsIcon*/);
 										}
 										
 										// leave eStr as null so doesn't get added again below
@@ -3047,43 +3046,55 @@ class test1View extends WatchUi.WatchFace
 
 			var outerMode = propertiesGetNumber("21");
 	
-			if (outerMode==1 && activityMonitorInfo.stepGoal>0)		// steps
+			if (outerMode==1)		// steps
 			{
-				var steps = activityMonitorInfo.steps;
-				var stepGoal = activityMonitorInfo.stepGoal;
-				
-				backgroundOuterFillEnd = (60 * steps) / stepGoal - 1;
-				if (backgroundOuterFillEnd>=60)
-				{
-					backgroundOuterFillEnd++;	// add that 1 back on again so multiples of stepGoal correctly align at start 
-					
-					// once past steps goal then use a different style - draw just two unfilled blocks moving around
-					var multiple = steps / stepGoal;
-					backgroundOuterFillStart = (backgroundOuterFillEnd+multiple)%60;
-					backgroundOuterFillEnd = (backgroundOuterFillEnd+59)%60;	// same as -1
-				}
+				getValueOuterFillStartEnd(activityMonitorInfo.steps, activityMonitorInfo.stepGoal);
 			}
 			else if (outerMode==2)			// minutes
 			{
 	    		backgroundOuterFillEnd = minute - 1;
 			}
-			else if (outerMode==3)			// hours
+			else if (outerMode==3 || outerMode==5)		// hours or 2nd time zone hours
 			{
+				var useHour = ((outerMode==3) ? hour : hour2nd);  
 		        if (deviceSettings.is24Hour)
 		        {
 	        		//backgroundOuterFillEnd = ((hour*60 + minute) * 120) / (24 * 60);
-	        		backgroundOuterFillEnd = (hour*60 + minute) / 24 - 1;
+	        		backgroundOuterFillEnd = (useHour*60 + minute) / 24 - 1;
 		        }
 		        else        	// 12 hours
 		        {
-	        		backgroundOuterFillEnd = ((hour%12)*60 + minute) / 12 - 1;
+	        		backgroundOuterFillEnd = ((useHour%12)*60 + minute) / 12 - 1;
 		        }
 	   		}
-	   		else if (outerMode==4)			// battery percentage
+	   		else if (outerMode==4)		// battery percentage
 	   		{
 				backgroundOuterFillEnd = (systemStats.battery * 60).toNumber() / 100 - 1;
 	   		}
-			else		// plain color
+	   		else if (outerMode==6)		// sunrise & sunset now top
+	   		{
+				getSunOuterFillStartEnd(timeNowInMinutesToday);
+	   		}
+	   		else if (outerMode==7)		// sunrise & sunset midnight top
+	   		{
+				getSunOuterFillStartEnd(0);
+	   		}
+	   		else if (outerMode==8)		// sunrise & sunset noon top
+	   		{
+				getSunOuterFillStartEnd(12*60);
+	   		}
+			else if (outerMode==9 || outerMode==10)		// intensity
+			{
+				// intensity minutes (weekly)
+				// smart intensity minutes
+				getValueOuterFillStartEnd(activityMonitorInfo.activeMinutesWeek.total, (outerMode==9) ? activityMonitorInfo.activeMinutesWeekGoal : ((activityMonitorInfo.activeMinutesWeekGoal * dayNumberOfWeek) / 7));
+			}
+	   		else if (outerMode==11)			// heart rate
+	   		{
+				calculateHeartRate(minute, second);
+				backgroundOuterFillEnd = getMinMax((heartDisplayAverage * 60) / heartMaxZone5, 0, 60) - 1;
+	   		}
+			else /*if (outerMode==0)*/		// plain color
 			{
 				backgroundOuterFillEnd = 59;
 			}
@@ -3119,6 +3130,32 @@ class test1View extends WatchUi.WatchFace
     		}
 		}
     }
+
+	function getValueOuterFillStartEnd(steps, stepGoal)
+	{
+		backgroundOuterFillEnd = ((stepGoal>0) ? ((60 * steps) / stepGoal - 1) : -1);
+		if (backgroundOuterFillEnd>=60)
+		{
+			backgroundOuterFillEnd++;	// add that 1 back on again so multiples of stepGoal correctly align at start 
+			
+			// once past steps goal then use a different style - draw just two unfilled blocks moving around
+			//var multiple = steps / stepGoal;
+			backgroundOuterFillStart = (backgroundOuterFillEnd + (steps/stepGoal))%60;
+			backgroundOuterFillEnd = (backgroundOuterFillEnd + 59)%60;	// same as -1
+		}
+	}
+	
+	function getSunOuterFill(t, defaultValue, timeOffsetInMinutes, segmentAdjust)
+	{
+		return ((((t!=null) ? t : 0) + 12 + 24*60 - timeOffsetInMinutes) / 24 + segmentAdjust)%60;
+	}
+
+	function getSunOuterFillStartEnd(timeOffsetInMinutes)
+	{
+		calculateSun();
+		backgroundOuterFillStart = getSunOuterFill(sunTimes[0], 0, timeOffsetInMinutes, 0);
+		backgroundOuterFillEnd = getSunOuterFill(sunTimes[1], 24*60, timeOffsetInMinutes, -1);
+	}
 
 	// eFlags:
 	// eUnused1 = 0x0100
@@ -3543,7 +3580,7 @@ class test1View extends WatchUi.WatchFace
  			// draw demo grid of all colors
 			for (var i=-3; i<3; i++)
 			{
-				var y = 120 + i * 20 - dcY;
+				var y = 130 + i * 20 - dcY;
 				if (y<=dcHeight && (y+20)>=0)
 				{
 					for (var j=-5; j<5; j++)
@@ -3563,13 +3600,14 @@ class test1View extends WatchUi.WatchFace
 
 			var x = 120 - dcX;
 			var y;
-			var iconStrings = ["ACEGIK", "BDFHJL", "NMPOWRS", "QTVXU"];		// 60 code bytes to initialise
+			
+			var iconStrings = ["ACEGKI", "BDFHLJ", "NMPOYWRS", "QTVX", "[Z\\]^_`aU"];		// 60 code bytes to initialise
 			//var iconOffsets = [180, 200, 40, 20];		// 60 code bytes to initialise
 				
-			for (var i=0; i<4; i++)
+			for (var i=0; i<5; i++)
 			{
 				//y = iconOffsets[i] - dcY;
-				y = ((((0x14<<24) | (0x28<<16) | (0xC8<<8) | 0xB4)>>(i*8))&0xFF) - dcY;
+				y = (((0xBEl | (0xD2l<<8) | (0x1El<<16) | (0x0Al<<24) | (0x32l<<32))>>(i*8))&0xFF) - dcY;
 				if (y<=dcHeight && (y+20)>=0)
 				{
 					useDc.drawText(x, y, iconsFontResource, iconStrings[i], 1/*TEXT_JUSTIFY_CENTER*/);
@@ -3892,7 +3930,7 @@ class test1View extends WatchUi.WatchFace
 
 	var doActivateGlanceCheck = -1;
 	
-	function checkProfileToActivate(clockTime, timeNow)
+	function checkProfileToActivate(timeNow)
 	{
 		var doActivate = profileActive;		// stick with current profile until told otherwise
 		doActivateGlanceCheck = -1;			// -1 used to clear profileGlance once glance is finished
@@ -3932,7 +3970,8 @@ class test1View extends WatchUi.WatchFace
 			var dateInfoShort = Time.Gregorian.info(timeNow, Time.FORMAT_SHORT);
 			var nowDayNumber = (dateInfoShort.day_of_week+5)%7;		// 1=Sun, 2=Mon 3=Tue, etc so convert to 0=Mon, 1=Tue ... 6=Sun
 			var prevDayNumber = (nowDayNumber+6)%7;
-	        var timeNowInMinutes = clockTime.hour*60 + clockTime.min;
+	        var timeNowInMinutesToday = dateInfoShort.hour*60 + dateInfoShort.min;
+	        var timeNowValueWholeMinute = timeNowValue + ((60-dateInfoShort.sec)%60);
 			var randomNum = 0;
 			var randomProfiles = new[PROFILE_NUM_USER];
 			var randomEvents = new[PROFILE_NUM_USER];
@@ -3959,7 +3998,7 @@ class test1View extends WatchUi.WatchFace
 					
 					if (startTime<endTime)		// Note: if 2 times are equal then go for 24 hours (e.g. by default both times are 0)
 					{
-						if (timeNowInMinutes>=startTime && timeNowInMinutes<endTime && (t0&(0x01<<nowDayNumber))!=0)	// current day set?
+						if (timeNowInMinutesToday>=startTime && timeNowInMinutesToday<endTime && (t0&(0x01<<nowDayNumber))!=0)	// current day set?
 						{
 							doActivate = i;
 						}
@@ -3967,8 +4006,8 @@ class test1View extends WatchUi.WatchFace
 					else
 					{
 						// goes over midnight
-						if ((timeNowInMinutes>=startTime && (t0&(0x01<<nowDayNumber))!=0) ||			// current day 
-							(timeNowInMinutes<endTime && (t0&(0x01<<prevDayNumber))!=0))				// previous day
+						if ((timeNowInMinutesToday>=startTime && (t0&(0x01<<nowDayNumber))!=0) ||			// current day 
+							(timeNowInMinutesToday<endTime && (t0&(0x01<<prevDayNumber))!=0))				// previous day
 						{
 							doActivate = i;
 						}
@@ -4000,9 +4039,9 @@ class test1View extends WatchUi.WatchFace
 					}
 				}
 				
-				if (profileRandom<0 && randomNum>0 && profileRandomLastMin!=clockTime.min)
+				if (profileRandom<0 && randomNum>0 && profileRandomLastMin!=dateInfoShort.min)
 				{
-					profileRandomLastMin = clockTime.min;
+					profileRandomLastMin = dateInfoShort.min;
 				
 					var r = Math.rand()%(24*60);		// number of minutes in a day
 					if (r < randomEventsTotal)
@@ -4028,7 +4067,7 @@ class test1View extends WatchUi.WatchFace
 								lenMinutes = 1 + ((lenMinutes*18 + numEvents/2) / (17 + numEvents));
 								
 								profileRandom = randomProfiles[i];
-								profileRandomEnd = timeNowValue + ((60-clockTime.sec)%60) + lenMinutes*60;
+								profileRandomEnd = timeNowValueWholeMinute + lenMinutes*60;
 								doActivate = profileRandom;
 								
 								break;
@@ -4077,7 +4116,7 @@ class test1View extends WatchUi.WatchFace
 
 							demoProfilesCurrentProfile = nextProfile;
 							// if within 1 minute of end time of previous demo profile - then just add 5 minutes to end of previous
-							demoProfilesCurrentEnd = ((timeNowValue-demoProfilesCurrentEnd < 60) ? demoProfilesCurrentEnd : (timeNowValue + (60-clockTime.sec)%60)) + 5*60;	// 5 minutes
+							demoProfilesCurrentEnd = ((timeNowValue-demoProfilesCurrentEnd < 60) ? demoProfilesCurrentEnd : timeNowValueWholeMinute) + 5*60;	// 5 minutes
 						}
 					
 						if (demoProfilesCurrentProfile >= 0)
@@ -4703,7 +4742,7 @@ class test1View extends WatchUi.WatchFace
 	var heartSampledSecond = 0;
 	var heartSamples = new[60]b;
 
-	var heartMax;
+	var heartMaxZone5;
 
 	function initHeartSamples(timeNowValue)
 	{
@@ -4715,10 +4754,10 @@ class test1View extends WatchUi.WatchFace
 			heartDisplayValues[i/5/*heartBinSize*/] = 0;
 		}
 		
-		heartMax = UserProfile.getHeartRateZones(0/*UserProfile.HR_ZONE_SPORT_GENERIC*/)[5];
-		if (heartMax<=0)	// max must be at least 1 to avoid potential zero divide
+		heartMaxZone5 = UserProfile.getHeartRateZones(0/*UserProfile.HR_ZONE_SPORT_GENERIC*/)[5];
+		if (heartMaxZone5==null || heartMaxZone5<=0)	// max must be at least 1 to avoid potential zero divide
 		{
-			heartMax = 1;
+			heartMaxZone5 = 200;
 		}
 	}
 
@@ -4840,7 +4879,7 @@ class test1View extends WatchUi.WatchFace
 			// draw the bars
 			for (var i=0; i<12/*heartNumBins*/; i++)
 			{
-				var h = getMinMax((heartDisplayValues[i]*(20/*heartChartHeight*/+1))/heartMax, 0, 20/*heartChartHeight*/);
+				var h = getMinMax((heartDisplayValues[i]*(20/*heartChartHeight*/+1))/heartMaxZone5, 0, 20/*heartChartHeight*/);
 	
 				useDc.fillRectangle(x + 4/*heartBarWidth*/*i, y - h, 4/*heartBarWidth*/-1, h+1);	// h+1 so it goes to same position as axes (for alignment with text when no axes drawn)
 				//useDc.drawPoint(100+x - dcX, 220-h - dcY);
@@ -4875,11 +4914,10 @@ class test1View extends WatchUi.WatchFace
 		var info = Activity.getActivityInfo();
 		if (info!=null)
 		{
-			var curLoc = info.currentLocation;
-			if (curLoc != null)
+			if (info.currentLocation!=null && info.currentLocationAccuracy>0)		// 0 accuracy means GPS not available
 			{
-				var l = curLoc.toDegrees();
-				
+				//System.println("currentLocationAccuracy=" + info.currentLocationAccuracy);
+				var l = info.currentLocation.toDegrees();
 				positionGot = true;
 				positionLatitude = l[0];
 				positionLongitude = l[1];
@@ -4957,7 +4995,7 @@ class test1View extends WatchUi.WatchFace
 		}
 
 		var dateInfoShort = Time.Gregorian.info(Time.now(), Time.FORMAT_SHORT);
-		var useAltitude = (propSunAdjustAltitude ? positionAltitude : 0.0);
+		var useAltitude = (propSunAltitudeAdjust ? positionAltitude : 0.0);
 
 		var todayValue = Time.today().value();
 		if (sunCalculatedDay!=todayValue ||
@@ -4997,20 +5035,20 @@ class test1View extends WatchUi.WatchFace
 		sunTimes[6] = null;				// assume don't know time of next sun event
 		sunTimes[7] = !sunTimes[2];		// and if the sun rises today then next event is sunset (or if it doesn't rise then sunset)
 		
-		var timeTodayInMinutes = dateInfoShort.hour*60 + dateInfoShort.min;
-		if (sunTimes[0]!=null && timeTodayInMinutes<sunTimes[0])	// before sunrise?
+		var timeNowInMinutesToday = dateInfoShort.hour*60 + dateInfoShort.min;
+		if (sunTimes[0]!=null && timeNowInMinutesToday<sunTimes[0])	// before sunrise?
 		{
 			sunTimes[6] = sunTimes[0];
 			sunTimes[7] = true;			// sunrise
 		}
 		else if (sunTimes[1]!=null)		// sunset occurs today
 		{
-			if (timeTodayInMinutes<sunTimes[1])		// before sunset?
+			if (timeNowInMinutesToday<sunTimes[1])		// before sunset?
 			{
 				sunTimes[6] = sunTimes[1];
 				sunTimes[7] = false;	// sunset
 			}
-			else if (sunTimes[3]!=null && timeTodayInMinutes<sunTimes[3])		// before sunrise tomorrow?
+			else if (sunTimes[3]!=null && timeNowInMinutesToday<sunTimes[3])		// before sunrise tomorrow?
 			{
 				sunTimes[6] = sunTimes[3];
 				sunTimes[7] = true;		// sunrise

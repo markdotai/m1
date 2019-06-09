@@ -156,6 +156,13 @@
             <listEntry value="4">@Strings.ItemBatteryPercentage</listEntry>
             <listEntry value="3">@Strings.ItemHours</listEntry>
             <listEntry value="2">@Strings.ItemMinutes</listEntry>
+            <listEntry value="5">@Strings.Item2ndHour</listEntry>
+            <listEntry value="6">@Strings.OuterModeSunNow</listEntry>
+            <listEntry value="7">@Strings.OuterModeSunMidnight</listEntry>
+            <listEntry value="8">@Strings.OuterModeSunNoon</listEntry>
+            <listEntry value="9">@Strings.ItemIntensity</listEntry>
+            <listEntry value="10">@Strings.OuterModeSmartIntensity</listEntry>
+            <listEntry value="11">@Strings.ItemHeartRate</listEntry>
         </settingConfig>
     </setting>
 
@@ -239,7 +246,7 @@
         <settingConfig type="numeric" />
     </setting>
 
-    <setting propertyKey="@Properties.37" title="@Strings.Field2ndOffsetTitle">
+    <setting propertyKey="@Properties.37" title="@Strings.Field2ndTimeZoneOffsetTitle">
         <settingConfig type="numeric" />
     </setting>
 
@@ -301,7 +308,7 @@
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
             <listEntry value="19">@Strings.FieldAM</listEntry>
             <listEntry value="20">@Strings.FieldPM</listEntry>
-            <listEntry value="88">@Strings.Field2ndHour</listEntry>
+            <listEntry value="88">@Strings.Item2ndHour</listEntry>
             <listEntry value="82">@Strings.FieldSunriseHour</listEntry>
             <listEntry value="83">@Strings.FieldSunriseMinute</listEntry>
             <listEntry value="84">@Strings.FieldSunsetHour</listEntry>
@@ -335,7 +342,7 @@
             <listEntry value="36">@Strings.ItemBatteryPercentage</listEntry>
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
-            <listEntry value="79">@Strings.FieldHeartRate</listEntry>
+            <listEntry value="79">@Strings.ItemHeartRate</listEntry>
             <listEntry value="77">@Strings.FieldHeartMin</listEntry>
             <listEntry value="78">@Strings.FieldHeartMax</listEntry>
             <listEntry value="80">@Strings.FieldHeartChart</listEntry>
@@ -344,7 +351,7 @@
             <listEntry value="95">@Strings.FieldDistanceUnits</listEntry>
             <listEntry value="89">@Strings.FieldCalories</listEntry>
             <listEntry value="90">@Strings.FieldActiveCalories</listEntry>
-            <listEntry value="91">@Strings.FieldIntensity</listEntry>
+            <listEntry value="91">@Strings.ItemIntensity</listEntry>
             <listEntry value="92">@Strings.FieldIntensityGoal</listEntry>
             <listEntry value="93">@Strings.FieldSmartGoal</listEntry>
             <listEntry value="96">@Strings.FieldPressure</listEntry>
@@ -376,6 +383,7 @@
             <listEntry value="53">@Strings.IconAlarm</listEntry>
             <listEntry value="56">@Strings.IconNotification</listEntry>
             <listEntry value="55">@Strings.IconPhone</listEntry>
+            <listEntry value="65">@Strings.IconPhoneHandset</listEntry>            
             <listEntry value="63">@Strings.IconNetwork</listEntry>
             <listEntry value="58">@Strings.IconBattery</listEntry>
             <listEntry value="59">@Strings.IconBatterySolid</listEntry>
@@ -383,6 +391,14 @@
             <listEntry value="60">@Strings.IconBed</listEntry>
             <listEntry value="62">@Strings.IconFootsteps</listEntry>
             <listEntry value="64">@Strings.IconStairs</listEntry>
+            <listEntry value="67">@Strings.IconFire</listEntry>            
+            <listEntry value="66">@Strings.IconStopwatch</listEntry>            
+            <listEntry value="68">@Strings.IconHeart</listEntry>            
+            <listEntry value="69">@Strings.IconSunrise</listEntry>            
+            <listEntry value="70">@Strings.IconSunset</listEntry>            
+            <listEntry value="71">@Strings.IconSun</listEntry>            
+            <listEntry value="72">@Strings.IconMoon</listEntry>            
+            <listEntry value="73">@Strings.IconMountain</listEntry>            
             <listEntry value="61">@Strings.IconFlower</listEntry>            
         </settingConfig>
     </setting>
@@ -454,7 +470,7 @@
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
             <listEntry value="19">@Strings.FieldAM</listEntry>
             <listEntry value="20">@Strings.FieldPM</listEntry>
-            <listEntry value="88">@Strings.Field2ndHour</listEntry>
+            <listEntry value="88">@Strings.Item2ndHour</listEntry>
             <listEntry value="82">@Strings.FieldSunriseHour</listEntry>
             <listEntry value="83">@Strings.FieldSunriseMinute</listEntry>
             <listEntry value="84">@Strings.FieldSunsetHour</listEntry>
@@ -488,7 +504,7 @@
             <listEntry value="36">@Strings.ItemBatteryPercentage</listEntry>
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
-            <listEntry value="79">@Strings.FieldHeartRate</listEntry>
+            <listEntry value="79">@Strings.ItemHeartRate</listEntry>
             <listEntry value="77">@Strings.FieldHeartMin</listEntry>
             <listEntry value="78">@Strings.FieldHeartMax</listEntry>
             <listEntry value="80">@Strings.FieldHeartChart</listEntry>
@@ -497,7 +513,7 @@
             <listEntry value="95">@Strings.FieldDistanceUnits</listEntry>
             <listEntry value="89">@Strings.FieldCalories</listEntry>
             <listEntry value="90">@Strings.FieldActiveCalories</listEntry>
-            <listEntry value="91">@Strings.FieldIntensity</listEntry>
+            <listEntry value="91">@Strings.ItemIntensity</listEntry>
             <listEntry value="92">@Strings.FieldIntensityGoal</listEntry>
             <listEntry value="93">@Strings.FieldSmartGoal</listEntry>
             <listEntry value="96">@Strings.FieldPressure</listEntry>
@@ -529,6 +545,7 @@
             <listEntry value="53">@Strings.IconAlarm</listEntry>
             <listEntry value="56">@Strings.IconNotification</listEntry>
             <listEntry value="55">@Strings.IconPhone</listEntry>
+            <listEntry value="65">@Strings.IconPhoneHandset</listEntry>            
             <listEntry value="63">@Strings.IconNetwork</listEntry>
             <listEntry value="58">@Strings.IconBattery</listEntry>
             <listEntry value="59">@Strings.IconBatterySolid</listEntry>
@@ -536,6 +553,14 @@
             <listEntry value="60">@Strings.IconBed</listEntry>
             <listEntry value="62">@Strings.IconFootsteps</listEntry>
             <listEntry value="64">@Strings.IconStairs</listEntry>
+            <listEntry value="67">@Strings.IconFire</listEntry>            
+            <listEntry value="66">@Strings.IconStopwatch</listEntry>            
+            <listEntry value="68">@Strings.IconHeart</listEntry>            
+            <listEntry value="69">@Strings.IconSunrise</listEntry>            
+            <listEntry value="70">@Strings.IconSunset</listEntry>            
+            <listEntry value="71">@Strings.IconSun</listEntry>            
+            <listEntry value="72">@Strings.IconMoon</listEntry>            
+            <listEntry value="73">@Strings.IconMountain</listEntry>            
             <listEntry value="61">@Strings.IconFlower</listEntry>            
         </settingConfig>
     </setting>
@@ -607,7 +632,7 @@
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
             <listEntry value="19">@Strings.FieldAM</listEntry>
             <listEntry value="20">@Strings.FieldPM</listEntry>
-            <listEntry value="88">@Strings.Field2ndHour</listEntry>
+            <listEntry value="88">@Strings.Item2ndHour</listEntry>
             <listEntry value="82">@Strings.FieldSunriseHour</listEntry>
             <listEntry value="83">@Strings.FieldSunriseMinute</listEntry>
             <listEntry value="84">@Strings.FieldSunsetHour</listEntry>
@@ -641,7 +666,7 @@
             <listEntry value="36">@Strings.ItemBatteryPercentage</listEntry>
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
-            <listEntry value="79">@Strings.FieldHeartRate</listEntry>
+            <listEntry value="79">@Strings.ItemHeartRate</listEntry>
             <listEntry value="77">@Strings.FieldHeartMin</listEntry>
             <listEntry value="78">@Strings.FieldHeartMax</listEntry>
             <listEntry value="80">@Strings.FieldHeartChart</listEntry>
@@ -650,7 +675,7 @@
             <listEntry value="95">@Strings.FieldDistanceUnits</listEntry>
             <listEntry value="89">@Strings.FieldCalories</listEntry>
             <listEntry value="90">@Strings.FieldActiveCalories</listEntry>
-            <listEntry value="91">@Strings.FieldIntensity</listEntry>
+            <listEntry value="91">@Strings.ItemIntensity</listEntry>
             <listEntry value="92">@Strings.FieldIntensityGoal</listEntry>
             <listEntry value="93">@Strings.FieldSmartGoal</listEntry>
             <listEntry value="96">@Strings.FieldPressure</listEntry>
@@ -682,6 +707,7 @@
             <listEntry value="53">@Strings.IconAlarm</listEntry>
             <listEntry value="56">@Strings.IconNotification</listEntry>
             <listEntry value="55">@Strings.IconPhone</listEntry>
+            <listEntry value="65">@Strings.IconPhoneHandset</listEntry>            
             <listEntry value="63">@Strings.IconNetwork</listEntry>
             <listEntry value="58">@Strings.IconBattery</listEntry>
             <listEntry value="59">@Strings.IconBatterySolid</listEntry>
@@ -689,6 +715,14 @@
             <listEntry value="60">@Strings.IconBed</listEntry>
             <listEntry value="62">@Strings.IconFootsteps</listEntry>
             <listEntry value="64">@Strings.IconStairs</listEntry>
+            <listEntry value="67">@Strings.IconFire</listEntry>            
+            <listEntry value="66">@Strings.IconStopwatch</listEntry>            
+            <listEntry value="68">@Strings.IconHeart</listEntry>            
+            <listEntry value="69">@Strings.IconSunrise</listEntry>            
+            <listEntry value="70">@Strings.IconSunset</listEntry>            
+            <listEntry value="71">@Strings.IconSun</listEntry>            
+            <listEntry value="72">@Strings.IconMoon</listEntry>            
+            <listEntry value="73">@Strings.IconMountain</listEntry>            
             <listEntry value="61">@Strings.IconFlower</listEntry>            
         </settingConfig>
     </setting>
@@ -760,7 +794,7 @@
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
             <listEntry value="19">@Strings.FieldAM</listEntry>
             <listEntry value="20">@Strings.FieldPM</listEntry>
-            <listEntry value="88">@Strings.Field2ndHour</listEntry>
+            <listEntry value="88">@Strings.Item2ndHour</listEntry>
             <listEntry value="82">@Strings.FieldSunriseHour</listEntry>
             <listEntry value="83">@Strings.FieldSunriseMinute</listEntry>
             <listEntry value="84">@Strings.FieldSunsetHour</listEntry>
@@ -794,7 +828,7 @@
             <listEntry value="36">@Strings.ItemBatteryPercentage</listEntry>
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
-            <listEntry value="79">@Strings.FieldHeartRate</listEntry>
+            <listEntry value="79">@Strings.ItemHeartRate</listEntry>
             <listEntry value="77">@Strings.FieldHeartMin</listEntry>
             <listEntry value="78">@Strings.FieldHeartMax</listEntry>
             <listEntry value="80">@Strings.FieldHeartChart</listEntry>
@@ -803,7 +837,7 @@
             <listEntry value="95">@Strings.FieldDistanceUnits</listEntry>
             <listEntry value="89">@Strings.FieldCalories</listEntry>
             <listEntry value="90">@Strings.FieldActiveCalories</listEntry>
-            <listEntry value="91">@Strings.FieldIntensity</listEntry>
+            <listEntry value="91">@Strings.ItemIntensity</listEntry>
             <listEntry value="92">@Strings.FieldIntensityGoal</listEntry>
             <listEntry value="93">@Strings.FieldSmartGoal</listEntry>
             <listEntry value="96">@Strings.FieldPressure</listEntry>
@@ -835,6 +869,7 @@
             <listEntry value="53">@Strings.IconAlarm</listEntry>
             <listEntry value="56">@Strings.IconNotification</listEntry>
             <listEntry value="55">@Strings.IconPhone</listEntry>
+            <listEntry value="65">@Strings.IconPhoneHandset</listEntry>            
             <listEntry value="63">@Strings.IconNetwork</listEntry>
             <listEntry value="58">@Strings.IconBattery</listEntry>
             <listEntry value="59">@Strings.IconBatterySolid</listEntry>
@@ -842,6 +877,14 @@
             <listEntry value="60">@Strings.IconBed</listEntry>
             <listEntry value="62">@Strings.IconFootsteps</listEntry>
             <listEntry value="64">@Strings.IconStairs</listEntry>
+            <listEntry value="67">@Strings.IconFire</listEntry>            
+            <listEntry value="66">@Strings.IconStopwatch</listEntry>            
+            <listEntry value="68">@Strings.IconHeart</listEntry>            
+            <listEntry value="69">@Strings.IconSunrise</listEntry>            
+            <listEntry value="70">@Strings.IconSunset</listEntry>            
+            <listEntry value="71">@Strings.IconSun</listEntry>            
+            <listEntry value="72">@Strings.IconMoon</listEntry>            
+            <listEntry value="73">@Strings.IconMountain</listEntry>            
             <listEntry value="61">@Strings.IconFlower</listEntry>            
         </settingConfig>
     </setting>
@@ -913,7 +956,7 @@
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
             <listEntry value="19">@Strings.FieldAM</listEntry>
             <listEntry value="20">@Strings.FieldPM</listEntry>
-            <listEntry value="88">@Strings.Field2ndHour</listEntry>
+            <listEntry value="88">@Strings.Item2ndHour</listEntry>
             <listEntry value="82">@Strings.FieldSunriseHour</listEntry>
             <listEntry value="83">@Strings.FieldSunriseMinute</listEntry>
             <listEntry value="84">@Strings.FieldSunsetHour</listEntry>
@@ -947,7 +990,7 @@
             <listEntry value="36">@Strings.ItemBatteryPercentage</listEntry>
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
-            <listEntry value="79">@Strings.FieldHeartRate</listEntry>
+            <listEntry value="79">@Strings.ItemHeartRate</listEntry>
             <listEntry value="77">@Strings.FieldHeartMin</listEntry>
             <listEntry value="78">@Strings.FieldHeartMax</listEntry>
             <listEntry value="80">@Strings.FieldHeartChart</listEntry>
@@ -956,7 +999,7 @@
             <listEntry value="95">@Strings.FieldDistanceUnits</listEntry>
             <listEntry value="89">@Strings.FieldCalories</listEntry>
             <listEntry value="90">@Strings.FieldActiveCalories</listEntry>
-            <listEntry value="91">@Strings.FieldIntensity</listEntry>
+            <listEntry value="91">@Strings.ItemIntensity</listEntry>
             <listEntry value="92">@Strings.FieldIntensityGoal</listEntry>
             <listEntry value="93">@Strings.FieldSmartGoal</listEntry>
             <listEntry value="96">@Strings.FieldPressure</listEntry>
@@ -988,6 +1031,7 @@
             <listEntry value="53">@Strings.IconAlarm</listEntry>
             <listEntry value="56">@Strings.IconNotification</listEntry>
             <listEntry value="55">@Strings.IconPhone</listEntry>
+            <listEntry value="65">@Strings.IconPhoneHandset</listEntry>            
             <listEntry value="63">@Strings.IconNetwork</listEntry>
             <listEntry value="58">@Strings.IconBattery</listEntry>
             <listEntry value="59">@Strings.IconBatterySolid</listEntry>
@@ -995,6 +1039,14 @@
             <listEntry value="60">@Strings.IconBed</listEntry>
             <listEntry value="62">@Strings.IconFootsteps</listEntry>
             <listEntry value="64">@Strings.IconStairs</listEntry>
+            <listEntry value="67">@Strings.IconFire</listEntry>            
+            <listEntry value="66">@Strings.IconStopwatch</listEntry>            
+            <listEntry value="68">@Strings.IconHeart</listEntry>            
+            <listEntry value="69">@Strings.IconSunrise</listEntry>            
+            <listEntry value="70">@Strings.IconSunset</listEntry>            
+            <listEntry value="71">@Strings.IconSun</listEntry>            
+            <listEntry value="72">@Strings.IconMoon</listEntry>            
+            <listEntry value="73">@Strings.IconMountain</listEntry>            
             <listEntry value="61">@Strings.IconFlower</listEntry>            
         </settingConfig>
     </setting>
@@ -1066,7 +1118,7 @@
             <listEntry value="18">@Strings.FieldYearCalendarWeekXXXX</listEntry>
             <listEntry value="19">@Strings.FieldAM</listEntry>
             <listEntry value="20">@Strings.FieldPM</listEntry>
-            <listEntry value="88">@Strings.Field2ndHour</listEntry>
+            <listEntry value="88">@Strings.Item2ndHour</listEntry>
             <listEntry value="82">@Strings.FieldSunriseHour</listEntry>
             <listEntry value="83">@Strings.FieldSunriseMinute</listEntry>
             <listEntry value="84">@Strings.FieldSunsetHour</listEntry>
@@ -1100,7 +1152,7 @@
             <listEntry value="36">@Strings.ItemBatteryPercentage</listEntry>
 		    <listEntry value="28">@Strings.FieldSeparatorPercent</listEntry>
             <listEntry value="37">@Strings.FieldMoveBar</listEntry>
-            <listEntry value="79">@Strings.FieldHeartRate</listEntry>
+            <listEntry value="79">@Strings.ItemHeartRate</listEntry>
             <listEntry value="77">@Strings.FieldHeartMin</listEntry>
             <listEntry value="78">@Strings.FieldHeartMax</listEntry>
             <listEntry value="80">@Strings.FieldHeartChart</listEntry>
@@ -1109,7 +1161,7 @@
             <listEntry value="95">@Strings.FieldDistanceUnits</listEntry>
             <listEntry value="89">@Strings.FieldCalories</listEntry>
             <listEntry value="90">@Strings.FieldActiveCalories</listEntry>
-            <listEntry value="91">@Strings.FieldIntensity</listEntry>
+            <listEntry value="91">@Strings.ItemIntensity</listEntry>
             <listEntry value="92">@Strings.FieldIntensityGoal</listEntry>
             <listEntry value="93">@Strings.FieldSmartGoal</listEntry>
             <listEntry value="96">@Strings.FieldPressure</listEntry>
@@ -1141,6 +1193,7 @@
             <listEntry value="53">@Strings.IconAlarm</listEntry>
             <listEntry value="56">@Strings.IconNotification</listEntry>
             <listEntry value="55">@Strings.IconPhone</listEntry>
+            <listEntry value="65">@Strings.IconPhoneHandset</listEntry>            
             <listEntry value="63">@Strings.IconNetwork</listEntry>
             <listEntry value="58">@Strings.IconBattery</listEntry>
             <listEntry value="59">@Strings.IconBatterySolid</listEntry>
@@ -1148,6 +1201,14 @@
             <listEntry value="60">@Strings.IconBed</listEntry>
             <listEntry value="62">@Strings.IconFootsteps</listEntry>
             <listEntry value="64">@Strings.IconStairs</listEntry>
+            <listEntry value="67">@Strings.IconFire</listEntry>            
+            <listEntry value="66">@Strings.IconStopwatch</listEntry>            
+            <listEntry value="68">@Strings.IconHeart</listEntry>            
+            <listEntry value="69">@Strings.IconSunrise</listEntry>            
+            <listEntry value="70">@Strings.IconSunset</listEntry>            
+            <listEntry value="71">@Strings.IconSun</listEntry>            
+            <listEntry value="72">@Strings.IconMoon</listEntry>            
+            <listEntry value="73">@Strings.IconMountain</listEntry>            
             <listEntry value="61">@Strings.IconFlower</listEntry>            
         </settingConfig>
     </setting>
@@ -1265,6 +1326,10 @@
 
     <setting propertyKey="@Properties.EG" title="@Strings.ExportFieldsTitle">
         <settingConfig type="alphaNumeric" maxLength="255" />
+    </setting>
+
+    <setting propertyKey="@Properties.SA" title="@Strings.SunAltitudeAdjustTitle">
+        <settingConfig type="boolean" />
     </setting>
 
 </settings>

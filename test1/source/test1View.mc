@@ -33,7 +33,7 @@ class test1View extends WatchUi.WatchFace
 //	{
 //	}
 		
-	const PROFILE_VERSION = 14;			// a version number
+	const PROFILE_VERSION = 15;			// a version number
 	const PROFILE_NUM_PRESET = 15;		// number of preset profiles (in the jsondata resource)
 
 	var updateTimeNowValue;
@@ -347,9 +347,10 @@ class test1View extends WatchUi.WatchFace
 	//	//!FIELD_SHAPE_MOON = 72,
 	//	//!FIELD_SHAPE_MOUNTAIN = 73,
 	//
-	//	FIELD_HEART_MIN = 77
-	//	FIELD_HEART_MAX = 78
-	//	FIELD_HEART_AVERAGE = 79
+	//	FIELD_HEART_MIN = 76
+	//	FIELD_HEART_MAX = 77
+	//	FIELD_HEART_AVERAGE = 78
+	//	FIELD_HEART_LATEST = 79
 	//	FIELD_HEART_BARS = 80
 	//	FIELD_HEART_AXES = 81
 	//	FIELD_SUNRISE_HOUR = 82,
@@ -2888,9 +2889,10 @@ class test1View extends WatchUi.WatchFace
 										break;
 									}
 									
-									case 77/*FIELD_HEART_MIN*/:
-									case 78/*FIELD_HEART_MAX*/:
-									case 79/*FIELD_HEART_AVERAGE*/:
+									case 76/*FIELD_HEART_MIN*/:
+									case 77/*FIELD_HEART_MAX*/:
+									case 78/*FIELD_HEART_AVERAGE*/:
+									case 79/*FIELD_HEART_LATEST*/:
 									case 80/*FIELD_HEART_BARS*/:
 									case 81/*FIELD_HEART_AXES*/:
 									{
@@ -2929,7 +2931,8 @@ class test1View extends WatchUi.WatchFace
 										}
 										else
 										{
-											var heartVal = (eDisplay==77/*FIELD_HEART_MIN*/) ? heartDisplayMin : ((eDisplay==78/*FIELD_HEART_MAX*/) ? heartDisplayMax : heartDisplayAverage);
+											var heartVal = (eDisplay==79/*FIELD_HEART_LATEST*/) ? heartDisplayLatest : 
+														((eDisplay==76/*FIELD_HEART_MIN*/) ? heartDisplayMin : ((eDisplay==77/*FIELD_HEART_MAX*/) ? heartDisplayMax : heartDisplayAverage));
 											eStr = (heartVal!=null) ? heartVal.format("%d") : "--";
 										}
 										
@@ -3134,7 +3137,7 @@ class test1View extends WatchUi.WatchFace
 	   		else if (outerMode==11)			// heart rate
 	   		{
 				calculateHeartRate(minute, second);
-				backgroundOuterFillEnd = getMinMax((heartDisplayAverage * 60) / heartMaxZone5, 0, 60) - 1;
+				backgroundOuterFillEnd = getMinMax((heartDisplayLatest * 60) / heartMaxZone5, 0, 60) - 1;
 	   		}
 			else /*if (outerMode==0)*/		// plain color
 			{
@@ -4779,7 +4782,8 @@ class test1View extends WatchUi.WatchFace
 	var heartDisplayMin;
 	var heartDisplayMax;
 	var heartDisplayAverage;
-	var heartDisplayValues = new[12/*heartNumBins*/]b;
+	var heartDisplayLatest;
+	var heartDisplayBins = new[12/*heartNumBins*/]b;
 	
 	var heartSampledSecond = 0;
 	var heartSamples = new[60]b;
@@ -4793,7 +4797,7 @@ class test1View extends WatchUi.WatchFace
 		for (var i=0; i<60; i++)
 		{
 			heartSamples[i] = 255;	// means not set
-			heartDisplayValues[i/5/*heartBinSize*/] = 0;
+			heartDisplayBins[i/5/*heartBinSize*/] = 0;
 		}
 		
 		heartMaxZone5 = UserProfile.getHeartRateZones(0/*UserProfile.HR_ZONE_SPORT_GENERIC*/)[5];
@@ -4837,7 +4841,7 @@ class test1View extends WatchUi.WatchFace
 			heartDisplayMin = null;
 			heartDisplayMax = null;
 			heartDisplayAverage = null;
-			var heartDisplayLatest = null;
+			heartDisplayLatest = null;
 
 			var allSum = 0;
 			var allCount = 0;
@@ -4873,7 +4877,7 @@ class test1View extends WatchUi.WatchFace
 				isLastI = (i==second);
 				if ((bin%5/*heartBinSize*/)==(5/*heartBinSize*/-1) || isLastI)
 				{
-					heartDisplayValues[bin/5/*heartBinSize*/] = ((binCount>0) ? (binSum/binCount) : 0);
+					heartDisplayBins[bin/5/*heartBinSize*/] = ((binCount>0) ? (binSum/binCount) : 0);
 					
 					binSum = 0;
 					binCount = 0;
@@ -4883,20 +4887,16 @@ class test1View extends WatchUi.WatchFace
 
 			if (allCount>0)
 			{
-				// during glance gesture display the latest heart rate value, otherwise display average
-				heartDisplayAverage = ((onOrGlanceActive&ITEM_ONGLANCE)!=0) ? heartDisplayLatest : (allSum + allCount/2)/allCount;
+				heartDisplayAverage = (allSum + allCount/2)/allCount;
 			}
 
 			// resort to sensor history if no heart rate measured in last minute
-			if (heartDisplayAverage==null && hasHeartRateHistory)
+			if (heartDisplayLatest==null && hasHeartRateHistory)
 			{
 				var heartSample = SensorHistory.getHeartRateHistory({:period => 1}).next();
 				if (heartSample!=null && heartSample.data!=null)
 				{
-					//var r = heartSample.data.toNumber();
-					//heartDisplayMin = r;		don't set, as no value in last minute
-					//heartDisplayMax = r;		don't set, as no value in last minute
-					heartDisplayAverage = heartSample.data.toNumber();
+					heartDisplayLatest = heartSample.data.toNumber();
 				}
 			}
 		}
@@ -4925,7 +4925,7 @@ class test1View extends WatchUi.WatchFace
 			// draw the bars
 			for (var i=0; i<12/*heartNumBins*/; i++)
 			{
-				var h = getMinMax((heartDisplayValues[i]*(20/*heartChartHeight*/+1))/heartMaxZone5, 0, 20/*heartChartHeight*/);
+				var h = getMinMax((heartDisplayBins[i]*(20/*heartChartHeight*/+1))/heartMaxZone5, 0, 20/*heartChartHeight*/);
 	
 				useDc.fillRectangle(x + 4/*heartOneBarWidth*/*i, y - h, 4/*heartOneBarWidth*/-1, h+1);	// h+1 so it goes to same position as axes (for alignment with text when no axes drawn)
 				//useDc.drawPoint(100+x - dcX, 220-h - dcY);

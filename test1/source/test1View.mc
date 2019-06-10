@@ -904,6 +904,11 @@ class test1View extends WatchUi.WatchFace
 		return (v<min) ? min : ((v>max) ? max : v);
 	}
 
+	function getNullCheckZero(v)
+	{
+		return ((v != null) ? v : 0);
+	}
+
 	function propertiesGetBoolean(p)
 	{
 		// this test code for null works fine
@@ -2574,7 +2579,8 @@ class test1View extends WatchUi.WatchFace
 		// moveBarLevel has range 1 to 5
 		// propFieldMoveAlarmTriggerTime has range 1 to 5
 		var activityTrackingOn = deviceSettings.activityTrackingOn;
-	    var moveBarAlertTriggered = (activityMonitorInfo.moveBarLevel >= propertiesGetNumber("29")); 
+		var activityMonitorMoveBarLevel = getNullCheckZero(activityMonitorInfo.moveBarLevel);
+	    var moveBarAlertTriggered = (activityMonitorMoveBarLevel >= propertiesGetNumber("29")); 
 	    visibilityStatus[15/*STATUS_MOVEBARALERT_TRIGGERED*/] = (activityTrackingOn && moveBarAlertTriggered);
 	    visibilityStatus[16/*STATUS_MOVEBARALERT_NOT*/] = (activityTrackingOn && !moveBarAlertTriggered);
 	    visibilityStatus[17/*STATUS_AM*/] = (hour < 12);
@@ -2583,6 +2589,12 @@ class test1View extends WatchUi.WatchFace
 	    visibilityStatus[20/*STATUS_2ND_PM*/] = (hour2nd >= 12);
 	    visibilityStatus[21/*STATUS_SUNEVENT_RISE*/] = null;	// calculated on demand
 	    visibilityStatus[22/*STATUS_SUNEVENT_SET*/] = null;		// calculated on demand
+
+		var activityMonitorSteps = getNullCheckZero(activityMonitorInfo.steps);
+		var activityMonitorStepGoal = getNullCheckZero(activityMonitorInfo.stepGoal);
+		var activityMonitorActiveMinutesWeekTotal = ((activityMonitorInfo.activeMinutesWeek!=null) ? activityMonitorInfo.activeMinutesWeek.total : 0);
+		var activityMonitorActiveMinutesWeekGoal = getNullCheckZero(activityMonitorInfo.activeMinutesWeekGoal);
+		var activeMinutesWeekSmartGoal = ((activityMonitorActiveMinutesWeekGoal * dayNumberOfWeek) / 7);
 
 		fieldActivePhoneStatus = null;
 		fieldActiveNotificationsStatus = null;
@@ -2814,25 +2826,25 @@ class test1View extends WatchUi.WatchFace
 				
 									case 31/*FIELD_STEPSCOUNT*/:
 									{
-										eStr = "" + activityMonitorInfo.steps;
+										eStr = "" + activityMonitorSteps;
 										break;
 									}
 			
 									case 32/*FIELD_STEPSGOAL*/:
 									{
-										eStr = "" + activityMonitorInfo.stepGoal;
+										eStr = "" + activityMonitorStepGoal;
 										break;
 									}
 			
 									case 33/*FIELD_FLOORSCOUNT*/:
 									{
-										eStr = "" + activityMonitorInfo.floorsClimbed;
+										eStr = "" + getNullCheckZero(activityMonitorInfo.floorsClimbed);
 										break;
 									}
 			
 									case 34/*FIELD_FLOORSGOAL*/:
 									{
-										eStr = "" + activityMonitorInfo.floorsClimbedGoal;
+										eStr = "" + getNullCheckZero(activityMonitorInfo.floorsClimbedGoal);
 										break;
 									}
 			
@@ -2864,7 +2876,7 @@ class test1View extends WatchUi.WatchFace
 											// moveBarLevel 0 = not triggered
 											// moveBarLevel has range 1 to 5
 											// moveBarNum goes from 1 to 5
-											var barIsOn = (moveBarNum <= activityMonitorInfo.moveBarLevel);
+											var barIsOn = (moveBarNum <= activityMonitorMoveBarLevel);
 											var tempKern = ((j<numToAdd-1 || nextIsMoveBar) ? -5 : 0);
 											addBackgroundField(dc, f, fieldInfoIndexEnd, (barIsOn ? "1" : "0"), ((barIsOn || propMoveBarOffColorIndex==COLOR_NOTSET) ? eColorIndex : propMoveBarOffColorIndex), tempKern, 0x1000/*eIsIcon*/);
 										}
@@ -2950,7 +2962,7 @@ class test1View extends WatchUi.WatchFace
 
 									case 89/*FIELD_CALORIES*/:
 									{
-										eStr = "" + activityMonitorInfo.calories;
+										eStr = "" + getNullCheckZero(activityMonitorInfo.calories);
 										break;
 									}
 
@@ -2961,26 +2973,26 @@ class test1View extends WatchUi.WatchFace
 
 									case 91/*FIELD_INTENSITY*/:
 									{
-										eStr = "" + activityMonitorInfo.activeMinutesWeek.total;
+										eStr = "" + activityMonitorActiveMinutesWeekTotal;
 										break;
 									}
 
 									case 92/*FIELD_INTENSITY_GOAL*/:
 									{
-										eStr = "" + activityMonitorInfo.activeMinutesWeekGoal;
+										eStr = "" + activityMonitorActiveMinutesWeekGoal;
 										break;
 									}
 
 									case 93/*FIELD_SMART_GOAL*/:
 									{
-										eStr = "" + (activityMonitorInfo.activeMinutesWeekGoal * dayNumberOfWeek) / 7;
+										eStr = "" + activeMinutesWeekSmartGoal;
 										break;
 									}
 
 									case 94/*FIELD_DISTANCE*/:
 									{
 										// convert cm to miles or km
-										var d = activityMonitorInfo.distance / ((deviceSettings.distanceUnits==System.UNIT_STATUTE) ? 160934.4 : 100000.0);
+										var d = getNullCheckZero(activityMonitorInfo.distance) / ((deviceSettings.distanceUnits==System.UNIT_STATUTE) ? 160934.4 : 100000.0);
 										eStr = d.format("%.1f");
 										break;
 									}
@@ -3056,7 +3068,7 @@ class test1View extends WatchUi.WatchFace
 	
 			if (outerMode==1)		// steps
 			{
-				getValueOuterFillStartEnd(activityMonitorInfo.steps, activityMonitorInfo.stepGoal);
+				getValueOuterFillStartEnd(activityMonitorSteps, activityMonitorStepGoal);
 			}
 			else if (outerMode==2)			// minutes
 			{
@@ -3095,7 +3107,7 @@ class test1View extends WatchUi.WatchFace
 			{
 				// intensity minutes (weekly)
 				// smart intensity minutes
-				getValueOuterFillStartEnd(activityMonitorInfo.activeMinutesWeek.total, (outerMode==9) ? activityMonitorInfo.activeMinutesWeekGoal : ((activityMonitorInfo.activeMinutesWeekGoal * dayNumberOfWeek) / 7));
+				getValueOuterFillStartEnd(activityMonitorActiveMinutesWeekTotal, (outerMode==9) ? activityMonitorActiveMinutesWeekGoal : activeMinutesWeekSmartGoal);
 			}
 	   		else if (outerMode==11)			// heart rate
 	   		{

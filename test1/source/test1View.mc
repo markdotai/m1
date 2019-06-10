@@ -36,6 +36,10 @@ class test1View extends WatchUi.WatchFace
 	const PROFILE_VERSION = 13;			// a version number
 	const PROFILE_NUM_PRESET = 14;		// number of preset profiles (in the jsondata resource)
 
+	var updateTimeNowValue;
+	var updateTimeTodayValue;
+	var updateTimeZoneOffset;
+
 	var firstUpdateSinceInitialize = true;
 
 	var settingsHaveChanged = false;
@@ -1270,8 +1274,6 @@ class test1View extends WatchUi.WatchFace
 		var watchUi = WatchUi;
 		var fonts = Rez.Fonts;
 
-		var timeNowValue = Time.now().value();
-
 		//if (forceClearStorage)
 		//{
 		//	storage.clearValues();		// clear all values from storage for debugging
@@ -1405,6 +1407,8 @@ class test1View extends WatchUi.WatchFace
 			sArray = null;
 		}
 						
+		var timeNowValue = Time.now().value();
+
 		// remember which profile was active and also any profileDelayEnd value
 		// - then checkProfiles will know whether to restore the private profile or not
 		{
@@ -1828,7 +1832,7 @@ class test1View extends WatchUi.WatchFace
 		applicationProperties.setValue("EG", "");
 	}
 	
-	function handleSettingsChanged(timeNow, second)
+	function handleSettingsChanged(second)
 	{
 		demoProfilesOnPrev = demoProfilesOn; 
 		demoProfilesOn = propertiesGetBoolean("DP");
@@ -1931,7 +1935,7 @@ class test1View extends WatchUi.WatchFace
 		
 		if (setProfileDelay)
 		{
-			profileDelayEnd = timeNow.value() + ((60-second)%60) + 2*60;		// delay of 2 minutes before any auto profile switching
+			profileDelayEnd = updateTimeNowValue + ((60-second)%60) + 2*60;		// delay of 2 minutes before any auto profile switching
 			profileRandomEnd = 0;							// clear this
 			demoProfilesCurrentEnd = 0;
 		}
@@ -2335,13 +2339,13 @@ class test1View extends WatchUi.WatchFace
         return (is24Hour ? h : (((h+11)%12) + 1)).format(addLeadingZero ? "%02d" : "%d"); 
     }
     
-    function getVisibilityStatus(visibilityStatus, eVisible)
+    function getVisibilityStatus(visibilityStatus, eVisible, dateInfoShort)
     {
     	if (visibilityStatus[eVisible]==null)
     	{
 	    	if (eVisible==21/*STATUS_SUNEVENT_RISE*/ || eVisible==22/*STATUS_SUNEVENT_SET*/)
 	    	{
-    			calculateSun();
+    			calculateSun(dateInfoShort);
 				if (sunTimes[7]!=null)
 				{
     				visibilityStatus[eVisible] = ((eVisible==21/*STATUS_SUNEVENT_RISE*/) ? sunTimes[7] : !sunTimes[7]);
@@ -2352,11 +2356,11 @@ class test1View extends WatchUi.WatchFace
     	return (visibilityStatus[eVisible]!=null && visibilityStatus[eVisible]);
     }
     
-    //function printMem(s)
-    //{
-    //	var stats = System.getSystemStats();
-	//	System.println("free=" + stats.freeMemory + " " + s);
-    //}
+//    function printMem(s)
+//    {
+//    	var stats = System.getSystemStats();
+//		System.println("free=" + stats.freeMemory + " " + s);
+//    }
     
     // Update the view
     function onUpdate(dc)
@@ -2365,6 +2369,10 @@ class test1View extends WatchUi.WatchFace
     
         var clockTime = System.getClockTime();	// get as first thing so we know it is correct and won't change later on
 		var timeNow = Time.now();
+		// don't do anything with gregorian.info time formatting up here - as the returned data could allocate different amounts of memory each time
+		updateTimeNowValue = timeNow.value();
+		updateTimeTodayValue = Time.today().value();
+		updateTimeZoneOffset = clockTime.timeZoneOffset;
         var hour = clockTime.hour;
         var minute = clockTime.min;
         var second = clockTime.sec;
@@ -2398,7 +2406,7 @@ class test1View extends WatchUi.WatchFace
 			doGetPropertiesAndDynamicResources = true;
 			forceDemoSettingsChange = true;
 			
-			handleSettingsChanged(timeNow, second);		// save/load/export/import etc
+			handleSettingsChanged(second);		// save/load/export/import etc
 
 			settingsHaveChanged = false;			// clear the flag now as it has been handled (do after handleSettingsChanged)
 			firstUpdateSinceInitialize = false;		// and make sure this is cleared now also
@@ -2622,7 +2630,7 @@ class test1View extends WatchUi.WatchFace
 							fieldActiveLTEStatus = lteState;
 						}
 
- 						if (getVisibilityStatus(visibilityStatus, eVisible))
+ 						if (getVisibilityStatus(visibilityStatus, eVisible, dateInfoShort))
 						{ 
 							var eColorIndex = propFieldData[elementStart + 2];
 
@@ -2845,7 +2853,7 @@ class test1View extends WatchUi.WatchFace
 									{
 										// check how many in rest of field
 										// and if next element is a movebar for kerning
-										var checkNextMoveBar = checkNextElementType(dataStart, i, visibilityStatus, 37/*FIELD_MOVEBAR*/);
+										var checkNextMoveBar = checkNextElementType(dataStart, i, visibilityStatus, 37/*FIELD_MOVEBAR*/, dateInfoShort);
 										var nextIsMoveBar = checkNextMoveBar[0];
 										var numToAdd = ((moveBarNum!=0) ? 1 : (5 - checkNextMoveBar[1]));	// if first in this field check for adding extra ones
 										
@@ -2882,7 +2890,7 @@ class test1View extends WatchUi.WatchFace
 											eStr = "0";		// just a placeholder in the field array
 											eFlags |= ((eDisplay==80/*FIELD_HEART_CHART*/) ? 0x0400/*eHeartChart*/ : 0x0800/*eHeartAxes*/);
 
-											var checkNextHeart = checkNextElementType(dataStart, i, visibilityStatus, 80/*FIELD_HEART_CHART*/+81/*FIELD_HEART_AXES*/-eDisplay);	// check for other type
+											var checkNextHeart = checkNextElementType(dataStart, i, visibilityStatus, 80/*FIELD_HEART_CHART*/+81/*FIELD_HEART_AXES*/-eDisplay, dateInfoShort);	// check for other type
 											eKern = (checkNextHeart[0] ? 0 : 58/*heartChartWidth*/);
 										}
 										else
@@ -2901,7 +2909,7 @@ class test1View extends WatchUi.WatchFace
 									case 86/*FIELD_SUNEVENT_HOUR*/:
 									case 87/*FIELD_SUNEVENT_MINUTE*/:
 									{
-										calculateSun();
+										calculateSun(dateInfoShort);
 
 										var t = null;
 										if (eDisplay>=86/*FIELD_SUNEVENT_HOUR*/)	// next sun event?
@@ -3073,15 +3081,15 @@ class test1View extends WatchUi.WatchFace
 	   		}
 	   		else if (outerMode==6)		// sunrise & sunset now top
 	   		{
-				getSunOuterFillStartEnd(timeNowInMinutesToday);
+				getSunOuterFillStartEnd(timeNowInMinutesToday, dateInfoShort);
 	   		}
 	   		else if (outerMode==7)		// sunrise & sunset midnight top
 	   		{
-				getSunOuterFillStartEnd(0);
+				getSunOuterFillStartEnd(0, dateInfoShort);
 	   		}
 	   		else if (outerMode==8)		// sunrise & sunset noon top
 	   		{
-				getSunOuterFillStartEnd(12*60);
+				getSunOuterFillStartEnd(12*60, dateInfoShort);
 	   		}
 			else if (outerMode==9 || outerMode==10)		// intensity
 			{
@@ -3150,9 +3158,9 @@ class test1View extends WatchUi.WatchFace
 		return ((((t!=null) ? t : 0) + 12 + 24*60 - timeOffsetInMinutes) / 24 + segmentAdjust)%60;
 	}
 
-	function getSunOuterFillStartEnd(timeOffsetInMinutes)
+	function getSunOuterFillStartEnd(timeOffsetInMinutes, dateInfoShort)
 	{
-		calculateSun();
+		calculateSun(dateInfoShort);
 		backgroundOuterFillStart = getSunOuterFill(sunTimes[0], 0, timeOffsetInMinutes, 0);
 		backgroundOuterFillEnd = getSunOuterFill(sunTimes[1], 24*60, timeOffsetInMinutes, -1);
 	}
@@ -3205,7 +3213,7 @@ class test1View extends WatchUi.WatchFace
 		}
 	}
 
-	function checkNextElementType(dataStart, i, visibilityStatus, testType)
+	function checkNextElementType(dataStart, i, visibilityStatus, testType, dateInfoShort)
 	{
 		var count = 0;
 		var nextIsType = -1;
@@ -3216,7 +3224,7 @@ class test1View extends WatchUi.WatchFace
 			var jDisplay = propFieldData[jStart];
 			var jVisible = propFieldData[jStart + 1];
 			// don't need to test >=0 as it's a byte array
-			if (jDisplay!=0/*FIELD_EMPTY*/ && /*jVisible>=0 &&*/ jVisible<23/*STATUS_NUM*/ && getVisibilityStatus(visibilityStatus, jVisible))
+			if (jDisplay!=0/*FIELD_EMPTY*/ && /*jVisible>=0 &&*/ jVisible<23/*STATUS_NUM*/ && getVisibilityStatus(visibilityStatus, jVisible, dateInfoShort))
 			{
 				if (jDisplay==testType)
 				{
@@ -3730,6 +3738,7 @@ class test1View extends WatchUi.WatchFace
     function onPartialUpdate(dc)
     {
     	var clockTime = System.getClockTime();
+    	updateTimeNowValue = Time.now().value();
     	var minute = clockTime.min;
     	var second = clockTime.sec;
 
@@ -3990,7 +3999,7 @@ class test1View extends WatchUi.WatchFace
 					// see if the start or end time uses sunrise/sunset					
 					if ((t1&(PROFILE_START_SUNRISE|PROFILE_START_SUNSET|PROFILE_END_SUNRISE|PROFILE_END_SUNSET))!=0)
 					{
-						calculateSun();
+						calculateSun(dateInfoShort);
 						
 						startTime = getProfileSunTime(startTime, t1, 0);
 						endTime = getProfileSunTime(endTime, t1, 2);
@@ -4582,16 +4591,15 @@ class test1View extends WatchUi.WatchFace
 	{
 		// use noon for all these times to be safe when getting dateInfo
 	
-		var gregorian = Time.Gregorian;
-
-		var todayNoon = Time.today().add(gregorian.duration({:hours => 12}));	// 12:00 noon local time
+		var todayNoon = new Time.Moment(updateTimeTodayValue + 12*60*60);		// local time for local noon today
 		var todayNoonValue = todayNoon.value();
 		if (todayNoonValue == dayWeekYearCalculatedDay[index])
 		{
 			return;
 		}
 
-		var timeZoneOffsetDuration = gregorian.duration({:seconds => System.getClockTime().timeZoneOffset});
+		var gregorian = Time.Gregorian;
+		var timeZoneOffsetDuration = gregorian.duration({:seconds => updateTimeZoneOffset});
 
 		var tempYear = {:year => dateInfoMedium.year, :month => 1, :day => 1, :hour => 12, :minute => 0, :second => 0};
 		var startOfYearNoon = gregorian.moment(tempYear).subtract(timeZoneOffsetDuration);
@@ -4777,7 +4785,7 @@ class test1View extends WatchUi.WatchFace
 
 			heartSampledSecond = second;
 			
-			if (heartChartVisible && checkRequestUpdate && (Time.now().value()<heartStarting+60) && ((second%5/*heartBinSize*/)==0))
+			if (heartChartVisible && checkRequestUpdate && (updateTimeNowValue<heartStarting+60) && ((second%5/*heartBinSize*/)==0))
 			{
         		WatchUi.requestUpdate();
 			}
@@ -4987,17 +4995,16 @@ class test1View extends WatchUi.WatchFace
 	var sunTimes = new[8];		// hour*60 + minute
 
 	// 1600 code bytes
-	function calculateSun()
+	function calculateSun(dateInfoShort)
 	{
 		if (!positionGot)
 		{
 			return;
 		}
 
-		var dateInfoShort = Time.Gregorian.info(Time.now(), Time.FORMAT_SHORT);
 		var useAltitude = (propSunAltitudeAdjust ? positionAltitude : 0.0);
 
-		var todayValue = Time.today().value();
+		var todayValue = updateTimeTodayValue;
 		if (sunCalculatedDay!=todayValue ||
 			sunCalculatedLatitude!=positionLatitude.toFloat() ||
 			sunCalculatedLongitude!=positionLongitude.toFloat() ||
@@ -5064,7 +5071,7 @@ class test1View extends WatchUi.WatchFace
 		var toRadians = (Math.PI/180);
 
 		// start of today + 12 hours + time zone
-		var todayNoonUTC = Time.today().add(gregorian.duration({:seconds => 12*60*60 + System.getClockTime().timeZoneOffset + dayOffset*86400}));	// UTC time for local noon today (or tomorrow)
+		var todayNoonUTC = new Time.Moment(updateTimeTodayValue + 12*60*60 + updateTimeZoneOffset + dayOffset*86400);	// UTC time for local noon today (or tomorrow)
 		var todayNoonValue = todayNoonUTC.value();
 
 		//var jan1st2000NoonUTC = gregorian.moment({:year => 2000, :month => 1, :day => 1, :hour => 12, :minute => 0, :second => 0 });		// value prints out as 946728000

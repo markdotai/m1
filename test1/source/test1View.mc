@@ -33,8 +33,8 @@ class test1View extends WatchUi.WatchFace
 //	{
 //	}
 		
-	const PROFILE_VERSION = 13;			// a version number
-	const PROFILE_NUM_PRESET = 14;		// number of preset profiles (in the jsondata resource)
+	const PROFILE_VERSION = 14;			// a version number
+	const PROFILE_NUM_PRESET = 15;		// number of preset profiles (in the jsondata resource)
 
 	var updateTimeNowValue;
 	var updateTimeTodayValue;
@@ -350,7 +350,7 @@ class test1View extends WatchUi.WatchFace
 	//	FIELD_HEART_MIN = 77
 	//	FIELD_HEART_MAX = 78
 	//	FIELD_HEART_AVERAGE = 79
-	//	FIELD_HEART_CHART = 80
+	//	FIELD_HEART_BARS = 80
 	//	FIELD_HEART_AXES = 81
 	//	FIELD_SUNRISE_HOUR = 82,
 	//	FIELD_SUNRISE_MINUTE = 83,
@@ -2617,6 +2617,7 @@ class test1View extends WatchUi.WatchFace
 				var fieldInfoIndexEnd = backgroundFieldInfoIndex[f] + FIELD_NUM_ELEMENTS_DRAW; 
 
 				var moveBarNum = 0;
+				var heartAxesNum = 0;
 
 				for (var i=0; i<FIELD_NUM_ELEMENTS; i++)
 				{
@@ -2890,20 +2891,41 @@ class test1View extends WatchUi.WatchFace
 									case 77/*FIELD_HEART_MIN*/:
 									case 78/*FIELD_HEART_MAX*/:
 									case 79/*FIELD_HEART_AVERAGE*/:
-									case 80/*FIELD_HEART_CHART*/:
+									case 80/*FIELD_HEART_BARS*/:
 									case 81/*FIELD_HEART_AXES*/:
 									{
 										calculateHeartRate(minute, second);
 
-										if (eDisplay==80/*FIELD_HEART_CHART*/ || eDisplay==81/*FIELD_HEART_AXES*/)
+										if (eDisplay==80/*FIELD_HEART_BARS*/ || eDisplay==81/*FIELD_HEART_AXES*/)
 										{
 											heartChartVisible = true;	// we know it is visible now
 										
 											eStr = "0";		// just a placeholder in the field array
-											eFlags |= ((eDisplay==80/*FIELD_HEART_CHART*/) ? 0x0400/*eHeartChart*/ : 0x0800/*eHeartAxes*/);
 
-											var checkNextHeart = checkNextElementType(dataStart, i, visibilityStatus, 80/*FIELD_HEART_CHART*/+81/*FIELD_HEART_AXES*/-eDisplay, dateInfoShort);	// check for other type
-											eKern = (checkNextHeart[0] ? 0 : 58/*heartChartWidth*/);
+											var checkNextHeart = checkNextElementType(dataStart, i, visibilityStatus, 80/*FIELD_HEART_BARS*/+81/*FIELD_HEART_AXES*/-eDisplay, dateInfoShort);	// check for other type
+
+											if (eDisplay==80/*FIELD_HEART_BARS*/)
+											{
+												eFlags |= 0x0400/*eHeartBars*/;
+												eKern = 51/*heartBarsWidth*/;
+
+												if (checkNextHeart[0] || heartAxesNum>0)	// bars need to be drawn at same width as axes
+												{
+													eFlags |= 0x0800/*eHeartAxes*/;
+													eKern = 55/*heartAxesWidth*/;
+												}
+											}
+											else
+											{
+												eFlags |= 0x0800/*eHeartAxes*/;
+												eKern = 55/*heartAxesWidth*/;
+												heartAxesNum++;
+											}
+
+											if (checkNextHeart[0])	// bars followed by axes or axes followed by bars
+											{
+												eKern = 0;
+											}
 										}
 										else
 										{
@@ -3180,7 +3202,7 @@ class test1View extends WatchUi.WatchFace
 	// eFlags:
 	// eUnused1 = 0x0100
 	// eUnused2 = 0x0200
-	// eHeartChart = 0x0400
+	// eHeartBars = 0x0400
 	// eHeartAxes = 0x0800
 	// eIsIcon = 0x1000
 	// eUseUnsupportedFont = 0x2000
@@ -3200,7 +3222,7 @@ class test1View extends WatchUi.WatchFace
 				var infoData = (sLen << 24) | (eLen << 16) | eFlags;
 								
 				var width = eKern;
-				if ((eFlags&(0x0400/*eHeartChart*/|0x0800/*eHeartAxes*/))==0)
+				if ((eFlags&(0x0400/*eHeartBars*/|0x0800/*eHeartAxes*/))==0)
 				{
 					var fontResource = ((eFlags&0x1000/*eIsIcon*/)!=0 ? iconsFontResource : ((eFlags&0x2000/*eUseUnsupportedFont*/)!=0 ? fontFieldUnsupportedResource : fontFieldResource));
 					var eDiacritics = (eFlags&(0x4000|0x8000/*eDiacritics*/))/0x4000; 
@@ -3357,10 +3379,10 @@ class test1View extends WatchUi.WatchFace
 							var eLen = ((w>>16) & 0xFF);
 							var curFont;
 							var dateY = dateYOffset;
-							if ((w&(0x0400/*eHeartChart*/|0x0800/*eHeartAxes*/))!=0)
+							if ((w&(0x0400/*eHeartBars*/|0x0800/*eHeartAxes*/))!=0)
 							{
 								curFont = null;
-								drawHeartChart(useDc, dateX+5/*heartChartXOffset*/, dateY+6, getColorArray(backgroundFieldInfoColorIndex[i]), (w&0x0400/*eHeartChart*/)!=0);		// draw heart rate chart
+								drawHeartChart(useDc, dateX, dateY+6, getColorArray(backgroundFieldInfoColorIndex[i]), (w&0x0400/*eHeartBars*/)!=0, (w&0x0800/*eHeartAxes*/)!=0);		// draw heart rate chart
 							}
 							else if ((w&0x1000/*eIsIcon*/)!=0)		// isIcon
 							{
@@ -4886,13 +4908,17 @@ class test1View extends WatchUi.WatchFace
 // 6000ms for drawPoint
 
 	//const heartChartHeight = 20;
-	//const heartBarWidth = 4;
-	//const heartChartXOffset = 5;
-	//const heartChartWidth = 58;	(12/*heartNumBins*/*4/*heartBarWidth*/ + 2*5/*heartChartXOffset*/)
+	//const heartOneBarWidth = 4;
+	//const heartChartXOffset = 2;
+	//const heartBarsWidth = 51;	(12/*heartNumBins*/*4/*heartOneBarWidth*/ - 1 + 2*2/*heartChartXOffset*/)
+	//const heartAxesWidth = 55;	(12/*heartNumBins*/*4/*heartOneBarWidth*/ + 3 + 2*2/*heartChartXOffset*/)
+	//const heartChartWidth = 52;	(12/*heartNumBins*/*4/*heartOneBarWidth*/ + 2*2/*heartChartXOffset*/)
 
-	function drawHeartChart(useDc, x, y, color, barsOrAxes)
+	function drawHeartChart(useDc, x, y, color, barsOrAxes, useAxesWidth)
 	{	
 		useDc.setColor(color, -1/*COLOR_TRANSPARENT*/);
+
+		x += (useAxesWidth ? 2 + 2/*heartChartXOffset*/ : 2/*heartChartXOffset*/);
 
 		if (barsOrAxes)
 		{
@@ -4901,7 +4927,7 @@ class test1View extends WatchUi.WatchFace
 			{
 				var h = getMinMax((heartDisplayValues[i]*(20/*heartChartHeight*/+1))/heartMaxZone5, 0, 20/*heartChartHeight*/);
 	
-				useDc.fillRectangle(x + 4/*heartBarWidth*/*i, y - h, 4/*heartBarWidth*/-1, h+1);	// h+1 so it goes to same position as axes (for alignment with text when no axes drawn)
+				useDc.fillRectangle(x + 4/*heartOneBarWidth*/*i, y - h, 4/*heartOneBarWidth*/-1, h+1);	// h+1 so it goes to same position as axes (for alignment with text when no axes drawn)
 				//useDc.drawPoint(100+x - dcX, 220-h - dcY);
 				//useDc.drawLine(i, 0, i, 30);
 			}
@@ -4910,8 +4936,8 @@ class test1View extends WatchUi.WatchFace
 		{
 			// draw the axes
 			useDc.fillRectangle(x-2, y - 20/*heartChartHeight*/, 1, 20/*heartChartHeight*/);				// left
-			useDc.fillRectangle(x+(4/*heartBarWidth*/*12/*heartNumBins*/), y-20/*heartChartHeight*/, 1, 20/*heartChartHeight*/);		// right
-			useDc.fillRectangle(x-2, y, (4/*heartBarWidth*/*12/*heartNumBins*/)+3, 1);				// bottom
+			useDc.fillRectangle(x+(4/*heartOneBarWidth*/*12/*heartNumBins*/), y-20/*heartChartHeight*/, 1, 20/*heartChartHeight*/);		// right
+			useDc.fillRectangle(x-2, y, (4/*heartOneBarWidth*/*12/*heartNumBins*/)+3, 1);				// bottom
 		}
 	}
 

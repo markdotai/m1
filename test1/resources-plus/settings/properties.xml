@@ -85,4 +85,5 @@
     <property id="EG" type="string"></property>				<!-- export import fields 5-8 -->
 
     <property id="SA" type="boolean">false</property>		<!-- sun altitude adjustment -->
+    <property id="NC" type="number">0</property>			<!-- non-active calorie override -->
 </properties>

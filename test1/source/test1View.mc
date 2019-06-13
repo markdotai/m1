@@ -11,7 +11,7 @@ using Application.Storage as applicationStorage;
 
 class test1View extends WatchUi.WatchFace
 {
-	//var forceMemoryTest = new[1024*6]b;
+	//var forceMemoryTest = new[512 /*1024*6*/]b;
 	//const forceTestFont = false;
 	//const forceTestLocation = true;
 	//const forceClearStorage = false;
@@ -33,8 +33,8 @@ class test1View extends WatchUi.WatchFace
 //	{
 //	}
 		
-	const PROFILE_VERSION = 15;			// a version number
-	const PROFILE_NUM_PRESET = 15;		// number of preset profiles (in the jsondata resource)
+	const PROFILE_VERSION = 20;			// a version number
+	const PROFILE_NUM_PRESET = 17;		// number of preset profiles (in the jsondata resource)
 
 	var updateTimeNowValue;
 	var updateTimeTodayValue;
@@ -49,15 +49,15 @@ class test1View extends WatchUi.WatchFace
 
 	var lastPartialUpdateSec;
 
-	enum
-	{
-		//!ITEM_OFF = 0x00,
-		ITEM_ON = 0x01,
-		ITEM_ONGLANCE = 0x02,
-		
-		ITEM_RETRIEVE = 0x10
-	}
-	var onOrGlanceActive = ITEM_ON;
+	//enum
+	//{
+	//	//!ITEM_OFF = 0x00,
+	//	//ITEM_ON = 0x01,
+	//	//ITEM_ONGLANCE = 0x02,
+	//	
+	//	//ITEM_RETRIEVE = 0x10
+	//}
+	var onOrGlanceActive = 0x01/*ITEM_ON*/;
 	
 	var fontTimeHourResource = null;
 	var fontTimeMinuteResource = null;
@@ -113,7 +113,7 @@ class test1View extends WatchUi.WatchFace
 	// We pack justifcation and field management (off/on/glance) into 1 char:
 	// (and it has a single digit value for export string to fit into 255 chars)
 	// a=0,1,2 & b=0,1,2, then (a + 3*b)=0 to 8
-	const FIELD_MANAGEMENT_MODULO = 3;
+	//const FIELD_MANAGEMENT_MODULO = 3;
 	enum
 	{
 	//	FIELD_INDEX_YOFFSET = 0,
@@ -169,20 +169,20 @@ class test1View extends WatchUi.WatchFace
 	const PROFILE_NUM_USER = 24;				// number of user profiles
 	var profileTimes = new[PROFILE_NUM_USER*2];
 	// 1st number:
-	const PROFILE_DAYS_MASK = 0x7F;				// 7 bits for days mon-sun
-	const PROFILE_BLOCK_MASK = 0x80;			// block random
+	//const PROFILE_DAYS_MASK = 0x7F;				// 7 bits for days mon-sun
+	//const PROFILE_BLOCK_MASK = 0x80;			// block random
 	//!const PROFILE_UNUSED1_MASK = 0x100;
 	//!const PROFILE_UNUSED2_MASK = 0x200;
-	const PROFILE_START_MASK = 0x7FF;
-	const PROFILE_START_SHIFT = 10;
-	const PROFILE_END_MASK = 0x7FF;
-	const PROFILE_END_SHIFT = 21;
+	//const PROFILE_START_MASK = 0x7FF;
+	//const PROFILE_START_SHIFT = 10;
+	//const PROFILE_END_MASK = 0x7FF;
+	//const PROFILE_END_SHIFT = 21;
 	// 2nd number:
-	const PROFILE_EVENTS_MASK = 0xFF;			// number of random events per day 0-255
-	const PROFILE_START_SUNRISE = 0x0100;
-	const PROFILE_START_SUNSET = 0x0200;
-	const PROFILE_END_SUNRISE = 0x0400;
-	const PROFILE_END_SUNSET = 0x0800;
+	//const PROFILE_EVENTS_MASK = 0xFF;			// number of random events per day 0-255
+	//const PROFILE_START_SUNRISE = 0x0100;
+	//const PROFILE_START_SUNSET = 0x0200;
+	//const PROFILE_END_SUNRISE = 0x0400;
+	//const PROFILE_END_SUNSET = 0x0800;
 	
 	var profileActive = PROFILE_PRIVATE_INDEX;	// currently active profile
 	var profileDelayEnd = 0;		// after manually changing settings then any automatic profile loads get delayed until this moment
@@ -987,12 +987,12 @@ class test1View extends WatchUi.WatchFace
 		var s = propertiesGetString(p).toUpper();
 		if (s.find("SUNRISE")==0)
 		{
-			t[0] = PROFILE_START_SUNRISE;
+			t[0] = 0x0100/*PROFILE_START_SUNRISE*/;
 			s = s.substring(7, s.length());
 		}
 		else if (s.find("SUNSET")==0)
 		{
-			t[0] = PROFILE_START_SUNSET;
+			t[0] = 0x0200/*PROFILE_START_SUNSET*/;
 			s = s.substring(6, s.length());
 		}
 		else
@@ -1177,6 +1177,18 @@ class test1View extends WatchUi.WatchFace
 		}
 		
 		applicationProperties.setValue("" + i, v);
+	}
+
+	(:m1normal)
+    function propertiesGetNonActiveCalories()
+    {
+		return 0;
+	}
+
+	(:m1plus)
+    function propertiesGetNonActiveCalories()
+    {
+		return propertiesGetNumber("NC");
 	}
 
 	function addStringToCharArray(s, toArray, toLen, toMax)
@@ -1393,7 +1405,8 @@ class test1View extends WatchUi.WatchFace
 				else
 				{
 					var n = (i%FIELD_NUM_PROPERTIES);
-    				propFieldData[i] = ((n==0/*FIELD_INDEX_YOFFSET*/ || n==1/*FIELD_INDEX_XOFFSET*/) ? 120 : 0);
+    				propFieldData[i] = ((n==0/*FIELD_INDEX_YOFFSET*/ || n==1/*FIELD_INDEX_XOFFSET*/) ? 120 : 
+    							((n>=3/*FIELD_INDEX_ELEMENTS*/ && (n-3)%3==2) ? 3 : 0));	// initialize colors to white (0==display, 1==visible if, 2==color)
 				}
 			}
 			
@@ -1807,7 +1820,7 @@ class test1View extends WatchUi.WatchFace
     function onExitSleep()
     {
         //System.println("Glance");
-        onOrGlanceActive = (ITEM_ON|ITEM_ONGLANCE);		// on + show on glance
+        onOrGlanceActive = (0x01/*ITEM_ON*/|0x02/*ITEM_ONGLANCE*/);		// on + show on glance
         //WatchUi.requestUpdate();
     }
 
@@ -1815,7 +1828,7 @@ class test1View extends WatchUi.WatchFace
     function onEnterSleep()
     {
         //System.println("Sleep");
-        onOrGlanceActive = ITEM_ON;			// on only
+        onOrGlanceActive = 0x01/*ITEM_ON*/;			// on only
         WatchUi.requestUpdate();
     }
 
@@ -1914,7 +1927,7 @@ class test1View extends WatchUi.WatchFace
 		{
 			// if user is retrieving field settings, or turning on/off demo profiles, then don't accept any settings changes
 			// - instead load the currently active profile to override any changes
-			if (propertiesGetNumber("FM")==ITEM_RETRIEVE || demoProfilesOn!=demoProfilesOnPrev)
+			if (propertiesGetNumber("FM")==0x10/*ITEM_RETRIEVE*/ || demoProfilesOn!=demoProfilesOnPrev)
 			{
 				loadProfile(profileActive);			// sets field management property to retrieve
 				getOrSetPropFieldDataProperties();
@@ -2020,7 +2033,7 @@ class test1View extends WatchUi.WatchFace
 		}
 		
 		var fIndex = (fNumber-1)*FIELD_NUM_PROPERTIES;		// index into field data array
-    	if (fManagement==ITEM_RETRIEVE)						// field status off/on/retrieve == retrieve
+    	if (fManagement==0x10/*ITEM_RETRIEVE*/)						// field status off/on/retrieve == retrieve
     	{
     		// set field properties from values in memory
     		for (var i=0; i<FIELD_NUM_PROPERTIES; i++)
@@ -2037,10 +2050,10 @@ class test1View extends WatchUi.WatchFace
     			}
     			else if (i==2/*FIELD_INDEX_JUSTIFICATION*/)
     			{
-    				var m = (v%FIELD_MANAGEMENT_MODULO);
+    				var m = (v%3/*FIELD_MANAGEMENT_MODULO*/);
 					applicationProperties.setValue("FM", m);
 
-    				v = (v/FIELD_MANAGEMENT_MODULO);
+    				v = (v/3/*FIELD_MANAGEMENT_MODULO*/);
     			}
     			
     			propertiesSetNumberForField(i, v);
@@ -2067,7 +2080,7 @@ class test1View extends WatchUi.WatchFace
 					}
 					else if (i==2/*FIELD_INDEX_JUSTIFICATION*/)
 					{
-						v = (fManagement%FIELD_MANAGEMENT_MODULO) + (v*FIELD_MANAGEMENT_MODULO);
+						v = (fManagement%3/*FIELD_MANAGEMENT_MODULO*/) + (v*3/*FIELD_MANAGEMENT_MODULO*/);
 					}
 					
 					propFieldData[fIndex + i] = getMinMax(v, 0, 255);	// 0 to 255 for byte array
@@ -2126,7 +2139,7 @@ class test1View extends WatchUi.WatchFace
 	 		propSecondIndicatorStyle = 0/*SECONDFONT_TRI*/;
 	 	}
 
-		if ((propSecondIndicatorOn&(ITEM_ON|ITEM_ONGLANCE))!=0)
+		if ((propSecondIndicatorOn&(0x01/*ITEM_ON*/|0x02/*ITEM_ONGLANCE*/))!=0)
 		{
 			// calculate the seconds color array
 	    	var secondColorIndex = propertiesGetColorIndex("13", 0);		// second color
@@ -2609,7 +2622,7 @@ class test1View extends WatchUi.WatchFace
     	{
     		var dataStart = f*FIELD_NUM_PROPERTIES;
     		var fJustification = propFieldData[dataStart + 2/*FIELD_INDEX_JUSTIFICATION*/];
-			if (((fJustification%FIELD_MANAGEMENT_MODULO) & onOrGlanceActive)!=0 && !propDemoDisplayOn)
+			if (((fJustification%3/*FIELD_MANAGEMENT_MODULO*/) & onOrGlanceActive)!=0 && !propDemoDisplayOn)
 			{
 				backgroundFieldInfoIndex[f] = f*FIELD_NUM_ELEMENTS_DRAW;	// index into backgroundFieldInfo arrays
 				backgroundFieldInfoCharArrayLength[f] = f*FIELD_INFO_CHAR_MAX_LEN;
@@ -2908,18 +2921,21 @@ class test1View extends WatchUi.WatchFace
 
 											if (eDisplay==80/*FIELD_HEART_BARS*/)
 											{
-												eFlags |= 0x0400/*eHeartBars*/;
-												eKern = 51/*heartBarsWidth*/;
-
 												if (checkNextHeart[0] || heartAxesNum>0)	// bars need to be drawn at same width as axes
 												{
-													eFlags |= 0x0800/*eHeartAxes*/;
+													eFlags |= (0x0400/*eHeartBars*/|0x0800/*eHeartAxes*/);
 													eKern = 55/*heartAxesWidth*/;
+												}
+												else
+												{
+													eFlags |= 0x0400/*eHeartBars*/;
+													eKern = 51/*heartBarsWidth*/;
 												}
 											}
 											else
 											{
-												eFlags |= 0x0800/*eHeartAxes*/;
+												// if axes are after the bars (i.e. not bars next) then draw bottom of axes
+												eFlags |= (checkNextHeart[0] ? 0x0800/*eHeartAxes*/ : (0x0800/*eHeartAxes*/|0x0200/*eHeartBottom*/));
 												eKern = 55/*heartAxesWidth*/;
 												heartAxesNum++;
 											}
@@ -2993,6 +3009,15 @@ class test1View extends WatchUi.WatchFace
 
 									case 90/*FIELD_ACTIVE_CALORIES*/:
 									{
+										var nonActiveCalories = propertiesGetNonActiveCalories();
+										if (nonActiveCalories<=0)
+										{
+											var userProfile = UserProfile.getProfile();
+											var BMR = (10.0/1000.0)*userProfile.weight + 6.25*userProfile.height - 5.0*(dateInfoMedium.year-userProfile.birthYear) + ((userProfile.gender==1/*GENDER_MALE*/)?5:(-161));
+											nonActiveCalories = (BMR*1.2).toNumber();
+										}
+										var calories = getNullCheckZero(activityMonitorInfo.calories) - (nonActiveCalories * timeNowInMinutesToday) / (24*60); 
+										eStr = "" + ((calories<0) ? "--" : calories);
 										break;
 									}
 
@@ -3204,7 +3229,7 @@ class test1View extends WatchUi.WatchFace
 
 	// eFlags:
 	// eUnused1 = 0x0100
-	// eUnused2 = 0x0200
+	// eHeartBottom = 0x0200
 	// eHeartBars = 0x0400
 	// eHeartAxes = 0x0800
 	// eIsIcon = 0x1000
@@ -3337,7 +3362,7 @@ class test1View extends WatchUi.WatchFace
     	{
     		var dataStart = f*FIELD_NUM_PROPERTIES;
     		var fJustification = propFieldData[dataStart + 2/*FIELD_INDEX_JUSTIFICATION*/];
-			if (((fJustification%FIELD_MANAGEMENT_MODULO) & onOrGlanceActive)!=0 && !propDemoDisplayOn)
+			if (((fJustification%3/*FIELD_MANAGEMENT_MODULO*/) & onOrGlanceActive)!=0 && !propDemoDisplayOn)
 			{
 				// draw the date        
 			    //const SCREEN_CENTRE_X = 120;
@@ -3345,7 +3370,7 @@ class test1View extends WatchUi.WatchFace
 				var dateYStart = propFieldData[dataStart + 0/*FIELD_INDEX_YOFFSET*/].toNumber();		// field y offset
 				var dateXStart = propFieldData[dataStart + 1/*FIELD_INDEX_XOFFSET*/].toNumber();		// field x offset
 
-				fJustification = fJustification/FIELD_MANAGEMENT_MODULO;	// field justification
+				fJustification = fJustification/3/*FIELD_MANAGEMENT_MODULO*/;	// field justification
 				if (fJustification==0)		// centre justify
 				{
 					dateXStart -= backgroundFieldTotalWidth[f]/2;
@@ -3382,10 +3407,11 @@ class test1View extends WatchUi.WatchFace
 							var eLen = ((w>>16) & 0xFF);
 							var curFont;
 							var dateY = dateYOffset;
-							if ((w&(0x0400/*eHeartBars*/|0x0800/*eHeartAxes*/))!=0)
+							var eHeart = (w & (0x0400/*eHeartBars*/|0x0800/*eHeartAxes*/|0x0200/*eHeartBottom*/));
+							if (eHeart!=0)
 							{
 								curFont = null;
-								drawHeartChart(useDc, dateX, dateY+6, getColorArray(backgroundFieldInfoColorIndex[i]), (w&0x0400/*eHeartBars*/)!=0, (w&0x0800/*eHeartAxes*/)!=0);		// draw heart rate chart
+								drawHeartChart(useDc, dateX, dateY+6, getColorArray(backgroundFieldInfoColorIndex[i]), eHeart);		// draw heart rate chart
 							}
 							else if ((w&0x1000/*eIsIcon*/)!=0)		// isIcon
 							{
@@ -3475,18 +3501,10 @@ class test1View extends WatchUi.WatchFace
 						if (fontTimeResource!=null)
 						{			   			
 							// align bottom of text
-							var timeY = timeYOffset;
-							if (fontTypeCur<24/*APPFONT_SYSTEM_XTINY*/)		// custom font?
-							{
-								//const timeYAdjustFontCustom = -32;
-								timeY += -32;
-							}
-							else
-							{
-								//const timeYAdjustFontSystem = 30;
-								timeY += 30 - graphics.getFontAscent(fontTimeResource);	
-							}
-			
+							// custom font if fontTypeCur<24/*APPFONT_SYSTEM_XTINY*/
+							//const timeYAdjustFontCustom = -32;
+							//const timeYAdjustFontSystem = 30;
+							var timeY = timeYOffset + ((fontTypeCur<24/*APPFONT_SYSTEM_XTINY*/) ? (-32) : (30 - graphics.getFontAscent(fontTimeResource)));
 				       		useDc.setColor(backgroundTimeColorArray[i], -1/*COLOR_TRANSPARENT*/);
 			        		useDc.drawText(timeX, timeY, fontTimeResource, backgroundTimeCharArray[i].toString(), 2/*TEXT_JUSTIFY_LEFT*/);
 			        	}
@@ -3794,7 +3812,7 @@ class test1View extends WatchUi.WatchFace
 	    	}
 	    }
     
-		if ((propSecondIndicatorOn&ITEM_ON)!=0)
+		if ((propSecondIndicatorOn&0x01/*ITEM_ON*/)!=0)
 		{ 
 	 		// it seems as though occasionally onPartialUpdate can skip a second
 	 		// so check whether that has happened, and within the same minute since last full update
@@ -3936,7 +3954,7 @@ class test1View extends WatchUi.WatchFace
 	{
 		t1 >>= startEndShift;
 		
-		if ((t1&(PROFILE_START_SUNRISE|PROFILE_START_SUNSET))!=0)
+		if ((t1&(0x0100/*PROFILE_START_SUNRISE*/|0x0200/*PROFILE_START_SUNSET*/))!=0)
 		{
 			// remove the 12 hour offset used when it is saved to storage
 			// note we add this on rather than subtracting since we are doing modulo 24*60 later (and want the value to be positive)
@@ -3944,7 +3962,7 @@ class test1View extends WatchUi.WatchFace
 		
 			// riseSetIndex==0 is sunrise
 			// riseSetIndex==1 is sunset
-			var t = sunTimes[(t1&PROFILE_START_SUNSET)/PROFILE_START_SUNSET];
+			var t = sunTimes[(t1&0x0200/*PROFILE_START_SUNSET*/)/0x0200/*PROFILE_START_SUNSET*/];
 			//var t = sunTimes[((t1&PROFILE_START_SUNRISE)!=0) ? 0 : 1];
 
 			if (t!=null)
@@ -3981,7 +3999,7 @@ class test1View extends WatchUi.WatchFace
 		var doActivate = profileActive;		// stick with current profile until told otherwise
 		doActivateGlanceCheck = -1;			// -1 used to clear profileGlance once glance is finished
 		
-		if ((onOrGlanceActive&ITEM_ONGLANCE)!=0)		// during glance
+		if ((onOrGlanceActive&0x02/*ITEM_ONGLANCE*/)!=0)		// during glance
 		{
 			if (profileGlance<0)
 			{
@@ -4030,11 +4048,11 @@ class test1View extends WatchUi.WatchFace
 				if (doActivate==PROFILE_PRIVATE_INDEX)	// not found a profile to activate yet
 				{
 					var t0 = profileTimes[i];
-					var startTime = (t0>>PROFILE_START_SHIFT)&PROFILE_START_MASK;
-					var endTime = (t0>>PROFILE_END_SHIFT)&PROFILE_END_MASK;
+					var startTime = (t0>>10/*PROFILE_START_SHIFT*/)&0x7FF/*PROFILE_START_MASK*/;
+					var endTime = (t0>>21/*PROFILE_END_SHIFT*/)&0x7FF/*PROFILE_END_MASK*/;
 
 					// see if the start or end time uses sunrise/sunset					
-					if ((t1&(PROFILE_START_SUNRISE|PROFILE_START_SUNSET|PROFILE_END_SUNRISE|PROFILE_END_SUNSET))!=0)
+					if ((t1&(0x0100/*PROFILE_START_SUNRISE*/|0x0200/*PROFILE_START_SUNSET*/|0x0400/*PROFILE_END_SUNRISE*/|0x0800/*PROFILE_END_SUNSET*/))!=0)
 					{
 						calculateSun(dateInfoShort);
 						
@@ -4060,7 +4078,7 @@ class test1View extends WatchUi.WatchFace
 					}
 				}
 
-				var numEvents = (t1&PROFILE_EVENTS_MASK);
+				var numEvents = (t1&0xFF/*PROFILE_EVENTS_MASK*/);
 				if (numEvents>0)
 				{
 					randomProfiles[randomNum] = i;
@@ -4071,7 +4089,7 @@ class test1View extends WatchUi.WatchFace
 			}
 			
 			// doActivate must be PROFILE_PRIVATE_INDEX or in range (0 to PROFILE_NUM_USER-1) when we get here
-			if (doActivate==PROFILE_PRIVATE_INDEX || (profileTimes[doActivate]&PROFILE_BLOCK_MASK)==0)
+			if (doActivate==PROFILE_PRIVATE_INDEX || (profileTimes[doActivate]&0x80/*PROFILE_BLOCK_MASK*/)==0)
 			{
 				if (profileRandom>=0)					// random already active
 				{
@@ -4137,16 +4155,8 @@ class test1View extends WatchUi.WatchFace
 				else
 				{
 					var n = propertiesGetTwoNumbers("DR");
-					n[0] = n[0] - 1;	// convert from user to code index
-					n[1] = n[1] - 1;	// convert from user to code index
-					if (n[0] < 0)
-					{
-						n[0] = 0;
-					}
-					if (n[1] > PROFILE_NUM_USER+PROFILE_NUM_PRESET - 1)
-					{
-						n[1] = PROFILE_NUM_USER+PROFILE_NUM_PRESET - 1;
-					}
+					n[0] = ((n[0]<1) ? 1 : n[0]) - 1;	// convert from user to code index
+					n[1] = ((n[1]>(PROFILE_NUM_USER+PROFILE_NUM_PRESET)) ? (PROFILE_NUM_USER+PROFILE_NUM_PRESET) : n[1]) - 1;	// convert from user to code index
 					
 	       			//System.println("DR=" + n[0] + " " + n[1]);
 
@@ -4349,15 +4359,15 @@ class test1View extends WatchUi.WatchFace
 				
 				var startTime = propertiesGetTime("PS");
 				var endTime = propertiesGetTime("PE");
-				t0 |= (startTime[1]<<PROFILE_START_SHIFT) | (endTime[1]<<PROFILE_END_SHIFT);
+				t0 |= (startTime[1]<<10/*PROFILE_START_SHIFT*/) | (endTime[1]<<21/*PROFILE_END_SHIFT*/);
 				
 				if (propertiesGetBoolean("PB"))
 				{
-					t0 |= PROFILE_BLOCK_MASK;
+					t0 |= 0x80/*PROFILE_BLOCK_MASK*/;
 				}
 
 				// add sunrise & sunset flags to random events number
-				var t1 = getMinMax(propertiesGetNumber("PR"), 0, PROFILE_EVENTS_MASK) | startTime[0] | (endTime[0]<<2);
+				var t1 = getMinMax(propertiesGetNumber("PR"), 0, 0xFF/*PROFILE_EVENTS_MASK*/) | startTime[0] | (endTime[0]<<2);
 
 				// remember the profile time
 				profileTimes[profileIndex] = t0;
@@ -4440,16 +4450,16 @@ class test1View extends WatchUi.WatchFace
 			
         	var properties = applicationProperties;		// using local variable reduces code size
 
-			properties.setValue("FM", ITEM_RETRIEVE);	// set field management to retrieve - so that properties are updated to match field settings
+			properties.setValue("FM", 0x10/*ITEM_RETRIEVE*/);	// set field management to retrieve - so that properties are updated to match field settings
 			
 			if (profileIndex>=0 && profileIndex<PROFILE_NUM_USER)	// not for private or preset profiles
 			{
 				// set the profile properties from our profile times array
 				var t0 = profileTimes[profileIndex];
 				var t1 = profileTimes[profileIndex+PROFILE_NUM_USER];
-				var days = t0&PROFILE_DAYS_MASK;
-				var startTime = (t0>>PROFILE_START_SHIFT)&PROFILE_START_MASK;
-				var endTime = (t0>>PROFILE_END_SHIFT)&PROFILE_END_MASK;
+				var days = (t0&0x7F/*PROFILE_DAYS_MASK*/);
+				var startTime = (t0>>10/*PROFILE_START_SHIFT*/)&0x7FF/*PROFILE_START_MASK*/;
+				var endTime = (t0>>21/*PROFILE_END_SHIFT*/)&0x7FF/*PROFILE_END_MASK*/;
 		
 				var daysNumber = 0;
 				for (var i=0; i<7; i++)
@@ -4462,11 +4472,11 @@ class test1View extends WatchUi.WatchFace
 				}
 				properties.setValue("PD", daysNumber);
 		
-				properties.setValue("PS", loadGetProfileTimeString(startTime, (t1&PROFILE_START_SUNRISE)!=0, (t1&PROFILE_START_SUNSET)!=0));
-				properties.setValue("PE", loadGetProfileTimeString(endTime, (t1&PROFILE_END_SUNRISE)!=0, (t1&PROFILE_END_SUNSET)!=0));
+				properties.setValue("PS", loadGetProfileTimeString(startTime, (t1&0x0100/*PROFILE_START_SUNRISE*/)!=0, (t1&0x0200/*PROFILE_START_SUNSET*/)!=0));
+				properties.setValue("PE", loadGetProfileTimeString(endTime, (t1&0x0400/*PROFILE_END_SUNRISE*/)!=0, (t1&0x0800/*PROFILE_END_SUNSET*/)!=0));
 
-				properties.setValue("PB", ((t0&PROFILE_BLOCK_MASK)!=0));
-				properties.setValue("PR", (t1&PROFILE_EVENTS_MASK));		
+				properties.setValue("PB", ((t0&0x80/*PROFILE_BLOCK_MASK*/)!=0));
+				properties.setValue("PR", (t1&0xFF/*PROFILE_EVENTS_MASK*/));		
 			}
 		}
 	}
@@ -4914,13 +4924,13 @@ class test1View extends WatchUi.WatchFace
 	//const heartAxesWidth = 55;	(12/*heartNumBins*/*4/*heartOneBarWidth*/ + 3 + 2*2/*heartChartXOffset*/)
 	//const heartChartWidth = 52;	(12/*heartNumBins*/*4/*heartOneBarWidth*/ + 2*2/*heartChartXOffset*/)
 
-	function drawHeartChart(useDc, x, y, color, barsOrAxes, useAxesWidth)
-	{	
+	function drawHeartChart(useDc, x, y, color, eHeart)
+	{
+		x += (((eHeart&0x0800/*eHeartAxes*/)!=0) ? 2 + 2/*heartChartXOffset*/ : 2/*heartChartXOffset*/);
+
 		useDc.setColor(color, -1/*COLOR_TRANSPARENT*/);
 
-		x += (useAxesWidth ? 2 + 2/*heartChartXOffset*/ : 2/*heartChartXOffset*/);
-
-		if (barsOrAxes)
+		if ((eHeart&0x0400/*eHeartBars*/)!=0)
 		{
 			// draw the bars
 			for (var i=0; i<12/*heartNumBins*/; i++)
@@ -4935,9 +4945,12 @@ class test1View extends WatchUi.WatchFace
 		else
 		{
 			// draw the axes
-			useDc.fillRectangle(x-2, y - 20/*heartChartHeight*/, 1, 20/*heartChartHeight*/);				// left
-			useDc.fillRectangle(x+(4/*heartOneBarWidth*/*12/*heartNumBins*/), y-20/*heartChartHeight*/, 1, 20/*heartChartHeight*/);		// right
-			useDc.fillRectangle(x-2, y, (4/*heartOneBarWidth*/*12/*heartNumBins*/)+3, 1);				// bottom
+			useDc.fillRectangle(x-2, y - 20/*heartChartHeight*/, 1, 20/*heartChartHeight*/+1);				// left
+			useDc.fillRectangle(x+(4/*heartOneBarWidth*/*12/*heartNumBins*/), y-20/*heartChartHeight*/, 1, 20/*heartChartHeight*/+1);		// right
+			if ((eHeart&0x0200/*eHeartBottom*/)!=0)
+			{
+				useDc.fillRectangle(x-1, y, (4/*heartOneBarWidth*/*12/*heartNumBins*/)+1, 1);				// bottom
+			}
 		}
 	}
 

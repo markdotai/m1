@@ -260,7 +260,16 @@
     </setting>
 
     <setting propertyKey="@Properties.FN" title="@Strings.FieldNumberTitle">
-        <settingConfig type="numeric" />
+        <settingConfig type="list">
+            <listEntry value="1">@Strings.Field1</listEntry>
+            <listEntry value="2">@Strings.Field2</listEntry>
+            <listEntry value="3">@Strings.Field3</listEntry>
+            <listEntry value="4">@Strings.Field4</listEntry>
+            <listEntry value="5">@Strings.Field5</listEntry>
+            <listEntry value="6">@Strings.Field6</listEntry>
+            <listEntry value="7">@Strings.Field7</listEntry>
+            <listEntry value="8">@Strings.Field8</listEntry>
+        </settingConfig>
     </setting>
 
     <setting propertyKey="@Properties.F0" title="@Strings.FieldYOffsetTitle">
@@ -1336,6 +1345,10 @@
 
     <setting propertyKey="@Properties.SA" title="@Strings.SunAltitudeAdjustTitle">
         <settingConfig type="boolean" />
+    </setting>
+
+    <setting propertyKey="@Properties.NC" title="@Strings.NonActiveCalorieOverrideTitle">
+        <settingConfig type="numeric" />
     </setting>
 
 </settings>

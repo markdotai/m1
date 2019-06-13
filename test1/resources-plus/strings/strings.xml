@@ -1,28 +1,17 @@
 <strings>
 
 <!-- 
-    <string id="Unused1">X</string>
-    
 	intensity minutes day
 	intensity goal (day = weekly/7)
 
 	ascent
 	descent
 	ascent/descent units (m/ft)
-    <string id="Unused43">Mountain Icon</string>
 	
-   steps percentage
-   intensity percentage
+   	steps percentage
+   	intensity percentage
    
-   ring 2nd time zone hours
-   ring intensity minutes (weekly)
-   ring smart intensity minutes
-   ring heart rate
-   ring heart rate min & max
-   ring sunrise & sunset (midnight top)
-   ring sunrise & sunset (noon top)
-   ring sunrise & sunset (not top)
-   ring distance? 10km or 6mi?
+    ring distance? 10km or 6mi?
  
     <string id="Unused29">Heart Rate Increasing</string>
     <string id="Unused30">Heart Rate Decreasing</string>
@@ -37,24 +26,22 @@
     <string id="Unused50">Battery Horizontal Icon</string>
     <string id="Unused51">Battery Horizontal Icon (solid)</string>
     <string id="Unused24">Lightning Icon</string>
- -->
- 
- <!--
- Feature from M1+
-                
+
+    <string id="Unused1">Intensity Goal Reached (weekly goal)</string>
+    <string id="Unused1">Intensity Goal Not Reached (weekly goal)</string>
+    <string id="Unused1">Smart Intensity Goal Reached (increasing daily)</string>
+    <string id="Unused1">Smart Intensity Goal Not Reached (increasing daily)</string>
+	steps goal reached
+	steps goal not reached
+	floors goal reached
+	floors goal not reached
+
 setting M1+    <string id="Unused1">BMR Calorie Value Override</string>
     
-?    <string id="Unused1">Intensity Goal Reached (weekly goal)</string>
-?    <string id="Unused1">Intensity Goal Not Reached (weekly goal)</string>
-?    <string id="Unused1">Smart Intensity Goal Reached (increasing daily)</string>
-?    <string id="Unused1">Smart Intensity Goal Not Reached (increasing daily)</string>
-?	steps goal reached
-?	steps goal not reached
-?	floors goal reached
-?	floors goal not reached
-
 setting    <string id="Unused1">Icon Font Size</string>
 
+Feature from M1+
+                
     <string id="Unused1">X</string>
     <string id="Unused2">X</string>
     <string id="Unused3">X</string>
@@ -76,20 +63,6 @@ setting    <string id="Unused1">Icon Font Size</string>
     <string id="Unused19">X</string>
     <string id="Unused20">X</string>
     <string id="Unused21">X</string>
-    <string id="Unused22">X</string>
-    <string id="Unused23">X</string>
-    <string id="Unused24">X</string>
-    <string id="Unused25">X</string>
-    <string id="Unused26">X</string>
-    <string id="Unused27">X</string>
-    <string id="Unused28">X</string>
-    <string id="Unused29">X</string>
-    <string id="Unused30">X</string>
-    <string id="Unused31">X</string>
-    <string id="Unused32">X</string>
-    <string id="Unused33">X</string>
-    <string id="Unused34">X</string>
-    <string id="Unused35">X</string>
  -->
      
     <string id="AppName">M1+</string>
@@ -97,6 +70,15 @@ setting    <string id="Unused1">Icon Font Size</string>
     <string id="AppName">M1+</string>
     <string id="AppName">M1+beta</string>
  -->
+
+    <string id="Field1">1</string>
+    <string id="Field2">2</string>
+    <string id="Field3">3</string>
+    <string id="Field4">4</string>
+    <string id="Field5">5</string>
+    <string id="Field6">6</string>
+    <string id="Field7">7</string>
+    <string id="Field8">8</string>
 
     <string id="BackgroundColorTitle">Background Color (RRGGBB/0-63)</string>
     
@@ -182,8 +164,8 @@ setting    <string id="Unused1">Icon Font Size</string>
     <string id="ProfileManagementTitle">Profile Management (save/load settings above to watch/profile)</string>
     <string id="ProfileNumberTitle">Profile Number To Save/Load (1-24) (or presets 25+)</string>
     <string id="ProfileDaysTitle">Profile Activation Days (of week 1-7, e.g. 456 or 71 or 1234567)</string>
-    <string id="ProfileStartTimeTitle">Profile Start Time (HH:MM activate from this time)</string>
-    <string id="ProfileEndTimeTitle">Profile End Time (HH:MM activate until this time)</string>
+    <string id="ProfileStartTimeTitle">Profile Start Time [Sunrise+-] HH:MM (activate from this time)</string>
+    <string id="ProfileEndTimeTitle">Profile End Time [Sunset+-] HH:MM (activate until this time)</string>
     <string id="ProfileBlockTitle">Profile Block Random (while this profile is active, block random events)</string>
     <string id="ProfileRandomTitle">Profile Random Events (number per day for this profile)</string>
 
@@ -194,6 +176,7 @@ setting    <string id="Unused1">Icon Font Size</string>
     <string id="ExportFieldsTitle">Export/Import Fields Text (use profile management above)</string>
 
 	<string id="SunAltitudeAdjustTitle">Sunrise/Sunset Altitude Adjustment</string>
+	<string id="NonActiveCalorieOverrideTitle">Non-Active Calorie Override (0 for not set, or BMR x 1.2)</string>
 
     <string id="FieldRetrieveSettings">Retrieve (settings will not be updated)</string>
 

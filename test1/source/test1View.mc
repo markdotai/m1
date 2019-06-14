@@ -4203,18 +4203,21 @@ class test1View extends WatchUi.WatchFace
     	
 	function parseSign(charArray, charArraySize)
 	{
-   		var c = charArray[parseIndex].toNumber();
-		if (c==45/*APPCHAR_MINUS*/)
-		{
-			parseIndex++;
-			return -1;
+		if (parseIndex<charArraySize)
+		{	
+	   		var c = charArray[parseIndex].toNumber();
+			if (c==45/*APPCHAR_MINUS*/)
+			{
+				parseIndex++;
+				return -1;
+			}
+			else if (c==43/*APPCHAR_PLUS*/)
+			{
+				parseIndex++;
+				// return 1; below
+			}
 		}
-		else if (c==43/*APPCHAR_PLUS*/)
-		{
-			parseIndex++;
-			// return 1; below
-		}
-
+		
 		return 1;
 	}
 

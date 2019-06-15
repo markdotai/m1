@@ -4801,7 +4801,7 @@ class test1View extends WatchUi.WatchFace
 	var heartSampledSecond = 0;
 	var heartSamples = new[60]b;
 
-	var heartMaxZone5;
+	var heartMaxZone5 = 200;
 
 	function initHeartSamples(timeNowValue)
 	{
@@ -4813,10 +4813,14 @@ class test1View extends WatchUi.WatchFace
 			heartDisplayBins[i/5/*heartBinSize*/] = 0;
 		}
 		
-		heartMaxZone5 = UserProfile.getHeartRateZones(0/*UserProfile.HR_ZONE_SPORT_GENERIC*/)[5];
-		if (heartMaxZone5==null || heartMaxZone5<=0)	// max must be at least 1 to avoid potential zero divide
+		var heartRateZones = UserProfile.getHeartRateZones(0/*UserProfile.HR_ZONE_SPORT_GENERIC*/);
+		if (heartRateZones!=null && (heartRateZones instanceof Array) && heartRateZones.size()>5)
 		{
-			heartMaxZone5 = 200;
+			heartMaxZone5 = heartRateZones[5];
+			if (heartMaxZone5==null || heartMaxZone5<=0)	// max must be at least 1 to avoid potential zero divide
+			{
+				heartMaxZone5 = 200;
+			}
 		}
 	}
 

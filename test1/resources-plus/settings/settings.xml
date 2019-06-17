@@ -1,6 +1,6 @@
 <settings>
 
-    <setting propertyKey="@Properties.1" title="@Strings.BackgroundColorTitle">
+    <setting propertyKey="@Properties.1" title="@Strings.BackgroundColorTitle" helpUrl="http://bit.ly/m1_colors">
         <settingConfig type="alphaNumeric" maxLength="6" />
     </setting>
 
@@ -113,7 +113,7 @@
         </settingConfig>
     </setting>
 
-    <setting propertyKey="@Properties.13" title="@Strings.SecondColorTitle">
+    <setting propertyKey="@Properties.13" title="@Strings.SecondColorTitle" helpUrl="http://bit.ly/m1_colors">
         <settingConfig type="alphaNumeric" maxLength="6" />
     </setting>
 
@@ -166,7 +166,7 @@
         </settingConfig>
     </setting>
 
-    <setting propertyKey="@Properties.22" title="@Strings.OuterColorFilledTitle">
+    <setting propertyKey="@Properties.22" title="@Strings.OuterColorFilledTitle" helpUrl="http://bit.ly/m1_colors">
         <settingConfig type="alphaNumeric" maxLength="6" />
     </setting>
 
@@ -230,7 +230,7 @@
         </settingConfig>
     </setting>
 
-    <setting propertyKey="@Properties.28" title="@Strings.FieldMoveBarOffColorTitle">
+    <setting propertyKey="@Properties.28" title="@Strings.FieldMoveBarOffColorTitle" helpUrl="http://bit.ly/m1_colors">
         <settingConfig type="alphaNumeric" maxLength="6" />
     </setting>
 
@@ -447,7 +447,7 @@
         </settingConfig>
     </setting>
 
-    <setting propertyKey="@Properties.F5" title="@Strings.ItemColorTitle">
+    <setting propertyKey="@Properties.F5" title="@Strings.ItemColorTitle" helpUrl="http://bit.ly/m1_colors">
         <settingConfig type="alphaNumeric" maxLength="6" />
     </setting>
 
@@ -610,7 +610,7 @@
         </settingConfig>
     </setting>
 
-    <setting propertyKey="@Properties.F8" title="@Strings.ItemColorTitle">
+    <setting propertyKey="@Properties.F8" title="@Strings.ItemColorTitle" helpUrl="http://bit.ly/m1_colors">
         <settingConfig type="alphaNumeric" maxLength="6" />
     </setting>
 
@@ -773,7 +773,7 @@
         </settingConfig>
     </setting>
 
-    <setting propertyKey="@Properties.F11" title="@Strings.ItemColorTitle">
+    <setting propertyKey="@Properties.F11" title="@Strings.ItemColorTitle" helpUrl="http://bit.ly/m1_colors">
         <settingConfig type="alphaNumeric" maxLength="6" />
     </setting>
 
@@ -936,7 +936,7 @@
         </settingConfig>
     </setting>
 
-    <setting propertyKey="@Properties.F14" title="@Strings.ItemColorTitle">
+    <setting propertyKey="@Properties.F14" title="@Strings.ItemColorTitle" helpUrl="http://bit.ly/m1_colors">
         <settingConfig type="alphaNumeric" maxLength="6" />
     </setting>
 
@@ -1099,7 +1099,7 @@
         </settingConfig>
     </setting>
 
-    <setting propertyKey="@Properties.F17" title="@Strings.ItemColorTitle">
+    <setting propertyKey="@Properties.F17" title="@Strings.ItemColorTitle" helpUrl="http://bit.ly/m1_colors">
         <settingConfig type="alphaNumeric" maxLength="6" />
     </setting>
 
@@ -1262,7 +1262,7 @@
         </settingConfig>
     </setting>
 
-    <setting propertyKey="@Properties.F20" title="@Strings.ItemColorTitle">
+    <setting propertyKey="@Properties.F20" title="@Strings.ItemColorTitle" helpUrl="http://bit.ly/m1_colors">
         <settingConfig type="alphaNumeric" maxLength="6" />
     </setting>
 

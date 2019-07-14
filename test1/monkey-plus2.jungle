@@ -1,0 +1,13 @@
+project.manifest = manifest-plus2.xml
+
+
+
+
+#m1plus2 jungle file
+
+base.resourcePath = $(base.resourcePath);resources-plus
+
+base.excludeAnnotations = exclude;m1normal
+#fenix5xplus.excludeAnnotations = older
+
+

@@ -15,6 +15,8 @@ class test1View extends WatchUi.WatchFace
 	//const forceDemoProfiles = false;
 	//const forceDemoFontStyles = false;
 
+	var isTurkish = false;
+
 	var firstUpdateSinceInitialize = true;
 
 	var settingsHaveChanged = false;
@@ -120,6 +122,7 @@ class test1View extends WatchUi.WatchFace
     
 	var hasDoNotDisturb;
 	var hasLTE;
+	var hasFloorsClimbed;
 
 	var fieldActivePhoneStatus = null;
 	var fieldActiveNotificationsStatus = null;
@@ -778,12 +781,17 @@ class test1View extends WatchUi.WatchFace
         var deviceSettings = System.getDeviceSettings();	// 960 bytes, but uses less code memory 
 		hasDoNotDisturb = (deviceSettings has :doNotDisturb);
 		hasLTE = (deviceSettings.connectionInfo[:lte]!=null);
+		hasFloorsClimbed = ActivityMonitor.Info has :floorsClimbed;
 
 		// need to seed the random number generator?
 		//var clockTime = System.getClockTime();
 		//var seed = clockTime.sec + clockTime.min*60 + clockTime.hour*(60*60) + System.getTimer();
 		//Math.srand(seed);
 				
+		var tempStr = WatchUi.loadResource(Rez.Strings.Turkish);
+		isTurkish = (tempStr!=null && tempStr.length()>0);
+		tempStr = null;
+
         iconsFontResource = watchUi.loadResource(fonts.id_icons);
 
 		outerFontResource = watchUi.loadResource(fonts.id_outer);
@@ -1830,14 +1838,13 @@ class test1View extends WatchUi.WatchFace
 			
 										if (propFieldFont < 24/*APPFONT_SYSTEM_XTINY*/)		// custom font
 										{ 
-											var tempStr = eStr.toUpper();				// custom fonts always upper case
-											eUseUnsupportedFont = useUnsupportedFieldFont(tempStr);
+											eUseUnsupportedFont = (isTurkish || useUnsupportedFieldFont(eStr.toUpper()));
 											if (eUseUnsupportedFont)
 											{
 												// will be using system font - so use case for that as specified by user
-												if (fontSystemCase==1)	// APPCASE_UPPER = 1
+												if (fontSystemCase==1 && !isTurkish)	// APPCASE_UPPER = 1
 												{
-													eStr = tempStr;
+													eStr = eStr.toUpper();
 												}
 												else if (fontSystemCase==2)	// APPCASE_LOWER = 2
 												{
@@ -1850,12 +1857,12 @@ class test1View extends WatchUi.WatchFace
 											}
 											else
 											{
-												eStr = tempStr;		// ok to use
+												eStr = eStr.toUpper();				// custom fonts always upper case
 											}
 										}
 										else
 										{
-											if (fontSystemCase==1)	// APPCASE_UPPER = 1
+											if (fontSystemCase==1 && !isTurkish)	// APPCASE_UPPER = 1
 											{
 												eStr = eStr.toUpper();
 											}
@@ -1969,13 +1976,13 @@ class test1View extends WatchUi.WatchFace
 			
 									case 33/*FIELD_FLOORSCOUNT*/:
 									{
-										eStr = "" + activityMonitorInfo.floorsClimbed;
+										eStr = "" + (hasFloorsClimbed ? activityMonitorInfo.floorsClimbed : 0);
 										break;
 									}
 			
 									case 34/*FIELD_FLOORSGOAL*/:
 									{
-										eStr = "" + activityMonitorInfo.floorsClimbedGoal;
+										eStr = "" + (hasFloorsClimbed ? activityMonitorInfo.floorsClimbedGoal : 0);
 										break;
 									}
 			
